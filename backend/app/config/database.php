@@ -1,8 +1,6 @@
 <?php
 
-/**
- * Fungsi sederhana untuk membaca file .env secara manual
- */
+
 function loadEnv($filePath) {
     if (!file_exists($filePath)) {
         return;
