@@ -109,7 +109,7 @@ $namaUser = $isLogin
           </svg>
 
           <span>
-            Halo,
+            
             <?= htmlspecialchars(
                 $namaUser,
                 ENT_QUOTES,
