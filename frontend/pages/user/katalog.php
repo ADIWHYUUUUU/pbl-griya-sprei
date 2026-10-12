@@ -51,7 +51,7 @@ $email     = "griyasprei@gmail.com";
     </section>
 
     <section class="grid" id="productGrid" aria-live="polite"></section>
-
+    
     <nav class="pagination" id="pagination" aria-label="Halaman"></nav>
   </main>
 

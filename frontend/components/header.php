@@ -139,7 +139,11 @@ $namaUser = $isLogin
             href="/frontend/pages/user/index.php"
             class="user-dropdown__item"
           >
-            Beranda Customer
+            <?= htmlspecialchars(
+                $_SESSION['email'] ?? '',
+                ENT_QUOTES,
+                'UTF-8'
+            ); ?>
           </a>
 
           <div class="user-dropdown__divider"></div>
