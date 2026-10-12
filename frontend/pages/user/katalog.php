@@ -17,30 +17,12 @@ $email     = "griyasprei@gmail.com";
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
 </head>
 <body>
 
-  <header class="header">
-    <div class="brand">
-      <img class="brand__logo" src="assets/images/logo.png" alt="Logo <?php echo $nama_toko; ?>">
-      <div>
-        <h1 class="brand__name"><?php echo $nama_toko; ?></h1>
-        <p class="brand__tagline"><?php echo $tagline; ?></p>
-      </div>
-    </div>
-
-    <nav class="nav" aria-label="Navigasi utama">
-      <a href="#" class="nav__link nav__link--active">Katalog Produk</a>
-      <a href="#" class="nav__link">Keranjang</a>
-      <a href="#" class="nav__link">Pembayaran</a>
-      <a href="#" class="nav__link">Riwayat Pemesanan</a>
-    </nav>
-
-    <button class="avatar" aria-label="Akun saya">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="#222"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>
-    </button>
-  </header>
+ <?php require __DIR__ . '/../../components/header.php'; ?>
 
   <main class="container">
 
