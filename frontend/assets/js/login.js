@@ -20,29 +20,26 @@ const rememberBox = document.getElementById("remember");
 const MIN_PASSWORD = 6;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
 /* =========================================
    2. VALIDASI
    ========================================= */
 
 function validateEmail() {
-    const valid = EMAIL_PATTERN.test(emailInput.value.trim());
+  const valid = EMAIL_PATTERN.test(emailInput.value.trim());
 
-    emailField.classList.toggle("field--error", !valid);
+  emailField.classList.toggle("field--error", !valid);
 
-    return valid;
+  return valid;
 }
-
 
 function validatePassword() {
-    const valid = passwordInput.value.length >= MIN_PASSWORD;
+  const valid = passwordInput.value.length >= MIN_PASSWORD;
 
-    passwordField.classList.toggle("field--error", !valid);
-    passwordHint.hidden = valid;
+  passwordField.classList.toggle("field--error", !valid);
+  passwordHint.hidden = valid;
 
-    return valid;
+  return valid;
 }
-
 
 /* =========================================
    3. FITUR INPUT
@@ -50,125 +47,97 @@ function validatePassword() {
 
 // Tombol hapus email
 emailInput.addEventListener("input", () => {
+  clearEmailBtn.hidden = emailInput.value === "";
 
-    clearEmailBtn.hidden = emailInput.value === "";
-
-    if (emailField.classList.contains("field--error")) {
-        validateEmail();
-    }
+  if (emailField.classList.contains("field--error")) {
+    validateEmail();
+  }
 });
-
 
 clearEmailBtn.addEventListener("click", () => {
+  emailInput.value = "";
+  clearEmailBtn.hidden = true;
 
-    emailInput.value = "";
-    clearEmailBtn.hidden = true;
-
-    emailInput.focus();
+  emailInput.focus();
 });
-
 
 // Tombol tampilkan / sembunyikan password
 toggleBtn.addEventListener("click", () => {
+  const isHidden = passwordInput.type === "password";
 
-    const isHidden = passwordInput.type === "password";
+  passwordInput.type = isHidden ? "text" : "password";
 
-    passwordInput.type = isHidden ? "text" : "password";
+  toggleBtn.setAttribute(
+    "aria-label",
+    isHidden ? "Sembunyikan kata sandi" : "Tampilkan kata sandi",
+  );
 
-    toggleBtn.setAttribute(
-        "aria-label",
-        isHidden
-            ? "Sembunyikan kata sandi"
-            : "Tampilkan kata sandi"
-    );
-
-    toggleBtn.style.color = isHidden ? "var(--green)" : "";
+  toggleBtn.style.color = isHidden ? "var(--green)" : "";
 });
-
 
 passwordInput.addEventListener("input", () => {
-
-    if (passwordField.classList.contains("field--error")) {
-        validatePassword();
-    }
+  if (passwordField.classList.contains("field--error")) {
+    validatePassword();
+  }
 });
-
 
 emailInput.addEventListener("blur", () => {
-
-    if (emailInput.value !== "") {
-        validateEmail();
-    }
+  if (emailInput.value !== "") {
+    validateEmail();
+  }
 });
-
 
 /* =========================================
    4. SUBMIT LOGIN
    ========================================= */
 
 form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    e.preventDefault();
+  const emailOk = validateEmail();
+  const passwordOk = validatePassword();
 
-    const emailOk = validateEmail();
-    const passwordOk = validatePassword();
+  if (!emailOk || !passwordOk) {
+    return;
+  }
 
-    if (!emailOk || !passwordOk) {
-        return;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  const formData = new FormData();
+
+  formData.append("email", email);
+  formData.append("password", password);
+
+  try {
+    const response = await fetch("../../backend/actions/login.php", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    // Login gagal
+    if (!result.success) {
+      alert(result.message);
+      return;
     }
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-
-    const formData = new FormData();
-
-    formData.append("email", email);
-    formData.append("password", password);
-
-
-    try {
-
-        const response = await fetch(
-            "../../backend/actions/login.php",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-        const result = await response.json();
-
-
-        // Login gagal
-        if (!result.success) {
-            alert(result.message);
-            return;
-        }
-
-
-        // Fitur ingat email
-        if (rememberBox.checked) {
-            localStorage.setItem("userEmail", email);
-        } else {
-            localStorage.removeItem("userEmail");
-        }
-
-
-        // Redirect mengikuti AuthController
-        window.location.href = result.redirect;
-
-
-    } catch (error) {
-
-        console.error("ERROR LOGIN:", error);
-
-        alert(
-            "Terjadi kesalahan saat login. Cek Console F12."
-        );
+    // Fitur ingat email
+    if (rememberBox.checked) {
+      localStorage.setItem("userEmail", email);
+    } else {
+      localStorage.removeItem("userEmail");
     }
 
+    // Redirect mengikuti AuthController
+    window.location.href = result.redirect;
+  } catch (error) {
+    console.error("ERROR LOGIN:", error);
+
+    alert("Terjadi kesalahan saat login. Cek Console F12.");
+  }
 });
-
 
 /* =========================================
    5. FITUR INGAT SAYA
@@ -177,10 +146,9 @@ form.addEventListener("submit", async (e) => {
 const savedEmail = localStorage.getItem("userEmail");
 
 if (savedEmail) {
+  emailInput.value = savedEmail;
 
-    emailInput.value = savedEmail;
+  clearEmailBtn.hidden = false;
 
-    clearEmailBtn.hidden = false;
-
-    rememberBox.checked = true;
+  rememberBox.checked = true;
 }

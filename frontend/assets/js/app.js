@@ -9,19 +9,24 @@ const products = window.catalogProducts ?? [];
 const ITEMS_PER_PAGE = 8;
 const state = { search: "", category: "all", size: "all", page: 1 };
 
-const grid        = document.getElementById("productGrid");
-const pagination  = document.getElementById("pagination");
+const grid = document.getElementById("productGrid");
+const pagination = document.getElementById("pagination");
 const searchInput = document.getElementById("searchInput");
-const sizeFilter  = document.getElementById("sizeFilter");
-const chips       = document.querySelectorAll(".chip");
+const sizeFilter = document.getElementById("sizeFilter");
+const chips = document.querySelectorAll(".chip");
 
-const escapeHTML = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-}[character]));
+const escapeHTML = (value) =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[character],
+  );
 
 /* =========================================
    3. FUNGSI BANTU
@@ -31,8 +36,11 @@ const formatRupiah = (n) => "Rp " + n.toLocaleString("id-ID");
 function getFilteredProducts() {
   const keyword = state.search.toLowerCase();
   return products.filter((p) => {
-    const matchText = (p.name + " " + p.desc + " " + p.type).toLowerCase().includes(keyword);
-    const matchCategory = state.category === "all" || p.category === state.category;
+    const matchText = (p.name + " " + p.desc + " " + p.type)
+      .toLowerCase()
+      .includes(keyword);
+    const matchCategory =
+      state.category === "all" || p.category === state.category;
     const matchSize = state.size === "all" || p.size === state.size;
     return matchText && matchCategory && matchSize;
   });
