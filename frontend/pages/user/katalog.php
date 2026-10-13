@@ -1,4 +1,29 @@
 <?php
+require_once __DIR__ . '/../../../backend/app/controllers/ProductController.php';
+
+$productController = new ProductController();
+$catalogProducts = array_map(static function ($product) {
+  $dimensions = array_filter([
+    $product['panjang_standar'] ?? null,
+    $product['lebar_standar'] ?? null,
+    $product['tinggi_standar'] ?? null,
+  ], static fn ($dimension) => $dimension !== null && $dimension !== '');
+  $category = (string) ($product['kategori_produk'] ?? '');
+  $imageName = $product['gambar_produk'] ?? '';
+
+  return [
+    'name' => $product['nama_produk'] ?? '',
+    'type' => $category,
+    'category' => stripos($category, 'bedcover') !== false ? 'bedcover' : 'sprei',
+    'size' => implode(' × ', $dimensions),
+    'price' => (float) ($product['harga_dasar'] ?? 0),
+    'color' => '#e8e4d8',
+    'desc' => $product['deskripsi'] ?? '',
+    'image' => $imageName !== ''
+      ? '/backend/public/uploads/' . rawurlencode(basename($imageName))
+      : '',
+  ];
+}, $productController->getAllProducts());
 
 $nama_toko = "Griya Sprei";
 $tagline   = "Homemade Pillow, Bolster, Sprei, Bedcover, Etc.";
@@ -27,10 +52,7 @@ $email     = "griyasprei@gmail.com";
 
   <main class="container">
 
-    <section class="hero">
-      <h2 class="hero__title">Sprei dan Bedcover</h2>
-      <p class="hero__text">Tersedia pilihan ukuran dan berbagai macam motif yang sesuai dengan keinginan anda.</p>
-    </section>
+    
 
     <section class="toolbar">
       <label class="search">
@@ -56,28 +78,17 @@ $email     = "griyasprei@gmail.com";
     <nav class="pagination" id="pagination" aria-label="Halaman"></nav>
   </main>
 
-  <footer class="footer">
-    <div class="footer__item">
-      <span class="footer__icon">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-      </span>
-      <?php echo $alamat; ?>
-    </div>
-    <div class="footer__item">
-      <span class="footer__icon">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
-      </span>
-      <?php echo $instagram; ?>
-    </div>
-    <div class="footer__item">
-      <span class="footer__icon">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-      </span>
-      <?php echo $email; ?>
-    </div>
-  </footer>
+  <!-- ===== FOOTER COMPONENT ===== -->
 
-  <script src="assets/js/app.js"></script>
+<?php require __DIR__ . '/../../components/footer.php'; ?>
+
+  <script>
+    window.catalogProducts = <?= json_encode(
+      $catalogProducts,
+      JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+    ); ?>;
+  </script>
+  <script src="../../assets/js/app.js"></script>
 </body>
 </html>
 

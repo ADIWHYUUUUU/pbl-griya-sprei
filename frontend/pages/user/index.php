@@ -41,12 +41,10 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
 
 <body>
 
-  <!-- ===== HEADER ===== -->
+ 
 
 <?php require __DIR__ . '/../../components/header.php'; ?>
 
-
-  <!-- ===== MAIN CONTENT ===== -->
 
   <main class="container">
 
@@ -261,81 +259,10 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
   </main>
 
 
-  <!-- ===== FOOTER ===== -->
-
-  <footer class="footer">
-
-    <div class="footer__inner">
-
-      <div>
-
-        <h3 class="footer__title">
-          Griya Sprei Malang
-        </h3>
-
-        <p class="footer__text">
-          Melayani sprei, bed cover, sarung bantal,
-          dan sarung guling untuk rumah tangga,
-          kos, homestay, hingga rumah sakit sejak 2010.
-        </p>
-
-        <p class="footer__text">
-          Jl. Kanjuruhan Asri No. 8,
-          Tlogomas, Lowokwaru, Kota Malang
-        </p>
-
-      </div>
+  
+<?php require __DIR__ . '/../../components/footer.php'; ?>
 
 
-      <div>
-
-        <h3 class="footer__title">
-          Kontak Kami
-        </h3>
-
-        <ul class="footer__list">
-
-          <li>+62 812-3456-7890</li>
-          <li>@produksispreikatun</li>
-          <li>griyasprei@gmail.com</li>
-
-        </ul>
-
-      </div>
-
-
-      <div>
-
-        <h3 class="footer__title">
-          Tautan
-        </h3>
-
-        <ul class="footer__list">
-
-          <li>
-            <a href="/frontend/pages/katalog.php">
-              Katalog
-            </a>
-          </li>
-
-          <li>
-            <a href="#">Pembayaran</a>
-          </li>
-
-          <li>
-            <a href="#">Riwayat Pesanan</a>
-          </li>
-
-        </ul>
-
-      </div>
-
-    </div>
-
-  </footer>
-
-
-  <!-- ===== JAVASCRIPT ===== -->
 
   <script src="/frontend/assets/js/data.js"></script>
   <script src="/frontend/assets/js/beranda.js"></script>

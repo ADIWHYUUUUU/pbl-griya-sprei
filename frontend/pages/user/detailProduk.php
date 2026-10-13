@@ -195,44 +195,7 @@ function aman($teks) {
     </div>
   </main>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="footer">
-    <div class="footer__inner">
-      <div>
-        <h3 class="footer__title">Griya Sprei Malang</h3>
-        <p class="footer__text">Melayani sprei, bed cover, sarung bantal, dan sarung guling untuk rumah tangga, kos, homestay, hingga rumah sakit sejak 2010.</p>
-        <p class="footer__text" style="display:flex;align-items:center;gap:8px;margin-top:24px;">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
-          Jl. Kanjuruhan Asri No. 8, Tlogomas, Lowokwaru, Kota Malang
-        </p>
-      </div>
-      <div>
-        <h3 class="footer__title">Kontak Kami</h3>
-        <ul class="footer__list">
-          <li style="display:flex;align-items:center;gap:8px;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
-            +62 812-3456-7890
-          </li>
-          <li style="display:flex;align-items:center;gap:8px;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
-            @produksispreikatun
-          </li>
-          <li style="display:flex;align-items:center;gap:8px;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-            griyasprei@gmail.com
-          </li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="footer__title">Tautan</h3>
-        <ul class="footer__list">
-<?php foreach ($tautan as $t) { ?>
-          <li><a href="<?php echo $t["link"]; ?>"><?php echo $t["label"]; ?></a></li>
-<?php } ?>
-        </ul>
-      </div>
-    </div>
-  </footer>
+  <?php require __DIR__ . '/../../components/footer.php'; ?>
 
   <script src="../assets/js/data.js"></script>
   <script src="../assets/js/detail.js"></script>

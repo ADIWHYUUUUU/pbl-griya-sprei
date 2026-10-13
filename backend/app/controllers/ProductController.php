@@ -10,6 +10,10 @@ class ProductController {
         $this->model = new ProductModel($pdo);
     }
 
+    public function getAllProducts() {
+        return $this->model->getAllProducts();
+    }
+
     
     public function create() {
         require_once __DIR__ . '/../views/produk/tambah.php';
@@ -55,7 +59,7 @@ class ProductController {
         }
     }
 
-    // 1. Menampilkan halaman form edit beserta data lama produk
+   
     public function edit($id) {
         // Ambil data produk berdasarkan id untuk ditampilkan di form
         $product = $this->model->getProductById($id); // (Pastikan nanti buat fungsi ini di Model jika belum ada)

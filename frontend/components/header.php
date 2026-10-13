@@ -57,7 +57,7 @@ $namaUser = $isLogin
     </a>
 
     <a href="#" class="nav__link">
-      Riwayat Pesanan
+      Pesanan Saya
     </a>
 
   </nav>
