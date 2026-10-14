@@ -195,6 +195,7 @@ function aman($teks) {
     </div>
   </main>
 
+<<<<<<< HEAD
   <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="footer__inner">
@@ -233,6 +234,9 @@ function aman($teks) {
       </div>
     </div>
   </footer>
+=======
+  <?php require __DIR__ . '/../../components/footer.php'; ?>
+>>>>>>> af99841c4edb3a4cc91886b8c6e66220c4a0baf6
 
   <script src="../assets/js/data.js"></script>
   <script src="../assets/js/detail.js"></script>

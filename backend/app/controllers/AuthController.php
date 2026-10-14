@@ -23,9 +23,7 @@ class AuthController
     }
 
 
-    // =========================================
-    // LOGIN
-    // =========================================
+   
     public function login()
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -33,7 +31,7 @@ class AuthController
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
-        // Validasi input
+        
         if ($email === '' || $password === '') {
             echo json_encode([
                 'success' => false,
@@ -43,9 +41,7 @@ class AuthController
         }
 
 
-        // =====================================
-        // LOGIN ADMIN
-        // =====================================
+       
         if ($email === $this->admin['email']) {
 
             if (!password_verify(
@@ -76,9 +72,7 @@ class AuthController
         }
 
 
-        // =====================================
-        // LOGIN CUSTOMER DARI DATABASE
-        // =====================================
+        
         $user = $this->model->findByEmail($email);
 
         if (!$user) {

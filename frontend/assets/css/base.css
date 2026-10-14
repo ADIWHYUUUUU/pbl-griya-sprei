@@ -104,4 +104,115 @@ button { cursor: pointer; }
   .nav { grid-column: 1 / -1; order: 3; justify-content: center; }
   .footer__inner { grid-template-columns: 1fr; }
   .container { padding: 0 16px; }
+<<<<<<< HEAD
 }
+=======
+}
+
+
+
+/* ===================================
+   USER DROPDOWN
+=================================== */
+
+.user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tombol nama customer */
+.user-dropdown__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+/* Hilangkan icon panah bawaan browser */
+.user-dropdown__trigger::-webkit-details-marker {
+    display: none;
+}
+
+.user-dropdown__trigger::marker {
+    content: "";
+}
+
+/* Animasi panah */
+.dropdown-arrow {
+    transition: transform 0.2s ease;
+}
+
+.user-dropdown[open] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Kotak dropdown */
+.user-dropdown__menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+
+    width: 200px;
+    padding: 8px;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    z-index: 1000;
+}
+
+/* Item dropdown */
+.user-dropdown__item {
+    display: block;
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #333333;
+
+    text-align: left;
+    text-decoration: none;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.user-dropdown__item:hover {
+    background: #f0f4ee;
+    color: #50634e;
+}
+
+/* Garis pemisah */
+.user-dropdown__divider {
+    height: 1px;
+    margin: 6px 0;
+    background: #e5e7eb;
+}
+
+/* Form logout */
+.user-dropdown__form {
+    margin: 0;
+}
+
+/* Warna logout */
+.user-dropdown__logout {
+    color: #b42318;
+}
+
+.user-dropdown__logout:hover {
+    background: #fff1f0;
+    color: #b42318;
+}
+>>>>>>> af99841c4edb3a4cc91886b8c6e66220c4a0baf6
