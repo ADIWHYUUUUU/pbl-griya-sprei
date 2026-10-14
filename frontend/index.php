@@ -7,15 +7,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/beranda.css">
+  <link rel="stylesheet" href="/frontend/assets/css/base.css">
+<link rel="stylesheet" href="/frontend/assets/css/beranda.css"> 
 </head>
 <body>
 
   <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="brand">
-      <img class="brand__logo" src="../assets/images/image1.png" alt="Logo Griya Sprei">
+      <img class="brand__logo" src="/frontend/assets/images/image1.png" alt="Logo Griya Sprei">
       <div>
         <h1 class="brand__name">Griya Sprei</h1>
         <p class="brand__tagline">Homemade Pillow, Bolster, Sprei, Bedcover, Etc.</p>
@@ -32,7 +32,7 @@
         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 11h10.2L20 7H6.5"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>
         <span class="cart__badge">3</span>
       </a>
-      <a href="login.html" class="btn-login">
+      <a href="/user/index.php" class="btn-login">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
         Masuk / Daftar
       </a>
@@ -120,7 +120,9 @@
     </div>
   </footer>
 
-  <script src="../assets/js/data.js"></script>
-  <script src="../assets/js/beranda.js"></script>
+  <script src="/frontend/assets/js/data.js"></script>
+  <script src="/frontend/assets/js/beranda.js"></script>
 </body>
 </html>
+
+vicong metu 
