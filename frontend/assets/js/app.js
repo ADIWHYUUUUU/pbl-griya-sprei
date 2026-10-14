@@ -76,6 +76,7 @@ function createCard(p) {
         </div>
       </div>
     </article>`;
+    
 }
 
 function renderProducts() {

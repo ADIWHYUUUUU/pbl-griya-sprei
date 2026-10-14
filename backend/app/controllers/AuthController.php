@@ -42,37 +42,6 @@ class AuthController
 
 
        
-        if ($email === $this->admin['email']) {
-
-            if (!password_verify(
-                $password,
-                $this->admin['password_hash']
-            )) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Email atau password salah.'
-                ]);
-                return;
-            }
-
-            // Simpan session admin
-            $_SESSION['login'] = true;
-            $_SESSION['nama'] = 'Admin';
-            $_SESSION['email'] = $this->admin['email'];
-            $_SESSION['role'] = 'ADMIN';
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Login admin berhasil.',
-                'role' => 'ADMIN',
-                'redirect' => 'admin/index.php'
-            ]);
-
-            return;
-        }
-
-
-        
         $user = $this->model->findByEmail($email);
 
         if (!$user) {
@@ -108,6 +77,8 @@ class AuthController
 
 
         // Simpan session customer
+        session_regenerate_id(true);
+        $_SESSION = [];
         $_SESSION['login'] = true;
         $_SESSION['id_user'] = $user['id_user'];
         $_SESSION['nama'] = $user['nama'];
@@ -126,9 +97,123 @@ class AuthController
     }
 
 
-    // =========================================
-    // REGISTER CUSTOMER
-    // =========================================
+    public function loginAdmin()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+        if ($email === '' || $password === '') {
+            echo json_encode(['success' => false, 'message' => 'Email dan kata sandi wajib diisi.']);
+            return;
+        }
+
+        $isConfiguredAdmin = $email === $this->admin['email']
+            && password_verify($password, $this->admin['password_hash']);
+        $user = $isConfiguredAdmin ? false : $this->model->findByEmail($email);
+        $isRegisteredAdmin = $user
+            && $user['role'] === 'ADMIN'
+            && password_verify($password, $user['password']);
+
+        if (!$isConfiguredAdmin && !$isRegisteredAdmin) {
+            echo json_encode(['success' => false, 'message' => 'Email atau kata sandi admin salah.']);
+            return;
+        }
+
+        session_regenerate_id(true);
+        $_SESSION = [];
+        $_SESSION['login'] = true;
+        $_SESSION['nama'] = $isConfiguredAdmin ? 'Admin' : $user['nama'];
+        $_SESSION['email'] = $email;
+        $_SESSION['role'] = 'ADMIN';
+        if ($isRegisteredAdmin) {
+            $_SESSION['id_user'] = $user['id_user'];
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Login admin berhasil.',
+            'redirect' => '/frontend/pages/admin/index.php'
+        ]);
+    }
+
+
+    public function registerAdmin()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($_POST['csrf_token'] ?? ''))) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Token keamanan tidak valid. Muat ulang halaman dan coba lagi.']);
+            return;
+        }
+
+        $hasAdminSession = ($_SESSION['login'] ?? false) === true
+            && ($_SESSION['role'] ?? '') === 'ADMIN';
+        if (!$hasAdminSession) {
+            $adminEmail = trim($_POST['admin_email'] ?? '');
+            $adminPassword = $_POST['admin_password'] ?? '';
+            $isConfiguredAdmin = $adminEmail === $this->admin['email']
+                && password_verify($adminPassword, $this->admin['password_hash']);
+            $adminUser = $isConfiguredAdmin ? false : $this->model->findByEmail($adminEmail);
+            $isRegisteredAdmin = $adminUser
+                && $adminUser['role'] === 'ADMIN'
+                && password_verify($adminPassword, $adminUser['password']);
+
+            if (!$isConfiguredAdmin && !$isRegisteredAdmin) {
+                http_response_code(403);
+                echo json_encode(['success' => false, 'message' => 'Verifikasi gagal. Masukkan kredensial admin yang sudah aktif.']);
+                return;
+            }
+        }
+
+        $nama = trim($_POST['nama'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $noHp = trim($_POST['no_hp'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $konfirmasi = $_POST['konfirmasi_password'] ?? '';
+        if ($nama === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $noHp === '') {
+            echo json_encode(['success' => false, 'message' => 'Nama, email yang valid, dan nomor HP wajib diisi.']);
+            return;
+        }
+        if (strlen($password) < 8) {
+            echo json_encode(['success' => false, 'message' => 'Kata sandi admin minimal 8 karakter.']);
+            return;
+        }
+        if ($password !== $konfirmasi) {
+            echo json_encode(['success' => false, 'message' => 'Konfirmasi kata sandi tidak sama.']);
+            return;
+        }
+        if ($email === $this->admin['email'] || $this->model->emailExists($email)) {
+            echo json_encode(['success' => false, 'message' => 'Email sudah digunakan.']);
+            return;
+        }
+
+        $adminId = $this->model->createAdmin([
+            'nama' => $nama,
+            'email' => $email,
+            'no_hp' => $noHp,
+            'password' => password_hash($password, PASSWORD_DEFAULT)
+        ]);
+
+        if (!$hasAdminSession) {
+            session_regenerate_id(true);
+            $_SESSION = [];
+            $_SESSION['login'] = true;
+            $_SESSION['id_user'] = $adminId;
+            $_SESSION['nama'] = $nama;
+            $_SESSION['email'] = $email;
+            $_SESSION['role'] = 'ADMIN';
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Akun admin berhasil didaftarkan.',
+            'redirect' => '/frontend/pages/admin/index.php'
+        ]);
+    }
+
+
     public function register()
     {
         header('Content-Type: application/json; charset=utf-8');

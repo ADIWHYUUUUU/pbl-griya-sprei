@@ -72,6 +72,7 @@
     </form>
 
     <p class="register">Belum memiliki akun? <a href="register.php">Daftar Sekarang</a></p>
+      <p class="register">Admin? <a href="admin/login.php">Masuk di sini</a></p>
   </main>
 
   <script src="../assets/js/login.js"></script>

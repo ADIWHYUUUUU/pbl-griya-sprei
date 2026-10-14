@@ -1,0 +1,48 @@
+{
+    "hero_pill": "Griya Sprei Malang · Homemade sejak 2010",
+    "hero_title": "Sprei dan bed cover pas di kasur Anda, ukuran standar maupun custom.",
+    "hero_description": "Pilih model kain, tentukan ukuran panjang × lebar × tinggi kasur presisi cm, tambahkan sarung bantal guling, dan nikmati tidur nyaman dengan bahan MicroSilk & Katun Jepang halus.",
+    "hero_image": "/backend/public/uploads/b676be6dd7418312257c59e6.jpg",
+    "explore_title": "Jelajahi katalog",
+    "sprei_title": "Sprei",
+    "sprei_description": "Standar atau custom sesuai kasur.",
+    "sprei_image": "/backend/public/uploads/88fad501619be420dffbf6f7.jpg",
+    "bedcover_title": "Bed Cover",
+    "bedcover_description": "Pilih model dan ukuran.",
+    "bedcover_image": "/backend/public/uploads/24328e4b6f1e3b03270fcba0.jpg",
+    "featured_title": "Produk Pilihan & Best Seller",
+    "featured": [
+        {
+            "name": "Sprei Katun Asterina Sage",
+            "tag": "Sprei Premium",
+            "description": "Motif emboss salur mewah, sejuk & bebas bulu halus.",
+            "price": 185000,
+            "color": "#9bb87a",
+            "image": "/backend/public/uploads/475f5e3326ffa7054e6bfdea.png"
+        },
+        {
+            "name": "Bedcover Set Verona Cream",
+            "tag": "Bed Cover Set",
+            "description": "Set bed cover selimut tebal hangat dengan sprei senada.",
+            "price": 320000,
+            "color": "#d9ccb4",
+            "image": "/backend/public/uploads/36b9c41e46bf433ff2688b26.png"
+        },
+        {
+            "name": "Sprei Katun Asterina Sand",
+            "tag": "Sprei Katun",
+            "description": "Serat katun alami 100% adem lembut untuk kulit sensitif.",
+            "price": 185000,
+            "color": "#c4a67c",
+            "image": "/backend/public/uploads/307e99aa410c78da01e6d6b0.png"
+        },
+        {
+            "name": "Bedcover Set Milano Navy",
+            "tag": "Bed Cover & Sprei",
+            "description": "Warna tenang minimalis, jahitan rapi double stitch.",
+            "price": 340000,
+            "color": "#2f4469",
+            "image": "/backend/public/uploads/f92128d464734a491c69c8e6.png"
+        }
+    ]
+}

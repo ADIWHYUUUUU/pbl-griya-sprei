@@ -5,7 +5,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Cek status login customer, tanpa memaksa pengunjung login
+$homepagePath = __DIR__ . '/../../../backend/storage/homepage.json';
+$homepage = is_file($homepagePath)
+  ? json_decode(file_get_contents($homepagePath), true)
+  : [];
+$homepage = is_array($homepage) ? $homepage : [];
+$homepageValue = static function (string $key, string $fallback = '') use ($homepage): string {
+  return htmlspecialchars((string) ($homepage[$key] ?? $fallback), ENT_QUOTES, 'UTF-8');
+};
+
+
 $isLogin = (
     ($_SESSION['login'] ?? false) === true &&
     ($_SESSION['role'] ?? '') === 'CUSTOMER'
@@ -55,19 +64,15 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
       <div class="hero__text">
 
         <span class="hero__pill">
-          Griya Sprei Malang · Homemade sejak 2010
+          <?= $homepageValue('hero_pill', 'Griya Sprei Malang · Homemade sejak 2010'); ?>
         </span>
 
         <h2 class="hero__title">
-          Sprei dan bed cover pas di kasur Anda,
-          ukuran standar maupun custom.
+          <?= $homepageValue('hero_title', 'Sprei dan bed cover pas di kasur Anda, ukuran standar maupun custom.'); ?>
         </h2>
 
         <p class="hero__desc">
-          Pilih model kain, tentukan ukuran panjang × lebar × tinggi
-          kasur presisi cm, tambahkan sarung bantal guling,
-          dan nikmati tidur nyaman dengan bahan MicroSilk
-          &amp; Katun Jepang halus.
+          <?= $homepageValue('hero_description', 'Pilih model kain, tentukan ukuran panjang × lebar × tinggi kasur presisi cm, tambahkan sarung bantal guling, dan nikmati tidur nyaman dengan bahan MicroSilk & Katun Jepang halus.'); ?>
         </p>
 
         <a
@@ -82,7 +87,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
       <div
         class="hero__image media"
         style="--ph:#9bb87a"
-      ></div>
+      ><?php if (!empty($homepage['hero_image'])): ?><img src="<?= $homepageValue('hero_image'); ?>" alt="Suasana produk Griya Sprei"><?php endif; ?></div>
 
     </section>
 
@@ -92,7 +97,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
     <section class="section">
 
       <h2 class="section__title">
-        Jelajahi katalog
+        <?= $homepageValue('explore_title', 'Jelajahi katalog'); ?>
       </h2>
 
       <div class="explore">
@@ -104,15 +109,15 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
           <div
             class="explore__image media"
             style="--ph:#4a74b5"
-          ></div>
+          ><?php if (!empty($homepage['sprei_image'])): ?><img src="<?= $homepageValue('sprei_image'); ?>" alt="Produk sprei"><?php endif; ?></div>
 
           <div class="explore__row">
 
             <div>
-              <h3>Sprei</h3>
+              <h3><?= $homepageValue('sprei_title', 'Sprei'); ?></h3>
 
               <p>
-                Standar atau custom sesuai kasur.
+                <?= $homepageValue('sprei_description', 'Standar atau custom sesuai kasur.'); ?>
               </p>
             </div>
 
@@ -135,15 +140,15 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
           <div
             class="explore__image media"
             style="--ph:#a98466"
-          ></div>
+          ><?php if (!empty($homepage['bedcover_image'])): ?><img src="<?= $homepageValue('bedcover_image'); ?>" alt="Produk bed cover"><?php endif; ?></div>
 
           <div class="explore__row">
 
             <div>
-              <h3>Bed Cover</h3>
+              <h3><?= $homepageValue('bedcover_title', 'Bed Cover'); ?></h3>
 
               <p>
-                Pilih model dan ukuran.
+                <?= $homepageValue('bedcover_description', 'Pilih model dan ukuran.'); ?>
               </p>
             </div>
 
@@ -168,7 +173,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
     <section class="section">
 
       <h2 class="section__title">
-        Produk Pilihan &amp; Best Seller
+        <?= $homepageValue('featured_title', 'Produk Pilihan & Best Seller'); ?>
       </h2>
 
       <div
@@ -265,6 +270,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
 
 
   <script src="/frontend/assets/js/data.js"></script>
+  <script>window.homepageContent = <?= json_encode($homepage, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?: '{}'; ?>;</script>
   <script src="/frontend/assets/js/beranda.js"></script>
 
 </body>
