@@ -80,6 +80,26 @@ class UserModel
     }
 
 
+    public function createAdmin($data)
+    {
+        $sql = '
+            INSERT INTO "user" (nama, email, password, no_hp, role, created_at)
+            VALUES (:nama, :email, :password, :no_hp, \'ADMIN\', CURRENT_TIMESTAMP)
+            RETURNING id_user
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':nama' => $data['nama'],
+            ':email' => $data['email'],
+            ':password' => $data['password'],
+            ':no_hp' => $data['no_hp']
+        ]);
+
+        return $stmt->fetchColumn();
+    }
+
+
     // =========================
     // CEK EMAIL SUDAH TERDAFTAR
     // =========================
