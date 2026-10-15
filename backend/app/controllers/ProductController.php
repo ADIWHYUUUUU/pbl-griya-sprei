@@ -8,6 +8,9 @@ class ProductController
 {
     private $model;
 
+    // =========================================
+    // CONSTRUCTOR
+    // =========================================
     public function __construct()
     {
         global $pdo;
@@ -114,12 +117,12 @@ class ProductController
         if (
             $nama === '' ||
             strlen($nama) > 150 ||
-            $kategori === '' ||
+            !in_array($kategori, ['SPREI', 'BEDCOVER'], true) ||
             $deskripsi === '' ||
-            $panjang === false || $panjang <= 0 ||
-            $lebar === false || $lebar <= 0 ||
-            $tinggi === false || $tinggi <= 0 ||
-            $harga === false || $harga < 0 ||
+            $panjang === false || !is_finite($panjang) || $panjang <= 0 ||
+            $lebar === false || !is_finite($lebar) || $lebar <= 0 ||
+            $tinggi === false || !is_finite($tinggi) || $tinggi <= 0 ||
+            $harga === false || !is_finite($harga) || $harga < 0 ||
             $stok === false || $stok < 0
         ) {
             http_response_code(400);
@@ -142,6 +145,11 @@ class ProductController
             exit('Ukuran gambar maksimal 2 MB.');
         }
 
+        if (!is_uploaded_file($file['tmp_name'])) {
+            http_response_code(400);
+            exit('File upload tidak valid.');
+        }
+
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->file($file['tmp_name']);
 
@@ -154,6 +162,11 @@ class ProductController
         if (!isset($allowedMime[$mime])) {
             http_response_code(400);
             exit('Format gambar tidak didukung.');
+        }
+
+        if (@getimagesize($file['tmp_name']) === false) {
+            http_response_code(400);
+            exit('File bukan gambar yang valid.');
         }
 
         // Folder penyimpanan gambar
@@ -199,20 +212,24 @@ class ProductController
             if (!$saved) {
                 throw new RuntimeException('Gagal menyimpan produk.');
             }
+
         } catch (Throwable $e) {
+
             // Jika database gagal, hapus gambar yang baru diupload
             if (is_file($destination)) {
                 unlink($destination);
             }
 
-            error_log($e->getMessage());
+            error_log('[CREATE PRODUCT] ' . $e->getMessage());
 
             http_response_code(500);
             exit('Produk gagal disimpan.');
         }
 
         header(
-            'Location: /../../../frontend/pages/admin/produk/index.php?success=created'
+            'Location: /frontend/pages/admin/index.php?success=created',
+            true,
+            303
         );
         exit;
     }
@@ -229,52 +246,169 @@ class ProductController
             exit('Produk tidak ditemukan.');
         }
 
-        require_once __DIR__ . '/../../../frontend/pages/admin/produk/edit.php';
+        require_once __DIR__ . '/../../../frontend/pages/admin/edit.php';
     }
 
     // =========================================
-    // UPDATE - PROSES EDIT
+    // UPDATE - PROSES EDIT PRODUK + GAMBAR
     // =========================================
     public function update($id)
     {
         $this->authorizeAdminPost();
 
+        // Validasi ID
         $id = filter_var($id, FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1]
         ]);
 
-        if ($id === false) {
+        if ($id === false || $id === null) {
             http_response_code(400);
             exit('ID produk tidak valid.');
         }
+
+        // Ambil data produk lama
+        $product = $this->model->getProductById($id);
+
+        if (!$product) {
+            http_response_code(404);
+            exit('Produk tidak ditemukan.');
+        }
+
+        // =====================================
+        // AMBIL INPUT FORM
+        // =====================================
 
         $nama = trim($_POST['nama_produk'] ?? '');
         $kategori = trim($_POST['kategori_produk'] ?? '');
         $deskripsi = trim($_POST['deskripsi'] ?? '');
 
-        $panjang = filter_var($_POST['panjang_standar'] ?? null, FILTER_VALIDATE_FLOAT);
-        $lebar = filter_var($_POST['lebar_standar'] ?? null, FILTER_VALIDATE_FLOAT);
-        $tinggi = filter_var($_POST['tinggi_standar'] ?? null, FILTER_VALIDATE_FLOAT);
-        $harga = filter_var($_POST['harga_dasar'] ?? null, FILTER_VALIDATE_FLOAT);
-        $stok = filter_var($_POST['stok'] ?? null, FILTER_VALIDATE_INT);
+        $panjang = filter_var(
+            $_POST['panjang_standar'] ?? null,
+            FILTER_VALIDATE_FLOAT
+        );
+
+        $lebar = filter_var(
+            $_POST['lebar_standar'] ?? null,
+            FILTER_VALIDATE_FLOAT
+        );
+
+        $tinggi = filter_var(
+            $_POST['tinggi_standar'] ?? null,
+            FILTER_VALIDATE_FLOAT
+        );
+
+        $harga = filter_var(
+            $_POST['harga_dasar'] ?? null,
+            FILTER_VALIDATE_FLOAT
+        );
+
+        $stok = filter_var(
+            $_POST['stok'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+
+        // =====================================
+        // VALIDASI INPUT
+        // =====================================
 
         if (
-            $nama === '' || strlen($nama) > 150 ||
-            $kategori === '' || $deskripsi === '' ||
-            $panjang === false || $panjang <= 0 ||
-            $lebar === false || $lebar <= 0 ||
-            $tinggi === false || $tinggi <= 0 ||
-            $harga === false || $harga < 0 ||
+            $nama === '' ||
+            strlen($nama) > 150 ||
+            !in_array($kategori, ['SPREI', 'BEDCOVER'], true) ||
+            $deskripsi === '' ||
+            $panjang === false || !is_finite($panjang) || $panjang <= 0 ||
+            $lebar === false || !is_finite($lebar) || $lebar <= 0 ||
+            $tinggi === false || !is_finite($tinggi) || $tinggi <= 0 ||
+            $harga === false || !is_finite($harga) || $harga < 0 ||
             $stok === false || $stok < 0
         ) {
             http_response_code(400);
-            exit('Data produk tidak valid.');
+            exit('Data produk tidak valid. Periksa kembali form.');
         }
 
-        if (!$this->model->getProductById($id)) {
-            http_response_code(404);
-            exit('Produk tidak ditemukan.');
+        // =====================================
+        // PROSES GAMBAR PRODUK
+        // =====================================
+
+        // Secara default, gunakan gambar lama
+        $gambarName = $product['gambar_produk'];
+
+        // Lokasi file baru, untuk cleanup jika UPDATE gagal
+        $destination = null;
+
+        // Jika admin mengunggah gambar baru
+        if (isset($_FILES['gambar_produk'])) {
+
+            $file = $_FILES['gambar_produk'];
+
+            if ($file['error'] !== UPLOAD_ERR_NO_FILE) {
+
+                if ($file['error'] !== UPLOAD_ERR_OK) {
+                    http_response_code(400);
+                    exit('Gambar gagal diunggah.');
+                }
+
+                // Validasi ukuran maksimal 2 MB
+                if ($file['size'] > 2 * 1024 * 1024) {
+                    http_response_code(400);
+                    exit('Ukuran gambar maksimal 2 MB.');
+                }
+
+                if (!is_uploaded_file($file['tmp_name'])) {
+                    http_response_code(400);
+                    exit('File upload tidak valid.');
+                }
+
+                // Validasi MIME berdasarkan isi file
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $mime = $finfo->file($file['tmp_name']);
+
+                $allowedMime = [
+                    'image/jpeg' => 'jpg',
+                    'image/png'  => 'png',
+                    'image/webp' => 'webp'
+                ];
+
+                if (!isset($allowedMime[$mime])) {
+                    http_response_code(400);
+                    exit('Format gambar tidak didukung.');
+                }
+
+                if (@getimagesize($file['tmp_name']) === false) {
+                    http_response_code(400);
+                    exit('File bukan gambar yang valid.');
+                }
+
+                // Folder penyimpanan gambar
+                $uploadDir = dirname(__DIR__, 3)
+                    . '/frontend/uploads/produk/';
+
+                if (
+                    !is_dir($uploadDir) &&
+                    !mkdir($uploadDir, 0755, true)
+                ) {
+                    http_response_code(500);
+                    exit('Folder upload gagal dibuat.');
+                }
+
+                // Buat nama gambar baru
+                $gambarName = bin2hex(random_bytes(16))
+                    . '.'
+                    . $allowedMime[$mime];
+
+                $destination = $uploadDir . $gambarName;
+
+                // Upload gambar baru
+                if (!move_uploaded_file($file['tmp_name'], $destination)) {
+                    http_response_code(500);
+                    exit('Gambar baru gagal disimpan.');
+                }
+            }
         }
+
+        // =====================================
+        // DATA UNTUK MODEL
+        // =====================================
 
         $data = [
             'nama_produk'     => $nama,
@@ -284,25 +418,50 @@ class ProductController
             'tinggi_standar'  => $tinggi,
             'harga_dasar'     => $harga,
             'stok'            => $stok,
-            'deskripsi'       => $deskripsi
+            'deskripsi'       => $deskripsi,
+
+            // Wajib dikirim agar tidak terjadi
+            // Undefined array key "gambar_produk"
+            'gambar_produk'   => $gambarName
         ];
 
+        // =====================================
+        // UPDATE DATABASE
+        // =====================================
+
         try {
+
             $saved = $this->model->updateProduct($id, $data);
 
             if (!$saved) {
-                throw new RuntimeException('Update gagal.');
+                throw new RuntimeException('Update produk gagal.');
             }
+
         } catch (Throwable $e) {
-            error_log($e->getMessage());
+
+            // Hapus gambar baru jika database gagal diperbarui
+            if ($destination !== null && is_file($destination)) {
+                unlink($destination);
+            }
+
+            error_log('[UPDATE PRODUCT] ' . $e->getMessage());
 
             http_response_code(500);
-            exit('Produk gagal diperbarui.');
+            exit('Produk gagal diperbarui. Periksa terminal PHP.');
         }
 
+        // Gambar lama tidak dihapus otomatis.
+
+        // =====================================
+        // REDIRECT SETELAH BERHASIL
+        // =====================================
+
         header(
-            'Location: /frontend/pages/admin/produk/index.php?success=updated'
+            'Location: /frontend/pages/admin/index.php?success=updated',
+            true,
+            303
         );
+
         exit;
     }
 
@@ -317,7 +476,7 @@ class ProductController
             'options' => ['min_range' => 1]
         ]);
 
-        if ($id === false) {
+        if ($id === false || $id === null) {
             http_response_code(400);
             exit('ID produk tidak valid.');
         }
@@ -329,24 +488,28 @@ class ProductController
             exit('Produk tidak ditemukan.');
         }
 
-        
-
         try {
+
             $deleted = $this->model->deleteProduct($id);
 
             if (!$deleted) {
                 throw new RuntimeException('Delete gagal.');
             }
+
         } catch (Throwable $e) {
-            error_log($e->getMessage());
+
+            error_log('[DELETE PRODUCT] ' . $e->getMessage());
 
             http_response_code(500);
             exit('Produk gagal dihapus.');
         }
 
         header(
-            'Location: /../../../frontend/pages/admin/produk/index.php?success=deleted'
+            'Location: /frontend/pages/admin/index.php?success=deleted',
+            true,
+            303
         );
+
         exit;
     }
 }

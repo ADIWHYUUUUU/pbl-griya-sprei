@@ -258,7 +258,7 @@ function e($value)
 
                                 <a
                                     class="btn btn-edit"
-                                    href="/frontend/pages/admin/produk/edit.php?id=<?= (int) $product['id_produk'] ?>"
+                                    href="/../../../frontend/pages/admin/edit.php?id=<?= (int) $product['id_produk'] ?>"
                                 >
                                     Edit
                                 </a>

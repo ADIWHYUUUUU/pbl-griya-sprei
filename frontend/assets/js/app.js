@@ -72,7 +72,9 @@ function createCard(p) {
             <div class="card__label">Harga mulai</div>
             <div class="card__price">${formatRupiah(p.price)}</div>
           </div>
-          <button class="btn" data-name="${escapeHTML(p.name)}">Lihat Detail</button>
+          <button class="btn" type="button" data-id="${Number(p.id)}">
+  Lihat Detail
+</button>
         </div>
       </div>
     </article>`;
@@ -138,7 +140,17 @@ pagination.addEventListener("click", (e) => {
 
 grid.addEventListener("click", (e) => {
   const btn = e.target.closest(".btn");
-  if (btn) alert("Detail produk: " + btn.dataset.name); // ganti dengan link halaman detail
+
+  if (!btn) return;
+
+  const idProduk = Number(btn.dataset.id);
+
+  if (!Number.isSafeInteger(idProduk) || idProduk <= 0) {
+    alert("ID produk tidak valid.");
+    return;
+  }
+
+  window.location.href = "detailproduk.php?id=" + idProduk;
 });
 
 /* =========================================

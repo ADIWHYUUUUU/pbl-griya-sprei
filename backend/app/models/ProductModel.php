@@ -85,7 +85,7 @@ class ProductModel
     }
 
     // =========================================
-    // UPDATE - EDIT PRODUK
+    // UPDATE - EDIT PRODUK + GAMBAR
     // =========================================
     public function updateProduct($id, $data)
     {
@@ -97,7 +97,8 @@ class ProductModel
                     tinggi_standar = :tinggi_standar,
                     harga_dasar = :harga_dasar,
                     stok = :stok,
-                    deskripsi = :deskripsi
+                    deskripsi = :deskripsi,
+                    gambar_produk = :gambar_produk
                 WHERE id_produk = :id_produk";
 
         $stmt = $this->pdo->prepare($sql);
@@ -111,7 +112,8 @@ class ProductModel
             ':tinggi_standar'  => $data['tinggi_standar'],
             ':harga_dasar'     => $data['harga_dasar'],
             ':stok'            => $data['stok'],
-            ':deskripsi'       => $data['deskripsi']
+            ':deskripsi'       => $data['deskripsi'],
+            ':gambar_produk'   => $data['gambar_produk']
         ]);
     }
 
@@ -128,8 +130,6 @@ class ProductModel
             ':id_produk' => $id
         ]);
 
-        // Mengembalikan true jika produk berhasil dihapus
         return $stmt->rowCount() > 0;
     }
 }
-    
