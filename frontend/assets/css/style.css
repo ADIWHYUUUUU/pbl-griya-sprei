@@ -253,5 +253,3 @@ button { cursor: pointer; }
   .grid { grid-template-columns: 1fr; }
   .nav { flex-wrap: wrap; }
 }
-
-

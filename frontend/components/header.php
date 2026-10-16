@@ -16,6 +16,14 @@ $namaUser = $isLogin
     ? ($_SESSION['nama'] ?? 'Pelanggan')
     : '';
 
+$currentPage = basename($_SERVER['SCRIPT_NAME'] ?? '');
+$activeNavPage = match ($currentPage) {
+  'index.php' => 'home',
+  'katalog.php', 'detailProduk.php' => 'catalog',
+  'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
+  default => '',
+};
+
 ?>
 
 <!-- ===== HEADER ===== -->
@@ -44,19 +52,20 @@ $namaUser = $isLogin
 
   <nav class="nav" aria-label="Navigasi utama">
 
-    <a href="/frontend/pages/user/index.php"
-   class="nav__link nav__link--active">
-    Beranda
-</a>
-    <a href="/frontend/pages/user/katalog.php" class="nav__link">
+     <a href="/frontend/pages/user/index.php"
+       class="nav__link<?= $activeNavPage === 'home' ? ' nav__link--active' : ''; ?>"
+       <?= $activeNavPage === 'home' ? 'aria-current="page"' : ''; ?>>
+      Beranda
+     </a>
+     <a href="/frontend/pages/user/katalog.php"
+       class="nav__link<?= $activeNavPage === 'catalog' ? ' nav__link--active' : ''; ?>"
+       <?= $activeNavPage === 'catalog' ? 'aria-current="page"' : ''; ?>>
       Katalog
     </a>
 
-    <a href="#" class="nav__link">
-      Pembayaran
-    </a>
-
-    <a href="#" class="nav__link">
+     <a href="#"
+       class="nav__link<?= $activeNavPage === 'orders' ? ' nav__link--active' : ''; ?>"
+       <?= $activeNavPage === 'orders' ? 'aria-current="page"' : ''; ?>>
       Pesanan Saya
     </a>
 

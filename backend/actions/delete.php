@@ -20,3 +20,4 @@ if ($id === false || $id === null) {
 
 $controller = new ProductController();
 $controller->delete($id);
+

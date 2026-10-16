@@ -20,8 +20,8 @@ if (empty($_SESSION['csrf_token'])) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/login.css">
 </head>
-<body class="page-login">
-<main class="login-card">
+<body class="page-login page-register">
+<main class="login-card login-card--register">
     <header class="brand">
         <img class="brand__logo" src="../../assets/images/image1.png" alt="Logo Griya Sprei">
         <div>
@@ -77,14 +77,14 @@ if (empty($_SESSION['csrf_token'])) {
             <label class="field__label" for="password">Kata Sandi <span class="required">*</span></label>
             <div class="input">
                 <svg class="input__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                <input type="password" id="password" name="password" placeholder="Minimal 8 karakter" minlength="8" autocomplete="new-password" required>
+                <input type="password" id="password" name="password" placeholder="Minimal 8 karakter" minlength="8" autocomplete="off" required>
             </div>
         </div>
         <div class="field">
             <label class="field__label" for="konfirmasi_password">Konfirmasi Kata Sandi <span class="required">*</span></label>
             <div class="input">
                 <svg class="input__icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-                <input type="password" id="konfirmasi_password" name="konfirmasi_password" placeholder="Ulangi kata sandi" minlength="8" autocomplete="new-password" required>
+                <input type="password" id="konfirmasi_password" name="konfirmasi_password" placeholder="Ulangi kata sandi" minlength="8" autocomplete="off" required>
             </div>
         </div>
         <button type="submit" class="btn-submit">

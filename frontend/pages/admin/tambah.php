@@ -129,7 +129,7 @@ function e($value)
         <p>Masukkan informasi produk baru Griya Sprei.</p>
 
         <form
-            action="/../../../backend/actions/store.php"
+            action="/backend/actions/store.php"
             method="POST"
             enctype="multipart/form-data"
         >
@@ -265,7 +265,7 @@ function e($value)
                 </button>
 
                 <a
-                    href="index.php"
+                    href="produk.php"
                     class="btn btn-back"
                 >
                     Kembali

@@ -11,14 +11,25 @@ const emailField = document.getElementById("emailField");
 const passwordField = document.getElementById("passwordField");
 
 const passwordHint = document.getElementById("passwordHint");
+const loginMessage = document.getElementById("loginMessage");
 
 const clearEmailBtn = document.getElementById("clearEmail");
 const toggleBtn = document.getElementById("togglePassword");
 
 const rememberBox = document.getElementById("remember");
 
-const MIN_PASSWORD = 6;
+const MIN_PASSWORD = 8;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function showLoginMessage(message) {
+  loginMessage.textContent = message;
+  loginMessage.hidden = false;
+}
+
+function clearLoginMessage() {
+  loginMessage.textContent = "";
+  loginMessage.hidden = true;
+}
 
 /* =========================================
    2. VALIDASI
@@ -47,6 +58,7 @@ function validatePassword() {
 
 // Tombol hapus email
 emailInput.addEventListener("input", () => {
+  clearLoginMessage();
   clearEmailBtn.hidden = emailInput.value === "";
 
   if (emailField.classList.contains("field--error")) {
@@ -76,6 +88,8 @@ toggleBtn.addEventListener("click", () => {
 });
 
 passwordInput.addEventListener("input", () => {
+  clearLoginMessage();
+
   if (passwordField.classList.contains("field--error")) {
     validatePassword();
   }
@@ -93,6 +107,7 @@ emailInput.addEventListener("blur", () => {
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  clearLoginMessage();
 
   const emailOk = validateEmail();
   const passwordOk = validatePassword();
@@ -119,7 +134,7 @@ form.addEventListener("submit", async (e) => {
 
     // Login gagal
     if (!result.success) {
-      alert(result.message);
+      showLoginMessage(result.message || "email atau kata sandi salah.");
       return;
     }
 
@@ -135,7 +150,7 @@ form.addEventListener("submit", async (e) => {
   } catch (error) {
     console.error("ERROR LOGIN:", error);
 
-    alert("Terjadi kesalahan saat login. Cek Console F12.");
+    showLoginMessage("Terjadi kesalahan saat login. Silakan coba lagi.");
   }
 });
 

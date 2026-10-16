@@ -22,8 +22,6 @@ class AuthController
         }
     }
 
-
-   
     public function login()
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -35,19 +33,17 @@ class AuthController
         if ($email === '' || $password === '') {
             echo json_encode([
                 'success' => false,
-                'message' => 'Email dan password wajib diisi.'
+                'message' => 'Email dan kata sandi wajib diisi.'
             ]);
             return;
         }
-
-
        
         $user = $this->model->findByEmail($email);
 
         if (!$user) {
             echo json_encode([
                 'success' => false,
-                'message' => 'Email atau password salah.'
+                'message' => 'Email atau kata sandi salah.'
             ]);
             return;
         }
@@ -60,13 +56,11 @@ class AuthController
         )) {
             echo json_encode([
                 'success' => false,
-                'message' => 'Email atau password salah.'
+                'message' => 'Email atau kata sandi salah.'
             ]);
             return;
         }
 
-
-        // Pastikan akun adalah CUSTOMER
         if ($user['role'] !== 'CUSTOMER') {
             echo json_encode([
                 'success' => false,
@@ -74,7 +68,6 @@ class AuthController
             ]);
             return;
         }
-
 
         // Simpan session customer
         session_regenerate_id(true);
@@ -255,11 +248,11 @@ class AuthController
         }
 
 
-        // Password minimal 6 karakter
-        if (strlen($password) < 6) {
+        // Password minimal 8 karakter
+        if (strlen($password) < 8) {
             echo json_encode([
                 'success' => false,
-                'message' => 'Password minimal 6 karakter.'
+                'message' => 'Kata sandi minimal 8 karakter.'
             ]);
             return;
         }
@@ -320,7 +313,6 @@ class AuthController
 
         return;
     }
-
 
     // =========================================
     // LOGOUT

@@ -63,12 +63,6 @@
 
         <li>
           <a href="#">
-            Pembayaran
-          </a>
-        </li>
-
-        <li>
-          <a href="#">
             Pesanan 
             Saya
           </a>

@@ -34,7 +34,7 @@ if (is_file($contentPath)) {
     }
 }
 
-$escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+$escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 $notice = '';
 $error = '';
 if (isset($_GET['saved'])) {
@@ -134,6 +134,7 @@ if (empty($_SESSION['csrf_token'])) {
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -143,100 +144,117 @@ if (empty($_SESSION['csrf_token'])) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/frontend/assets/css/admin-beranda.css">
 </head>
+
 <body>
-<header class="admin-header">
-    <a href="index.php" class="back-link" aria-label="Kembali ke dashboard">← Dashboard</a>
-    <div><span class="eyebrow">PENGELOLAAN TOKO</span><h1>Konten beranda</h1></div>
-    <a href="/frontend/pages/user/index.php" target="_blank" rel="noopener" class="preview-link">Lihat beranda ↗</a>
-</header>
+    <header class="admin-header">
+        <a href="index.php" class="back-link" aria-label="Kembali ke dashboard">← Dashboard</a>
+        <div><span class="eyebrow">PENGELOLAAN TOKO</span>
+            <h1>Konten beranda</h1>
+        </div>
+        <a href="/frontend/pages/user/index.php" target="_blank" rel="noopener" class="preview-link">Lihat beranda ↗</a>
+    </header>
 
-<main class="editor-shell">
-    <?php if ($notice !== ''): ?><p class="alert alert--success" role="status"><?= $escape($notice); ?></p><?php endif; ?>
-    <?php if ($error !== ''): ?><p class="alert alert--error" role="alert"><?= $escape($error); ?></p><?php endif; ?>
+    <main class="editor-shell">
+        <?php if ($notice !== ''): ?><p class="alert alert--success" role="status"><?= $escape($notice); ?></p><?php endif; ?>
+        <?php if ($error !== ''): ?><p class="alert alert--error" role="alert"><?= $escape($error); ?></p><?php endif; ?>
 
-    <form method="post" enctype="multipart/form-data" class="editor-form">
-        <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']); ?>">
+        <form method="post" enctype="multipart/form-data" class="editor-form">
+            <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']); ?>">
 
-        <section class="editor-section">
-            <div class="section-heading"><div><span class="eyebrow">01 / PEMBUKA</span><h2>Hero beranda</h2></div></div>
-            <div class="form-grid">
-                <label class="field field--wide">Label kecil<input name="hero_pill" maxlength="120" value="<?= $escape($content['hero_pill']); ?>"></label>
-                <label class="field field--wide">Judul utama<textarea name="hero_title" rows="2" maxlength="240" required><?= $escape($content['hero_title']); ?></textarea></label>
-                <label class="field field--wide">Deskripsi<textarea name="hero_description" rows="3" maxlength="600" required><?= $escape($content['hero_description']); ?></textarea></label>
-                <?php renderImageField('hero_image', 'Gambar utama', $content['hero_image'] ?? '', $escape); ?>
-            </div>
-        </section>
+            <section class="editor-section">
+                <div class="section-heading">
+                    <div><span class="eyebrow">01 / PEMBUKA</span>
+                        <h2>Hero beranda</h2>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <label class="field field--wide">Label kecil<input name="hero_pill" maxlength="120" value="<?= $escape($content['hero_pill']); ?>"></label>
+                    <label class="field field--wide">Judul utama<textarea name="hero_title" rows="2" maxlength="240" required><?= $escape($content['hero_title']); ?></textarea></label>
+                    <label class="field field--wide">Deskripsi<textarea name="hero_description" rows="3" maxlength="600" required><?= $escape($content['hero_description']); ?></textarea></label>
+                    <?php renderImageField('hero_image', 'Gambar utama', $content['hero_image'] ?? '', $escape); ?>
+                </div>
+            </section>
 
-        <section class="editor-section">
-            <div class="section-heading"><div><span class="eyebrow">02 / KATEGORI</span><h2>Jelajahi katalog</h2></div></div>
-            <div class="form-grid">
-                <label class="field">Judul bagian<input name="explore_title" maxlength="100" value="<?= $escape($content['explore_title']); ?>"></label>
-                <span></span>
-                <label class="field">Nama kategori<input name="sprei_title" maxlength="80" value="<?= $escape($content['sprei_title']); ?>"></label>
-                <label class="field">Nama kategori<input name="bedcover_title" maxlength="80" value="<?= $escape($content['bedcover_title']); ?>"></label>
-                <label class="field">Deskripsi sprei<textarea name="sprei_description" rows="2" maxlength="180"><?= $escape($content['sprei_description']); ?></textarea></label>
-                <label class="field">Deskripsi bed cover<textarea name="bedcover_description" rows="2" maxlength="180"><?= $escape($content['bedcover_description']); ?></textarea></label>
-                <?php renderImageField('sprei_image', 'Gambar kategori sprei', $content['sprei_image'] ?? '', $escape); ?>
-                <?php renderImageField('bedcover_image', 'Gambar kategori bed cover', $content['bedcover_image'] ?? '', $escape); ?>
-            </div>
-        </section>
+            <section class="editor-section">
+                <div class="section-heading">
+                    <div><span class="eyebrow">02 / KATEGORI</span>
+                        <h2>Jelajahi katalog</h2>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <label class="field">Judul bagian<input name="explore_title" maxlength="100" value="<?= $escape($content['explore_title']); ?>"></label>
+                    <span></span>
+                    <label class="field">Nama kategori<input name="sprei_title" maxlength="80" value="<?= $escape($content['sprei_title']); ?>"></label>
+                    <label class="field">Nama kategori<input name="bedcover_title" maxlength="80" value="<?= $escape($content['bedcover_title']); ?>"></label>
+                    <label class="field">Deskripsi sprei<textarea name="sprei_description" rows="2" maxlength="180"><?= $escape($content['sprei_description']); ?></textarea></label>
+                    <label class="field">Deskripsi bed cover<textarea name="bedcover_description" rows="2" maxlength="180"><?= $escape($content['bedcover_description']); ?></textarea></label>
+                    <?php renderImageField('sprei_image', 'Gambar kategori sprei', $content['sprei_image'] ?? '', $escape); ?>
+                    <?php renderImageField('bedcover_image', 'Gambar kategori bed cover', $content['bedcover_image'] ?? '', $escape); ?>
+                </div>
+            </section>
 
-        <section class="editor-section">
-            <div class="section-heading section-heading--products">
-                <div><span class="eyebrow">03 / PILIHAN TOKO</span><h2>Produk pilihan</h2><p class="section-note">Atur produk yang muncul di halaman beranda.</p></div>
-                <button type="button" class="button button--secondary" id="add-product">＋ Tambah produk</button>
-            </div>
-            <label class="field field--title">Judul bagian<input name="featured_title" maxlength="100" value="<?= $escape($content['featured_title']); ?>"></label>
-            <div id="featured-products" class="product-list">
-                <?php foreach (($content['featured'] ?? []) as $index => $product): ?>
-                    <?php renderProductFields($index, $product, $escape); ?>
-                <?php endforeach; ?>
-            </div>
-            <template id="product-template">
-                <?php renderProductFields('__INDEX__', [], $escape); ?>
-            </template>
-        </section>
+            <section class="editor-section">
+                <div class="section-heading section-heading--products">
+                    <div><span class="eyebrow">03 / PILIHAN TOKO</span>
+                        <h2>Produk pilihan</h2>
+                        <p class="section-note">Atur produk yang muncul di halaman beranda.</p>
+                    </div>
+                    <button type="button" class="button button--secondary" id="add-product">＋ Tambah produk</button>
+                </div>
+                <label class="field field--title">Judul bagian<input name="featured_title" maxlength="100" value="<?= $escape($content['featured_title']); ?>"></label>
+                <div id="featured-products" class="product-list">
+                    <?php foreach (($content['featured'] ?? []) as $index => $product): ?>
+                        <?php renderProductFields($index, $product, $escape); ?>
+                    <?php endforeach; ?>
+                </div>
+                <template id="product-template">
+                    <?php renderProductFields('__INDEX__', [], $escape); ?>
+                </template>
+            </section>
 
-        <div class="save-bar"><a href="index.php" class="cancel-link">Batal</a><button type="submit" class="button button--primary">Simpan perubahan</button></div>
-    </form>
-</main>
-<script>
-const productList = document.getElementById('featured-products');
-const productTemplate = document.getElementById('product-template');
-let nextProductIndex = <?= count($content['featured'] ?? []); ?>;
-document.getElementById('add-product').addEventListener('click', () => {
-    if (productList.children.length >= 12) return;
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = productTemplate.innerHTML.replaceAll('__INDEX__', String(nextProductIndex++));
-    productList.append(wrapper.firstElementChild);
-});
-productList.addEventListener('click', (event) => {
-    if (event.target.matches('[data-remove-product]')) event.target.closest('.product-card').remove();
-});
-</script>
+            <div class="save-bar"><a href="index.php" class="cancel-link">Batal</a><button type="submit" class="button button--primary">Simpan perubahan</button></div>
+        </form>
+    </main>
+    <script>
+        const productList = document.getElementById('featured-products');
+        const productTemplate = document.getElementById('product-template');
+        let nextProductIndex = <?= count($content['featured'] ?? []); ?>;
+        document.getElementById('add-product').addEventListener('click', () => {
+            if (productList.children.length >= 12) return;
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = productTemplate.innerHTML.replaceAll('__INDEX__', String(nextProductIndex++));
+            productList.append(wrapper.firstElementChild);
+        });
+        productList.addEventListener('click', (event) => {
+            if (event.target.matches('[data-remove-product]')) event.target.closest('.product-card').remove();
+        });
+    </script>
 </body>
+
 </html>
 
 <?php
 function renderImageField(string $name, string $label, string $image, callable $escape): void
 {
-    ?>
+?>
     <div class="image-field">
         <span class="field-label"><?= $escape($label); ?></span>
         <label class="upload-control"><span>Pilih gambar</span><input type="file" name="<?= $escape($name); ?>" accept="image/jpeg,image/png,image/webp"></label>
         <?php if ($image !== ''): ?><img class="image-preview" src="<?= $escape($image); ?>" alt="Gambar saat ini"><?php endif; ?>
         <small>JPG, PNG, WebP · Maksimal 5 MB</small>
     </div>
-    <?php
+<?php
 }
 
 function renderProductFields($index, array $product, callable $escape): void
 {
     $prefix = 'featured[' . $index . ']';
     $imageIndex = $index === '__INDEX__' ? '__INDEX__' : preg_replace('/[^0-9]/', '', (string) $index);
-    ?>
+?>
     <article class="product-card">
-        <div class="product-card__heading"><h3>Produk pilihan</h3><button type="button" class="remove-button" data-remove-product aria-label="Hapus produk">Hapus</button></div>
+        <div class="product-card__heading">
+            <h3>Produk pilihan</h3><button type="button" class="remove-button" data-remove-product aria-label="Hapus produk">Hapus</button>
+        </div>
         <div class="form-grid">
             <label class="field">Nama produk<input name="<?= $escape($prefix); ?>[name]" maxlength="120" required value="<?= $escape($product['name'] ?? ''); ?>"></label>
             <label class="field">Label<input name="<?= $escape($prefix); ?>[tag]" maxlength="60" required value="<?= $escape($product['tag'] ?? ''); ?>"></label>
@@ -252,6 +270,6 @@ function renderProductFields($index, array $product, callable $escape): void
             </div>
         </div>
     </article>
-    <?php
+<?php
 }
 ?>

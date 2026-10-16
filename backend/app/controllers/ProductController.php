@@ -1,4 +1,3 @@
-
 <?php
 
 require_once __DIR__ . '/../config/database.php';
@@ -227,7 +226,7 @@ class ProductController
         }
 
         header(
-            'Location: /frontend/pages/admin/index.php?success=created',
+            'Location: /frontend/pages/admin/produk.php?success=created',
             true,
             303
         );
@@ -457,7 +456,7 @@ class ProductController
         // =====================================
 
         header(
-            'Location: /frontend/pages/admin/index.php?success=updated',
+            'Location: /frontend/pages/admin/produk.php?success=updated',
             true,
             303
         );
@@ -505,7 +504,7 @@ class ProductController
         }
 
         header(
-            'Location: /frontend/pages/admin/index.php?success=deleted',
+            'Location: /frontend/pages/admin/produk.php?success=deleted',
             true,
             303
         );

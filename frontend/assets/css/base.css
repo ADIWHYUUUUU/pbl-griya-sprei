@@ -57,7 +57,7 @@ button { cursor: pointer; }
   display: grid;
   grid-template-columns: 1fr auto 1fr;   /* menu selalu di tengah */
   align-items: center;
-  height: 72px; padding: 0 32px;
+  height: 72px; padding: 0 max(32px, calc((100vw - 1440px) / 2 + 32px));
   background: var(--white);
   border-bottom: 1px solid var(--border);
 }
@@ -104,12 +104,8 @@ button { cursor: pointer; }
   .nav { grid-column: 1 / -1; order: 3; justify-content: center; }
   .footer__inner { grid-template-columns: 1fr; }
   .container { padding: 0 16px; }
-<<<<<<< HEAD
-}
-=======
-}
 
-
+}
 
 /* ===================================
    USER DROPDOWN
@@ -215,4 +211,3 @@ button { cursor: pointer; }
     background: #fff1f0;
     color: #b42318;
 }
->>>>>>> af99841c4edb3a4cc91886b8c6e66220c4a0baf6

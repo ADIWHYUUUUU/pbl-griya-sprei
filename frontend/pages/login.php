@@ -24,6 +24,7 @@
 
     <!-- ===== FORM LOGIN ===== -->
     <form id="loginForm" novalidate>
+      <p class="flash-message" id="loginMessage" role="alert" hidden></p>
 
       <!-- Email -->
       <div class="field" id="emailField">
@@ -53,7 +54,7 @@
         </div>
         <p class="field__hint field__hint--error" id="passwordHint" hidden>
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8v.01"/></svg>
-          <span>Kata sandi minimal 6 karakter</span>
+          <span>Kata sandi minimal 8 karakter</span>
         </p>
       </div>
 
@@ -72,7 +73,6 @@
     </form>
 
     <p class="register">Belum memiliki akun? <a href="register.php">Daftar Sekarang</a></p>
-      <p class="register">Admin? <a href="admin/login.php">Masuk di sini</a></p>
   </main>
 
   <script src="../assets/js/login.js"></script>
