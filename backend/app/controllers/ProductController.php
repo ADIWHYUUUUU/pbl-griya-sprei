@@ -7,9 +7,7 @@ class ProductController
 {
     private $model;
 
-    // =========================================
-    // CONSTRUCTOR
-    // =========================================
+    
     public function __construct()
     {
         global $pdo;
@@ -17,9 +15,6 @@ class ProductController
         $this->model = new ProductModel($pdo);
     }
 
-    // =========================================
-    // PROTEKSI ADMIN DAN CSRF
-    // =========================================
     private function authorizeAdminPost()
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -51,9 +46,7 @@ class ProductController
         }
     }
 
-    // =========================================
-    // READ - SEMUA PRODUK
-    // =========================================
+   
     public function getAllProducts()
     {
         return $this->model->getAllProducts();
