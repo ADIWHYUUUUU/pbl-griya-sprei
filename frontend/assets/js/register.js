@@ -63,8 +63,10 @@ registerForm.addEventListener("submit", async function (e) {
       return;
     }
 
-    alert(result.message);
-
+    sessionStorage.setItem(
+      "registrationSuccessMessage",
+      result.message || "Registrasi berhasil. Silakan login.",
+    );
     window.location.href = "login.php";
   } catch (error) {
     console.error("ERROR REGISTER:", error);
