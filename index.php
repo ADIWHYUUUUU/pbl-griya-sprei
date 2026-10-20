@@ -1,8 +1,3 @@
-
-
-
-    <?php
-
-    header('Location: /frontend/pages/user/index.php');
-    exit;
-
+<?php
+header('Location: /frontend/pages/user/index.php');
+exit;
