@@ -87,6 +87,11 @@ button { cursor: pointer; }
   color: var(--error);
   font-size: 12px;
 }
+.flash-message--success {
+  border-color: rgba(53, 89, 47, .2);
+  background: #e6efe3;
+  color: #35592f;
+}
 .flash-message[hidden] { display: none; }
 
 .field__label {

@@ -23,11 +23,22 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function showLoginMessage(message) {
   loginMessage.textContent = message;
+  loginMessage.classList.remove("flash-message--success");
+  loginMessage.setAttribute("role", "alert");
+  loginMessage.hidden = false;
+}
+
+function showSuccessMessage(message) {
+  loginMessage.textContent = message;
+  loginMessage.classList.add("flash-message--success");
+  loginMessage.setAttribute("role", "status");
   loginMessage.hidden = false;
 }
 
 function clearLoginMessage() {
   loginMessage.textContent = "";
+  loginMessage.classList.remove("flash-message--success");
+  loginMessage.setAttribute("role", "alert");
   loginMessage.hidden = true;
 }
 
@@ -166,4 +177,13 @@ if (savedEmail) {
   clearEmailBtn.hidden = false;
 
   rememberBox.checked = true;
+}
+
+const registrationSuccessMessage = sessionStorage.getItem(
+  "registrationSuccessMessage",
+);
+
+if (registrationSuccessMessage) {
+  sessionStorage.removeItem("registrationSuccessMessage");
+  showSuccessMessage(registrationSuccessMessage);
 }
