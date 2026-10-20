@@ -11,7 +11,7 @@ if (
     exit;
 }
 
-require_once __DIR__ . '/../../../backend/app/controllers/ProductController.php';
+require_once __DIR__ . '/../../../backend/app/controllers/product_controller.php';
 
 $controller = new ProductController();
 $products = $controller->getAllProducts();
@@ -98,7 +98,7 @@ function e($value)
                                     href="/frontend/pages/admin/edit.php?id=<?= (int) $product['id_produk'] ?>"
                                 >Edit</a>
                                 <form
-                                    action="/backend/actions/delete.php"
+                                    action="/backend/actions/admin/delete.php"
                                     method="POST"
                                     onsubmit="return confirm('Yakin ingin menghapus produk ini?');"
                                 >

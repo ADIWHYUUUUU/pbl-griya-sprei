@@ -5,11 +5,13 @@ akses internet diperlukan agar stylesheet dan komponen Bootstrap dimuat.
 
 ## Menjalankan
 
-Buka `index.html` di browser atau jalankan server lokal dari root repository:
+Jalankan server lokal dari root repository agar halaman frontend dan endpoint backend berada pada origin yang sama:
 
 ```sh
-php -S localhost:8080 -t frontend
+php -S localhost:8080 -t .
 ```
+
+Kemudian buka `http://localhost:8080/frontend/pages/user/index.php`.
 
 ## Struktur
 

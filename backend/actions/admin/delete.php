@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../app/controllers/ProductController.php';
+require_once __DIR__ . '/../../app/controllers/product_controller.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -20,4 +20,3 @@ if ($id === false || $id === null) {
 
 $controller = new ProductController();
 $controller->delete($id);
-

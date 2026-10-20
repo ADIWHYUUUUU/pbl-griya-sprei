@@ -4,13 +4,13 @@ Backend aplikasi menggunakan PHP native tanpa framework.
 
 ## Menjalankan
 
-Dari root repository, jalankan:
+Dari root repository, jalankan server dengan document root repositori agar endpoint di `backend/actions/` dapat diakses bersama frontend:
 
 ```sh
-php -S localhost:8000 -t backend/public
+php -S localhost:8000 -t .
 ```
 
-Kemudian buka `http://localhost:8000`.
+Kemudian buka `http://localhost:8000/frontend/pages/user/index.php`.
 
 ## Struktur
 

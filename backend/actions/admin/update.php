@@ -1,4 +1,3 @@
-
 <?php
 
 // =========================================
@@ -6,7 +5,7 @@
 // =========================================
 
 // Memanggil ProductController
-require_once __DIR__ . '/../app/controllers/ProductController.php';
+require_once __DIR__ . '/../../app/controllers/product_controller.php';
 
 // =========================================
 // VALIDASI REQUEST METHOD

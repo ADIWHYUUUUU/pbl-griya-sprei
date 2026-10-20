@@ -52,7 +52,7 @@ form.addEventListener("submit", async (event) => {
   if (!validateEmail() || !validatePassword()) return;
 
   try {
-    const response = await fetch("/backend/actions/admin-login.php", {
+    const response = await fetch("/backend/actions/admin/login.php", {
       method: "POST",
       body: new FormData(form),
     });

@@ -159,7 +159,7 @@ $activeNavPage = match ($currentPage) {
 
           <!-- Logout menggunakan POST -->
           <form
-            action="/backend/actions/logout.php"
+            action="/backend/actions/user/logout.php"
             method="POST"
             class="user-dropdown__form"
           >

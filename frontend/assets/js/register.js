@@ -44,7 +44,7 @@ registerForm.addEventListener("submit", async function (e) {
   const formData = new FormData(registerForm);
 
   try {
-    const response = await fetch("../../backend/actions/register.php", {
+    const response = await fetch("../../backend/actions/user/register.php", {
       method: "POST",
       body: formData,
     });

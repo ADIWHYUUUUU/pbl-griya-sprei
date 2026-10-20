@@ -9,7 +9,7 @@ if (
     header('Location: /frontend/pages/login.php');
     exit;
 }
-require_once __DIR__ . '/../../../backend/app/controllers/ProductController.php';
+require_once __DIR__ . '/../../../backend/app/controllers/product_controller.php';
 $controller = new ProductController();
 $id = filter_var(
     $_GET['id'] ?? null,
@@ -55,7 +55,7 @@ function e($value)
                 Perbarui informasi produk Griya Sprei.
             </p>
             <form
-                action="/backend/actions/update.php"
+                action="/backend/actions/admin/update.php"
                 method="POST"
                 enctype="multipart/form-data">
                 <input

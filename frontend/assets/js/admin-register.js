@@ -5,7 +5,7 @@ form.addEventListener("submit", async (event) => {
   if (!form.reportValidity()) return;
 
   try {
-    const response = await fetch("/backend/actions/admin-register.php", {
+    const response = await fetch("/backend/actions/admin/register.php", {
       method: "POST",
       body: new FormData(form),
     });

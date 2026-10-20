@@ -136,7 +136,7 @@ form.addEventListener("submit", async (e) => {
   formData.append("password", password);
 
   try {
-    const response = await fetch("../../backend/actions/login.php", {
+    const response = await fetch("../../backend/actions/user/login.php", {
       method: "POST",
       body: formData,
     });
