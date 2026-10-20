@@ -150,7 +150,9 @@ grid.addEventListener("click", (e) => {
     return;
   }
 
-  window.location.href = "detailproduk.php?id=" + idProduk;
+  window.location.href =
+    "/frontend/pages/user/detail_produk.php?id=" +
+    encodeURIComponent(idProduk);
 });
 
 /* =========================================

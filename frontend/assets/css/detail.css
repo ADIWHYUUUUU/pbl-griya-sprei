@@ -31,6 +31,7 @@
 .panel--form { padding: 32px; }
 .form__title { font-size: 20px; font-weight: 500; padding: 8px 0; margin-bottom: 20px; background: linear-gradient(90deg, transparent, #f7f7f4); }
 .form__label { display: block; font-size: 14px; font-weight: 500; margin: 20px 0 10px; }
+.stock-note { margin: -12px 0 16px; font-size: 12px; color: var(--muted); }
 
 /* Tab Standar / Custom */
 .segmented { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: #efefec; border-radius: 8px; }
@@ -98,6 +99,7 @@ textarea:focus { border-color: var(--green-dark); }
   font-size: 18px; font-weight: 500; box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
 }
 .btn-cart:hover { background: #3f523f; }
+.btn-cart:disabled { background: #9a9a94; box-shadow: none; cursor: not-allowed; }
 
 /* 5. RESPONSIF */
 @media (max-width: 1000px) {

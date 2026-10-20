@@ -69,3 +69,38 @@ button, input, textarea { font: inherit; }
   .product-card { padding: 16px 12px; }
   .save-bar { padding: 12px; }
 }
+
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-actions form {
+    margin: 0;
+}
+
+.logout-button {
+    padding: 11px 18px;
+    border: 1px solid #dc3545;
+    border-radius: 8px;
+    background: #fff;
+    color: #dc3545;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.logout-button:hover {
+    background: #dc3545;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        flex-wrap: wrap;
+    }
+}

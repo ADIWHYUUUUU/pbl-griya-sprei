@@ -6,7 +6,9 @@ require_once __DIR__ . '/../../../backend/app/config/database.php';
 // =========================================
 // DATA SESSION
 // =========================================
-$namaUser = $_SESSION["nama"] ?? "";
+$isLogin = ($_SESSION["login"] ?? false) === true
+  && ($_SESSION["role"] ?? "") === "CUSTOMER";
+$namaUser = $isLogin ? ($_SESSION["nama"] ?? "Pelanggan") : "";
 $jumlahKeranjang = isset($_SESSION["keranjang"]) && is_array($_SESSION["keranjang"])
     ? count($_SESSION["keranjang"])
     : 0;
@@ -94,15 +96,9 @@ $tambahan = [
 // MENU NAVIGASI
 // =========================================
 $menu = [
-    ["label" => "Beranda", "link" => "beranda.php"],
-    ["label" => "Katalog", "link" => "katalog.php"],
-    ["label" => "Pembayaran", "link" => "#"],
-    ["label" => "Riwayat Pesanan", "link" => "#"]
-];
-$tautan = [
-    ["label" => "Katalog", "link" => "katalog.php"],
-    ["label" => "Pembayaran", "link" => "#"],
-    ["label" => "Riwayat Pesanan", "link" => "#"]
+  ["label" => "Beranda", "link" => "/frontend/pages/user/index.php"],
+  ["label" => "Katalog", "link" => "/frontend/pages/user/katalog.php"],
+  ["label" => "Pesanan Saya", "link" => "#"]
 ];
 // =========================================
 // ESCAPE OUTPUT HTML
@@ -177,7 +173,7 @@ function aman($teks)
         </span>
       </a>
       <a
-        href="<?= $namaUser !== "" ? "#" : "login.php" ?>"
+        href="<?= $isLogin ? "/frontend/pages/user/index.php" : "/frontend/pages/login.php" ?>"
         class="btn-login"
         id="userButton"
       >
@@ -201,7 +197,7 @@ function aman($teks)
   <main class="container">
     <!-- ===== BREADCRUMB ===== -->
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="beranda.php">Beranda</a>
+      <a href="/frontend/pages/user/index.php">Beranda</a>
       <span>›</span>
       <a href="katalog.php">Katalog</a>
       <span>›</span>
@@ -265,7 +261,14 @@ function aman($teks)
         </div>
       </div>
       <!-- ===== KOLOM KANAN: FORM PESANAN ===== -->
-      <form class="panel panel--form" id="orderForm" novalidate>
+      <form
+        class="panel panel--form"
+        id="orderForm"
+        data-stock="<?= (int) $produk["stok"] ?>"
+        data-price="<?= aman($produk["harga"]) ?>"
+        data-category="<?= aman($produk["varian"]) ?>"
+        novalidate
+      >
         <!-- ID PRODUK YANG DIPILIH -->
         <input
           type="hidden"
@@ -275,6 +278,11 @@ function aman($teks)
         <h2 class="form__title">
           Konfigurasi Ukuran &amp; Spesifikasi
         </h2>
+        <p class="stock-note" id="stockStatus">
+          <?= $produk["stok"] > 0
+              ? "Stok tersedia: " . (int) $produk["stok"] . " set"
+              : "Produk sedang habis." ?>
+        </p>
         <!-- TIPE UKURAN -->
         <p class="form__label">Pilih Tipe Ukuran</p>
         <div class="segmented" role="tablist">
@@ -339,7 +347,7 @@ function aman($teks)
             class="stepper"
             data-stepper
             data-min="1"
-            data-max="50"
+            data-max="<?= max(1, min(50, $produk["stok"])) ?>"
           >
             <button
               type="button"
@@ -405,7 +413,11 @@ function aman($teks)
           hidden
         ></p>
         <!-- TOMBOL KERANJANG -->
-        <button type="submit" class="btn-cart">
+        <button
+          type="submit"
+          class="btn-cart"
+          <?= $produk["stok"] <= 0 ? "disabled" : "" ?>
+        >
           Tambahkan ke Keranjang
           <svg
             viewBox="0 0 24 24"
@@ -424,7 +436,6 @@ function aman($teks)
   <!-- FOOTER -->
   <?php require __DIR__ . '/../../components/footer.php'; ?>
   <!-- JAVASCRIPT DETAIL -->
-  <script src="../../assets/js/data.js"></script>
-  <script src="../../assets/js/detail.js"></script>
+  <script src="../../assets/js/detail_produk.js"></script>
 </body>
 </html>

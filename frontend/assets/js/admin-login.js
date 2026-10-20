@@ -8,6 +8,12 @@ const clearEmailButton = document.getElementById("clearEmail");
 const toggleButton = document.getElementById("togglePassword");
 const rememberCheckbox = document.getElementById("remember");
 
+rememberCheckbox.addEventListener("change", () => {
+  if (!rememberCheckbox.checked) {
+    localStorage.removeItem("adminEmail");
+  }
+});
+
 function validateEmail() {
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
   emailField.classList.toggle("field--error", !valid);

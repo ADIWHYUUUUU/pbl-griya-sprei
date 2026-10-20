@@ -13,6 +13,10 @@ if (
     exit;
 }
 
+// Token CSRF untuk logout
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
 
 <!DOCTYPE html>
@@ -33,12 +37,38 @@ if (
             <p>Selamat datang di panel pengelolaan Griya Sprei.</p>
         </div>
     </div>
+
     <nav class="admin-actions dashboard-actions" aria-label="Navigasi admin">
         <a href="produk.php" class="btn btn-add">Kelola Produk</a>
+
         <a href="tambah.php" class="btn btn-edit">Tambah Produk</a>
-        <a href="/frontend/pages/admin/beranda.php" class="btn btn-edit">Edit Beranda</a>
+
+        <a href="beranda.php" class="btn btn-edit">Edit Beranda</a>
+
         <a href="register.php" class="btn btn-add">Tambah Admin</a>
+
+        <!-- TOMBOL LOGOUT ADMIN -->
+        <form
+            action="/backend/actions/admin/logout.php"
+            method="POST"
+            class="logout-form"
+        >
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= htmlspecialchars(
+                    $_SESSION['csrf_token'],
+                    ENT_QUOTES,
+                    'UTF-8'
+                ); ?>"
+            >
+
+            <button type="submit" class="btn btn-logout">
+                Keluar
+            </button>
+        </form>
     </nav>
+
     <div class="dashboard-note">
         <h2>Pengelolaan Toko</h2>
         <p>Pilih salah satu menu untuk mengelola katalog dan konten toko.</p>

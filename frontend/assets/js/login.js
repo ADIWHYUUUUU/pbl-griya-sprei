@@ -18,6 +18,12 @@ const toggleBtn = document.getElementById("togglePassword");
 
 const rememberBox = document.getElementById("remember");
 
+rememberBox.addEventListener("change", () => {
+  if (!rememberBox.checked) {
+    localStorage.removeItem("userEmail");
+  }
+});
+
 const MIN_PASSWORD = 8;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

@@ -56,7 +56,6 @@
         </button>
     </form>
     <p class="register">Belum punya akun admin? <a href="register.php">Daftar akun</a></p>
-    <p class="register"><a href="../login.php">Kembali ke login customer</a></p>
 </main>
 <script src="../../assets/js/admin-login.js"></script>
 </body>

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../../backend/app/controllers/ProductController.php';
+require_once __DIR__ . '/../../../backend/app/controllers/product_controller.php';
 $productController = new ProductController();
 $catalogProducts = array_map(static function ($product) {
     $dimensions = array_filter([
@@ -34,7 +34,7 @@ $catalogProducts = array_map(static function ($product) {
             ? '/frontend/uploads/produk/' . rawurlencode(basename($imageName))
             : '',
         // LINK DETAIL BERDASARKAN ID PRODUK
-        'detailUrl' => 'detailproduk.php?id=' . (int) $product['id_produk'],
+        'detailUrl' => '/frontend/pages/user/detail_produk.php?id=' . (int) $product['id_produk'],
     ];
 }, $productController->getAllProducts());
 // =========================================
