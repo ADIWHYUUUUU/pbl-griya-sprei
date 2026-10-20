@@ -5,6 +5,7 @@ const productName = $("productTitle").textContent.trim();
 const stock = Number(form.dataset.stock);
 const price = Number(form.dataset.price);
 const category = form.dataset.category;
+const stockStatus = $("stockStatus");
 const modeButtons = document.querySelectorAll(".segmented__btn");
 const submitButton = form.querySelector('[type="submit"]');
 const dimensions = {
@@ -35,6 +36,7 @@ function hideMessage() {
 function setMode(newMode) {
   mode = newMode;
   form.classList.toggle("is-standard", mode === "standard");
+  stockStatus.hidden = mode !== "standard";
 
   modeButtons.forEach((button) => {
     const isActive = button.dataset.mode === mode;

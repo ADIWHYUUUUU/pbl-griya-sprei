@@ -198,11 +198,11 @@ function aman($teks)
     <!-- ===== BREADCRUMB ===== -->
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href="/frontend/pages/user/index.php">Beranda</a>
-      <span>›</span>
+      <span>/</span>
       <a href="katalog.php">Katalog</a>
-      <span>›</span>
+      <span>/</span>
       <strong id="crumbName">
-        <?= aman($produk["nama"] . " (" . $produk["varian"] . ")") ?>
+        <?= aman($produk["nama"]) ?>
       </strong>
     </nav>
     <div class="detail">
@@ -234,6 +234,11 @@ function aman($teks)
                   $produk["tinggi"]
               ) ?> cm
             </strong>
+          </p>
+          <p class="stock-note" id="stockStatus">
+            <?= $produk["stok"] > 0
+                ? "Stok tersedia: " . (int) $produk["stok"] . " set"
+                : "Produk sedang habis." ?>
           </p>
           <p class="product-desc" id="productDesc">
             <?= aman($produk["deskripsi"]) ?>
@@ -278,11 +283,6 @@ function aman($teks)
         <h2 class="form__title">
           Konfigurasi Ukuran &amp; Spesifikasi
         </h2>
-        <p class="stock-note" id="stockStatus">
-          <?= $produk["stok"] > 0
-              ? "Stok tersedia: " . (int) $produk["stok"] . " set"
-              : "Produk sedang habis." ?>
-        </p>
         <!-- TIPE UKURAN -->
         <p class="form__label">Pilih Tipe Ukuran</p>
         <div class="segmented" role="tablist">
