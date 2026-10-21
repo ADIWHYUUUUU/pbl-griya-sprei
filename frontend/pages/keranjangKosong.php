@@ -9,6 +9,14 @@
 // kalau keranjang tidak berisi produk.
 // =====================================================
 
+session_start();
+
+// Kalau ternyata keranjang masih ada isinya, kembalikan ke keranjang.php
+if (!empty($_SESSION['keranjang'])) {
+    header('Location: keranjang.php');
+    exit;
+}
+
 // Teks yang tampil di halaman (mudah diubah di sini)
 $judul     = 'KERANJANG SAAT INI KOSONG';
 $deskripsi = 'Belum ada sprei atau bed cover yang ditambahkan ke keranjang.
