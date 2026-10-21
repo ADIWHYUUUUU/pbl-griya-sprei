@@ -1,14 +1,11 @@
 <?php
-// =====================================================
-// HALAMAN CHECKOUT (FRONTEND) - GRIYA SPREI
 session_start();
 
-// Fungsi kecil supaya teks aman ditampilkan
 function e($teks) {
     return htmlspecialchars($teks, ENT_QUOTES, 'UTF-8');
 }
 
-// ---------- 1. Data pemesan (contoh, nanti dari akun yang login) ----------
+// ---------- Data pemesan ----------
 $pemesan = [
     'nama'    => 'Vico Dwi Wijaya',
     'telepon' => '+62 812-4491-1980',
@@ -18,7 +15,7 @@ $pemesan = [
 $alamatAwal  = 'Jl. Ngawi Barat No. 12, RT 03 / RW 07, Kel. Ngawi Barat, Kec. Lowokwaru, Kota Malang, Jawa Timur (Kode Pos 65141)';
 $catatanAwal = 'Rumah pagar hitam samping warung Bu Sri, pagar selalu dibuka saja tidak dikunci.';
 
-// ---------- 2. Pilihan metode pengiriman ----------
+// ---------- Pilihan metode pengiriman ----------
 $metodeKirim = [
     'instan' => ['kelompok' => 'Kurir Instan', 'jenis' => 'instan', 'nama' => 'Gojek / Grab Express',
                  'info' => 'Khusus area Kota Malang',
@@ -31,26 +28,46 @@ $metodeKirim = [
                  'waktu' => 'Perkiraan: 1 – 3 hari'],
 ];
 
-// ---------- 3. Pesanan berhasil dikirim -> tampilkan halaman sukses ----------
+// ---------- Pesanan berhasil dikirim akan di tampilkan berhasil ----------
 if (isset($_GET['berhasil']) && isset($_SESSION['pesanan_terakhir'])) {
     $pesananBaru = $_SESSION['pesanan_terakhir'];
 }
 
-// ---------- 4. Proses tombol "Kirim Pesanan" ----------
+// ---------- "Kirim Pesanan" ----------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id     = isset($_POST['id']) ? (int) $_POST['id'] : 0;
     $metode = isset($_POST['metode']) ? $_POST['metode'] : '';
     $setuju = isset($_POST['setuju']);
 
-    // Data tidak lengkap -> kembali ke checkout
+    // Data tidak lengkap  akan kembali ke checkout
     if (!isset($_SESSION['keranjang'][$id]) || !isset($metodeKirim[$metode]) || !$setuju) {
         header('Location: checkout.php?id=' . $id);
         exit;
     }
 
+    // Spesifikasi produk
+    $produk = $_SESSION['keranjang'][$id];
+    $jenis  = (isset($_POST['jenis']) && $_POST['jenis'] === 'custom') ? 'custom' : 'standar';
+    $p = max(1, (int) ($_POST['panjang'] ?? 0));
+    $l = max(1, (int) ($_POST['lebar'] ?? 0));
+    $t = max(1, (int) ($_POST['tinggi'] ?? 0));
+    $bantal = max(0, (int) ($_POST['bantal'] ?? 0));
+    $guling = max(0, (int) ($_POST['guling'] ?? 0));
+
+    $tambahan = [];
+    if ($bantal > 0) $tambahan[] = $bantal . ' sarung bantal';
+    if ($guling > 0) $tambahan[] = $guling . ' sarung guling';
+
+    $produk['jenis']    = $jenis;
+    $produk['ukuran']   = "$p × $l × $t cm";
+    $produk['tambahan'] = $tambahan ? implode(' + ', $tambahan) : '-';
+    $produk['catatan']  = trim($_POST['catatan_produk'] ?? '') ?: '-';
+
     $pesanan = [
         'kode'     => 'GS-' . date('ymd') . '-' . str_pad($id, 3, '0', STR_PAD_LEFT),
-        'produk'   => $_SESSION['keranjang'][$id],
+        'produk'   => $produk,
+        'penerima' => trim($_POST['nama_penerima'] ?? '') ?: $pemesan['nama'],
+        'telepon'  => trim($_POST['telepon'] ?? '') ?: $pemesan['telepon'],
         'alamat'   => trim($_POST['alamat']) ?: $alamatAwal,
         'catatan_alamat' => trim($_POST['catatan_alamat']),
         'metode'   => $metodeKirim[$metode]['nama'],
@@ -59,25 +76,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'waktu'    => date('d M Y, H:i'),
     ];
 
-    $_SESSION['pesanan'][]          = $pesanan;   // daftar untuk halaman Pesanan Saya
-    $_SESSION['pesanan_terakhir']   = $pesanan;   // untuk ditampilkan di halaman sukses
-    unset($_SESSION['keranjang'][$id]);           // produk keluar dari keranjang
+    $_SESSION['pesanan'][]          = $pesanan;  
+    $_SESSION['pesanan_terakhir']   = $pesanan;   
+    unset($_SESSION['keranjang'][$id]);           
 
     header('Location: checkout.php?berhasil=1');
     exit;
 }
 
-// ---------- 5. Ambil produk yang mau di-checkout ----------
+// ---------- Ambil produk yang mau di-checkout ----------
 if (!isset($pesananBaru)) {
     $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-    // Produk tidak ada di keranjang -> kembali ke keranjang
+    // Produk tidak ada di keranjang akan kembali ke keranjang
     if (!isset($_SESSION['keranjang'][$id])) {
         header('Location: keranjang.php');
         exit;
     }
 
     $produk = $_SESSION['keranjang'][$id];
+
+    preg_match_all('/\d+/', $produk['ukuran'], $angka);
+    $dimensi = array_pad(array_slice($angka[0], 0, 3), 3, '');
+    list($panjang, $lebar, $tinggi) = $dimensi;
+
+    // Ambil jumlah sarung bantal & guling dari teks tambahan
+    $jmlBantal = preg_match('/(\d+)\s*sarung bantal/i', $produk['tambahan'], $m) ? (int) $m[1] : 0;
+    $jmlGuling = preg_match('/(\d+)\s*sarung guling/i', $produk['tambahan'], $m) ? (int) $m[1] : 0;
 }
 ?>
 <!DOCTYPE html>
@@ -94,44 +119,10 @@ if (!isset($pesananBaru)) {
 </head>
 <body>
 
-  <!-- ===== HEADER (sama dengan halaman lain) ===== -->
-<?php
-  // Jumlah barang di keranjang untuk badge ikon keranjang
-  $jumlahKeranjang = 0;
-  foreach ($_SESSION['keranjang'] ?? [] as $isi) {
-      $jumlahKeranjang += $isi['jumlah'];
-  }
-?>
-  <header class="header">
-    <div class="brand">
-      <img class="brand__logo" src="../assets/images/image1.png" alt="Logo Griya Sprei">
-      <div>
-        <h1 class="brand__name">Griya Sprei</h1>
-        <p class="brand__tagline">Homemade Pillow, Bolster, Sprei, Bedcover, Etc.</p>
-      </div>
-    </div>
-    <nav class="nav" aria-label="Navigasi utama">
-      <a href="beranda.html" class="nav__link">Beranda</a>
-      <a href="katalog.html" class="nav__link">Katalog</a>
-      <a href="#" class="nav__link">Pembayaran</a>
-      <a href="#" class="nav__link">Riwayat Pesanan</a>
-    </nav>
-    <div class="header__actions">
-      <a href="keranjang.php" class="cart" aria-label="Keranjang">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 11h10.2L20 7H6.5"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>
-        <?php if ($jumlahKeranjang > 0) { ?><span class="cart__badge"><?= $jumlahKeranjang ?></span><?php } ?>
-      </a>
-      <a href="login.html" class="btn-login">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
-        Masuk / Daftar
-      </a>
-    </div>
-  </header>
 
 <main class="container">
 <div class="isi">
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb">
         <a href="beranda.html">Beranda</a> /
         <a href="keranjang.php">Keranjang</a> /
@@ -140,28 +131,29 @@ if (!isset($pesananBaru)) {
 
 <?php if (isset($pesananBaru)) { ?>
 
-    <!-- ================= PESANAN BERHASIL ================= -->
-    <section class="kartu sukses">
-        <div class="ikon-sukses">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    <!-- ================= PESANAN BERHASIL DIKIRIM ================= -->
+    <div class="modal-latar tampil" id="modalSukses">
+        <div class="modal modal-sukses" role="dialog" aria-modal="true" aria-labelledby="judulSukses">
+            <div class="ikon-sukses">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>
+            </div>
+            <h2 id="judulSukses">Pesanan Berhasil Dikirim!</h2>
+            <p>Pesanan Anda telah diterima oleh sistem kami. Admin sedang memverifikasi pesanan dan
+               menghitung total biaya + ongkos kirim.</p>
+            <p class="kode-pesanan">Kode pesanan: <b><?= e($pesananBaru['kode']) ?></b> · <?= e($pesananBaru['produk']['nama']) ?></p>
+            <div class="aksi-sukses">
+                <a href="pesanan_saya.php" class="tombol tombol-lebar">Lihat Pesanan Saya</a>
+                <a href="keranjang.php" class="tombol tombol-abu">Tutup</a>
+            </div>
         </div>
-        <h2>Pesanan Berhasil Dikirim</h2>
-        <p>Kode pesanan <b><?= e($pesananBaru['kode']) ?></b> untuk <b><?= e($pesananBaru['produk']['nama']) ?></b>
-           sekarang berstatus <span class="status">MENUNGGU VERIFIKASI</span></p>
-        <p class="kecil">Admin akan memverifikasi ukuran dan menghitung total tagihan beserta ongkos kirim
-           (<?= e($pesananBaru['metode']) ?>) maksimal 1×24 jam.</p>
-        <div class="aksi-sukses">
-            <a href="keranjang.php" class="tombol tombol-garis">Kembali ke Keranjang</a>
-            <a href="pesanan_saya.php" class="tombol">Lihat Pesanan Saya →</a>
-        </div>
-    </section>
+    </div>
 
 <?php } else { ?>
 
     <form method="post" id="formCheckout">
         <input type="hidden" name="id" value="<?= $id ?>">
 
-        <!-- ================= 1. DATA & ALAMAT ================= -->
+        <!-- ================= DATA & ALAMAT ================= -->
         <section class="kartu">
             <div class="kepala">
                 <span class="ikon-bulat">
@@ -171,43 +163,29 @@ if (!isset($pesananBaru)) {
                     <h2>Data &amp; Alamat Pengiriman</h2>
                     <small>Informasi pemesan dan tujuan pengiriman</small>
                 </div>
-                <button type="button" class="tombol-kecil" id="tombolUbahAlamat">
+                <button type="button" class="tombol-kecil" data-buka-modal="modalAlamat">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m14 5 5 5-10 10H4v-5z"/></svg>
-                    <span>Ubah Alamat</span>
+                    Ubah Alamat
                 </button>
             </div>
 
             <div class="dua-kolom">
                 <div>
                     <small class="judul-kecil">IDENTITAS PEMESAN</small>
-                    <p class="baris-ikon"><b><?= e($pemesan['nama']) ?></b></p>
-                    <p class="baris-ikon">📞 <?= e($pemesan['telepon']) ?></p>
+                    <p class="baris-ikon"><b id="teksNama"><?= e($pemesan['nama']) ?></b></p>
+                    <p class="baris-ikon">📞 <span id="teksTelepon"><?= e($pemesan['telepon']) ?></span></p>
                     <p class="baris-ikon">✉️ <?= e($pemesan['email']) ?></p>
                 </div>
 
                 <div class="kotak-alamat">
                     <small class="judul-kecil">ALAMAT PENGIRIMAN LENGKAP</small>
-
-                    <!-- Tampilan biasa -->
-                    <div id="alamatTampil">
-                        <p id="teksAlamat"><?= e($alamatAwal) ?></p>
-                        <p class="catatan-alamat">ⓘ <b>Catatan alamat:</b> <span id="teksCatatanAlamat"><?= e($catatanAwal) ?></span></p>
-                    </div>
-
-                    <!-- Mode ubah (muncul saat tombol "Ubah Alamat" ditekan) -->
-                    <div id="alamatUbah" class="sembunyi">
-                        <label>Alamat lengkap
-                            <textarea name="alamat" id="inputAlamat" rows="3"><?= e($alamatAwal) ?></textarea>
-                        </label>
-                        <label>Catatan alamat
-                            <input type="text" name="catatan_alamat" id="inputCatatanAlamat" value="<?= e($catatanAwal) ?>">
-                        </label>
-                    </div>
+                    <p id="teksAlamat"><?= e($alamatAwal) ?></p>
+                    <p class="catatan-alamat" id="kotakCatatanAlamat">ⓘ <b>Catatan alamat:</b> <span id="teksCatatanAlamat"><?= e($catatanAwal) ?></span></p>
                 </div>
             </div>
         </section>
 
-        <!-- ================= 2. DETAIL PESANAN ================= -->
+        <!-- ================= DETAIL PESANAN ================= -->
         <section class="kartu">
             <div class="kepala">
                 <span class="ikon-bulat">
@@ -217,6 +195,10 @@ if (!isset($pesananBaru)) {
                     <h2>Detail Pesanan</h2>
                     <small>Konfirmasi detail spesifikasi pesanan</small>
                 </div>
+                <button type="button" class="tombol-kecil" data-buka-modal="modalSpesifikasi">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20 20 4M7 4h-3v3M20 17v3h-3"/></svg>
+                    Ubah Spesifikasi
+                </button>
             </div>
 
             <div class="produk">
@@ -224,16 +206,16 @@ if (!isset($pesananBaru)) {
                 <div class="detail">
                     <h3>
                         <?= e($produk['nama']) ?>
-                        <span class="label label-<?= e($produk['jenis']) ?>"><?= strtoupper(e($produk['jenis'])) ?></span>
+                        <span class="label label-<?= e($produk['jenis']) ?>" id="teksJenis"><?= strtoupper(e($produk['jenis'])) ?></span>
                     </h3>
-                    <p><small>Ukuran:</small> <?= e($produk['ukuran']) ?> &nbsp;&nbsp; <small>Jumlah:</small> <?= (int) $produk['jumlah'] ?> pcs</p>
-                    <p><small>Tambahan:</small> <?= e($produk['tambahan']) ?></p>
-                    <p class="catatan-produk"><b>Catatan:</b> <?= e($produk['catatan']) ?></p>
+                    <p><small>Ukuran:</small> <span id="teksUkuran"><?= e($produk['ukuran']) ?></span> &nbsp;&nbsp; <small>Jumlah:</small> <?= (int) $produk['jumlah'] ?> pcs</p>
+                    <p><small>Tambahan:</small> <span id="teksTambahan"><?= e($produk['tambahan']) ?></span></p>
+                    <p class="catatan-produk"><b>Catatan:</b> <span id="teksCatatanProduk"><?= e($produk['catatan']) ?></span></p>
                 </div>
             </div>
         </section>
 
-        <!-- ================= 3. METODE PENGIRIMAN ================= -->
+        <!-- ================= METODE PENGIRIMAN ================= -->
         <section class="kartu">
             <div class="kepala">
                 <span class="ikon-bulat">
@@ -262,7 +244,7 @@ if (!isset($pesananBaru)) {
             </label>
         </section>
 
-        <!-- ================= 4. ALUR & PERSETUJUAN ================= -->
+        <!-- ================= ALUR & PERSETUJUAN ================= -->
         <section class="kartu kartu-info">
             <div class="kepala">
                 <span class="ikon-bulat">
@@ -294,41 +276,136 @@ if (!isset($pesananBaru)) {
             </button>
             <small>🕓 Verifikasi Admin: Maks 1×24 Jam</small>
         </div>
+
+
+        <!-- =====================================================
+             UBAH ALAMAT PENGIRIMAN
+             ===================================================== -->
+        <div class="modal-latar" id="modalAlamat">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="judulModalAlamat">
+                <div class="modal-kepala">
+                    <h2 id="judulModalAlamat">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+                        Ubah Alamat Pengiriman
+                    </h2>
+                    <button type="button" class="tutup-modal" data-tutup-modal aria-label="Tutup">×</button>
+                </div>
+
+                <div class="modal-isi">
+                    <label class="isian">Nama Penerima
+                        <input type="text" name="nama_penerima" id="inputNama" value="<?= e($pemesan['nama']) ?>">
+                    </label>
+                    <label class="isian">Nomor WhatsApp
+                        <input type="tel" name="telepon" id="inputTelepon" value="<?= e($pemesan['telepon']) ?>">
+                    </label>
+                    <label class="isian">Alamat Lengkap &amp; Kota
+                        <textarea name="alamat" id="inputAlamat" rows="3"><?= e($alamatAwal) ?></textarea>
+                    </label>
+                    <label class="isian">Catatan Khusus Pengiriman <small>(Opsional)</small>
+                        <input type="text" name="catatan_alamat" id="inputCatatanAlamat" value="<?= e($catatanAwal) ?>">
+                    </label>
+                </div>
+
+                <div class="modal-kaki">
+                    <button type="button" class="tombol tombol-abu" data-tutup-modal>Batal</button>
+                    <button type="button" class="tombol" id="simpanAlamat">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             UBAH SPESIFIKASI PESANAN
+             ===================================================== -->
+        <div class="modal-latar" id="modalSpesifikasi">
+            <div class="modal modal-lebar" role="dialog" aria-modal="true" aria-labelledby="judulModalSpek">
+                <div class="modal-kepala">
+                    <div>
+                        <h2 id="judulModalSpek">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21H3z"/><path d="m8 12 2 2M11 9l2 2M14 6l2 2"/></svg>
+                            Ubah Spesifikasi Pesanan
+                        </h2>
+                        <small><?= e($produk['nama']) ?></small>
+                    </div>
+                    <button type="button" class="tutup-modal" data-tutup-modal aria-label="Tutup">×</button>
+                </div>
+
+                <div class="modal-isi">
+                    <small class="judul-bagian">TIPE UKURAN</small>
+                    <div class="pilih-tipe">
+                        <label>
+                            <input type="radio" name="jenis" value="standar" <?= $produk['jenis'] === 'standar' ? 'checked' : '' ?>>
+                            <span>Standar</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="jenis" value="custom" <?= $produk['jenis'] === 'custom' ? 'checked' : '' ?>>
+                            <span>Custom</span>
+                        </label>
+                    </div>
+
+                    <small class="judul-bagian">DIMENSI KASUR</small>
+                    <div class="tiga-kolom">
+                        <label class="isian">Panjang
+                            <span class="input-satuan"><input type="number" min="1" name="panjang" id="inputPanjang" value="<?= e($panjang) ?>"><i>cm</i></span>
+                        </label>
+                        <label class="isian">Lebar
+                            <span class="input-satuan"><input type="number" min="1" name="lebar" id="inputLebar" value="<?= e($lebar) ?>"><i>cm</i></span>
+                        </label>
+                        <label class="isian">Tinggi Kasur
+                            <span class="input-satuan"><input type="number" min="1" name="tinggi" id="inputTinggi" value="<?= e($tinggi) ?>"><i>cm</i></span>
+                        </label>
+                    </div>
+                    <p class="info-tinggi">ⓘ Tinggi standar kasur: 25 cm. Tambahan penyesuaian tinggi per 5 cm: <b>+Rp 15.000</b>.</p>
+
+                    <small class="judul-bagian">TAMBAHKAN SARUNG BANTAL DAN GULING</small>
+                    <div class="dua-penghitung">
+                        <div class="penghitung-kotak">
+                            <div>
+                                <b>Sarung Bantal</b>
+                                <small>+Rp 25.000 / pcs</small>
+                            </div>
+                            <div class="penghitung">
+                                <button type="button" data-kurang="inputBantal">−</button>
+                                <input type="number" min="0" name="bantal" id="inputBantal" value="<?= $jmlBantal ?>" readonly>
+                                <button type="button" data-tambah="inputBantal">+</button>
+                            </div>
+                        </div>
+                        <div class="penghitung-kotak">
+                            <div>
+                                <b>Sarung Guling</b>
+                                <small>+Rp 25.000 / pcs</small>
+                            </div>
+                            <div class="penghitung">
+                                <button type="button" data-kurang="inputGuling">−</button>
+                                <input type="number" min="0" name="guling" id="inputGuling" value="<?= $jmlGuling ?>" readonly>
+                                <button type="button" data-tambah="inputGuling">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <small class="judul-bagian">CATATAN JAHITAN KHUSUS WORKSHOP</small>
+                    <textarea class="isian-lepas" name="catatan_produk" id="inputCatatanProduk" rows="3"><?= e($produk['catatan']) ?></textarea>
+                </div>
+
+                <div class="modal-kaki">
+                    <button type="button" class="tombol tombol-garis" data-tutup-modal>Batal</button>
+                    <button type="button" class="tombol" id="simpanSpesifikasi">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Simpan Spesifikasi
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </form>
 
 <?php } ?>
 
 </div>
 </main>
-
-  <!-- ===== FOOTER (sama dengan halaman lain) ===== -->
-  <footer class="footer">
-    <div class="footer__inner">
-      <div>
-        <h3 class="footer__title">Griya Sprei Malang</h3>
-        <p class="footer__text">Melayani sprei, bed cover, sarung bantal, dan sarung guling untuk rumah tangga, kos, homestay, hingga rumah sakit sejak 2010.</p>
-        <p class="footer__text">Jl. Kanjuruhan Asri No. 8, Tlogomas, Lowokwaru, Kota Malang</p>
-      </div>
-      <div>
-        <h3 class="footer__title">Kontak Kami</h3>
-        <ul class="footer__list">
-          <li>+62 812-3456-7890</li>
-          <li>@produksispreikatun</li>
-          <li>griyasprei@gmail.com</li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="footer__title">Tautan</h3>
-        <ul class="footer__list">
-          <li><a href="katalog.html">Katalog</a></li>
-          <li><a href="#">Pembayaran</a></li>
-          <li><a href="#">Riwayat Pesanan</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
-
-
 <script src="../assets/js/checkout.js"></script>
 </body>
 </html>

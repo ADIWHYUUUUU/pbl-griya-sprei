@@ -16,15 +16,7 @@ semuaFormHapus.forEach(function (form) {
     });
 });
 
-
-// =====================================================
-// BAGIAN KERANJANG KOSONG (dulu keranjangKosong.js)
-// Hanya jalan kalau kotak keranjang kosong ada di halaman.
-// =====================================================
-
-// ---------- A. Animasi muncul ----------
-// Setelah halaman selesai dimuat,
-// tambahkan class "muncul" supaya kotak tampil pelan-pelan.
+// ---------- Animasi muncul ----------
 window.addEventListener('load', function () {
     var kotak = document.getElementById('kotakKosong');
     if (kotak) {
@@ -33,7 +25,7 @@ window.addEventListener('load', function () {
 });
 
 
-// ---------- B. Ikon keranjang bergoyang kecil saat diarahkan mouse ----------
+// ---------- Ikon keranjang bergoyang----------
 var ikon = document.querySelector('.ikon-kosong');
 
 if (ikon) {
@@ -49,7 +41,7 @@ if (ikon) {
 }
 
 
-// ---------- C. Tombol "Jelajahi Katalog" memberi tanda sedang memuat ----------
+// ----------Jelajahi Katalog ----------
 var tombolKatalog = document.querySelector('.kosong-besar .tombol');
 var teksAsli = tombolKatalog ? tombolKatalog.innerHTML : '';
 
@@ -57,12 +49,12 @@ if (tombolKatalog) {
     tombolKatalog.addEventListener('click', function () {
         tombolKatalog.textContent = 'Membuka katalog...';
         tombolKatalog.style.opacity = '0.7';
-        tombolKatalog.style.pointerEvents = 'none';   // cegah klik dua kali
+        tombolKatalog.style.pointerEvents = 'none'; 
     });
 }
 
 
-// ---------- D. Kembali lewat tombol Back browser -> tombol normal lagi ----------
+// ---------- tombol kembali  ----------
 window.addEventListener('pageshow', function () {
     if (tombolKatalog) {
         tombolKatalog.innerHTML = teksAsli;

@@ -1,10 +1,9 @@
 // =====================================================
 // SCRIPT HALAMAN CHECKOUT - GRIYA SPREI
-// Letak file: pbl-griya-sprei/frontend/assets/js/checkout.js
 // =====================================================
 
 
-// ---------- 1. Tombol "Ubah Alamat" -> tampilkan / sembunyikan form ----------
+// ---------- "Ubah Alamat" tampilkan atau di sembunyikan----------
 var tombolUbah    = document.getElementById('tombolUbahAlamat');
 var alamatTampil  = document.getElementById('alamatTampil');
 var alamatUbah    = document.getElementById('alamatUbah');
@@ -14,7 +13,7 @@ if (tombolUbah) {
         var sedangUbah = !alamatUbah.classList.contains('sembunyi');
 
         if (sedangUbah) {
-            // Simpan: salin isi input ke tampilan biasa
+            // Simpan
             document.getElementById('teksAlamat').textContent =
                 document.getElementById('inputAlamat').value;
             document.getElementById('teksCatatanAlamat').textContent =

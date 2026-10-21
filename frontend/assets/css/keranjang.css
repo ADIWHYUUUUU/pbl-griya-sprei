@@ -2,22 +2,19 @@
    STYLE HALAMAN KERANJANG - GRIYA SPREI
    ===================================================== */
 
-/* ---------- Warna utama (ubah di sini saja) ---------- */
+/* ---------- Warna utama ---------- */
 :root {
-    --hijau: var(--green-dark);   /* ikut base.css */
-    --hijau-muda: #e6ece2;
+    --hijau: var(--green-dark);   
     --merah: #c0453d;
     --merah-muda: #fbe5e2;
     --latar: var(--bg);
     --garis: var(--border);
     --abu: #8a9086;
-    --abu-muda: #eef0ea;       /* untuk bagian keranjang kosong */
+    --abu-muda: #eef0ea;      
     --oranye: var(--price);
     --teks: #1f2a1c;
     --teks-abu: var(--muted);
 }
-
-/* Reset, body, header & footer sudah diatur di base.css */
 
 a {
     color: inherit;
@@ -59,7 +56,7 @@ small {
    ISI HALAMAN
    ===================================================== */
 .isi {
-    max-width: none;   /* lebar penuh seperti katalog */
+    max-width: none;  
     margin: 0 auto;
     padding: 24px 0 10px;
     font-size: 14px;
@@ -304,30 +301,25 @@ small {
 }
 
 
-/* =====================================================
-   BAGIAN KERANJANG KOSONG (dulu keranjangKosong.css)
-   ===================================================== */
+/* BAGIAN KERANJANG KOSONG  */
 .kosong-besar {
     position: relative;
-    overflow: hidden;            /* lingkaran hiasan tidak keluar kotak */
+    overflow: hidden;           
     background: white;
     border-radius: 14px;
     padding: 60px 20px 70px;
     text-align: center;
 
-    /* awal animasi: transparan & sedikit turun */
     opacity: 0;
     transform: translateY(12px);
     transition: opacity 0.5s, transform 0.5s;
 }
 
-/* class "muncul" ditambahkan oleh JavaScript */
 .kosong-besar.muncul {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* Lingkaran hiasan abu di pojok kanan atas & kiri bawah */
 .kosong-besar::before,
 .kosong-besar::after {
     content: "";
@@ -365,7 +357,6 @@ small {
     justify-content: center;
 }
 
-/* Bulatan hijau kecil di kanan atas ikon */
 .ikon-kosong .titik {
     position: absolute;
     top: 0;
@@ -387,7 +378,7 @@ small {
     position: relative;
     font-size: 13px;
     font-weight: 600;
-    letter-spacing: 0.06em;      /* huruf agak renggang */
+    letter-spacing: 0.06em;      
     color: var(--oranye);
     margin-bottom: 10px;
 }
@@ -402,23 +393,8 @@ small {
 }
 
 
-/* ---------- Tombol (khusus bagian kosong) ---------- */
+/* ---------- Tombol---------- */
 .kosong-besar .tombol {
     position: relative;
     padding: 11px 20px;
-}
-
-
-/* =====================================================
-   TAMPILAN HP - BAGIAN KOSONG (layar kecil)
-   ===================================================== */
-@media (max-width: 600px) {
-    .kosong-besar {
-        padding: 44px 16px 52px;
-    }
-
-    .ikon-kosong {
-        width: 90px;
-        height: 90px;
-    }
 }
