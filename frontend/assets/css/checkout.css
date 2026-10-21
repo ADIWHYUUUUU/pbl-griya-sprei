@@ -1,0 +1,499 @@
+/* =====================================================
+   STYLE HALAMAN CHECKOUT - GRIYA SPREI
+   Letak file: pbl-griya-sprei/frontend/assets/css/checkout.css
+   ===================================================== */
+
+/* ---------- Warna utama (sama dengan keranjang) ---------- */
+:root {
+    --hijau: #4b5e45;
+    --hijau-muda: #e6ece2;
+    --merah: #c0453d;
+    --merah-muda: #fbe5e2;
+    --latar: #f4f5f0;
+    --garis: #e4e6df;
+    --abu: #8a9086;
+}
+
+/* ---------- Dasar ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    background: var(--latar);
+    color: #1f2a1c;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+small {
+    color: var(--abu);
+    font-size: 11px;
+}
+
+.sembunyi {
+    display: none;
+}
+
+
+/* ---------- Tombol ---------- */
+.tombol {
+    background: var(--hijau);
+    color: white;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.tombol:hover {
+    opacity: 0.85;
+}
+
+.tombol:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.tombol-garis {
+    background: white;
+    color: var(--hijau);
+    border: 1px solid var(--hijau);
+}
+
+.tombol-besar {
+    width: 100%;
+    max-width: 420px;
+    justify-content: center;
+    padding: 13px 20px;
+    font-size: 14px;
+}
+
+.tombol-kecil {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--latar);
+    border: 1px solid var(--garis);
+    border-radius: 20px;
+    padding: 5px 11px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1f2a1c;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.tombol-kecil:hover {
+    border-color: var(--hijau);
+}
+
+
+/* =====================================================
+   ISI HALAMAN
+   ===================================================== */
+.isi {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 20px 50px;
+}
+
+.breadcrumb {
+    font-size: 12px;
+    color: var(--abu);
+    margin-bottom: 18px;
+}
+
+.breadcrumb a:hover {
+    color: var(--hijau);
+}
+
+.breadcrumb b {
+    color: #1f2a1c;
+}
+
+
+/* ---------- Kartu putih ---------- */
+.kartu {
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 16px;
+}
+
+.kepala {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.kepala h2 {
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.ikon-bulat {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--hijau-muda);
+    color: var(--hijau);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.judul-kecil {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+
+/* =====================================================
+   1. DATA & ALAMAT
+   ===================================================== */
+.dua-kolom {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 20px;
+    padding-left: 44px;
+}
+
+.baris-ikon {
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.kotak-alamat {
+    background: #f7f8f4;
+    border: 1px solid var(--garis);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.catatan-alamat {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--merah);
+    background: var(--merah-muda);
+    border-radius: 6px;
+    padding: 6px 9px;
+}
+
+.kotak-alamat label {
+    display: block;
+    font-size: 11px;
+    color: var(--abu);
+    margin-bottom: 8px;
+}
+
+.kotak-alamat textarea,
+.kotak-alamat input,
+.label-catatan textarea {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: 1px solid var(--garis);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    color: #1f2a1c;
+    resize: vertical;
+}
+
+.kotak-alamat textarea:focus,
+.kotak-alamat input:focus,
+.label-catatan textarea:focus {
+    outline: none;
+    border-color: var(--hijau);
+}
+
+
+/* =====================================================
+   2. DETAIL PESANAN
+   ===================================================== */
+.produk {
+    display: flex;
+    gap: 18px;
+    padding-left: 44px;
+}
+
+.foto-produk {
+    width: 86px;
+    height: 86px;
+    object-fit: cover;
+    border: 1px solid var(--garis);
+    border-radius: 6px;
+    background: #eceee7;     /* kotak abu kalau foto belum ada */
+    color: transparent;
+    font-size: 0;
+}
+
+.detail {
+    flex: 1;
+}
+
+.detail h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.detail p {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.catatan-produk {
+    background: var(--hijau-muda);
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin-top: 8px;
+}
+
+/* Label STANDAR / CUSTOM */
+.label {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-left: 6px;
+}
+
+.label-standar {
+    background: var(--hijau-muda);
+    color: var(--hijau);
+}
+
+.label-custom {
+    background: var(--merah-muda);
+    color: var(--merah);
+}
+
+
+/* =====================================================
+   3. METODE PENGIRIMAN
+   ===================================================== */
+.pilihan-kirim {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.opsi {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: #f7f8f4;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.opsi:hover {
+    border-color: var(--abu);
+}
+
+.opsi.terpilih {
+    border-color: var(--hijau);
+    background: var(--hijau-muda);
+}
+
+.opsi input {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    accent-color: var(--hijau);
+}
+
+.opsi b {
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.opsi .waktu {
+    margin-top: 6px;
+    font-size: 10px;
+}
+
+.kelompok {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.kelompok-instan {
+    color: var(--hijau);
+}
+
+.kelompok-reguler {
+    color: var(--merah);
+}
+
+.label-catatan {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   4. ALUR & PERSETUJUAN
+   ===================================================== */
+.kartu-info {
+    background: #eef1ea;
+}
+
+.teks-alur {
+    font-size: 12px;
+    line-height: 1.7;
+    color: #444;
+    margin-top: 6px;
+}
+
+.status {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--merah-muda);
+    color: var(--merah);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.persetujuan {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.55;
+    cursor: pointer;
+}
+
+.persetujuan input {
+    margin-top: 3px;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    accent-color: var(--hijau);
+}
+
+/* Kedip merah kalau belum dicentang tapi tombol ditekan */
+.persetujuan.perlu {
+    border-color: var(--merah);
+    background: var(--merah-muda);
+}
+
+
+/* ---------- Tombol kirim ---------- */
+.bagian-kirim {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+
+/* =====================================================
+   HALAMAN SUKSES
+   ===================================================== */
+.sukses {
+    text-align: center;
+    padding: 40px 24px;
+}
+
+.ikon-sukses {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--hijau-muda);
+    color: var(--hijau);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sukses h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.sukses p {
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 6px;
+}
+
+.sukses .kecil {
+    color: var(--abu);
+    font-size: 12px;
+}
+
+.aksi-sukses {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+
+/* =====================================================
+   TAMPILAN HP (layar kecil)
+   ===================================================== */
+@media (max-width: 760px) {
+    .dua-kolom,
+    .produk {
+        grid-template-columns: 1fr;
+        padding-left: 0;
+    }
+
+    .pilihan-kirim {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .produk {
+        flex-direction: column;
+    }
+
+    .foto-produk {
+        width: 100%;
+        height: 160px;
+    }
+
+    .kepala {
+        flex-wrap: wrap;
+    }
+}
