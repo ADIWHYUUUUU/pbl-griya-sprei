@@ -774,10 +774,11 @@ body.ada-modal {
     flex: 1;
     justify-content: center;
 }
-
-@media (max-width: 560px) {
-    .tiga-kolom,
+@media (min-width: 561px) and (max-width: 1100px) {
+    .tiga-kolom {
+        grid-template-columns: repeat(3, 1fr);
+    }
     .dua-penghitung {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
