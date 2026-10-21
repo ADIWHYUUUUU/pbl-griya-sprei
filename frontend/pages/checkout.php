@@ -76,9 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'waktu'    => date('d M Y, H:i'),
     ];
 
-    $_SESSION['pesanan'][]          = $pesanan;  
-    $_SESSION['pesanan_terakhir']   = $pesanan;   
-    unset($_SESSION['keranjang'][$id]);           
+    $_SESSION['pesanan'][]          = $pesanan;
+    $_SESSION['pesanan_terakhir']   = $pesanan;
+    unset($_SESSION['keranjang'][$id]);
 
     header('Location: checkout.php?berhasil=1');
     exit;
