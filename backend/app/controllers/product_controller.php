@@ -7,7 +7,7 @@ class ProductController
 {
     private $model;
 
-    
+      
     public function __construct()
     {
         global $pdo;

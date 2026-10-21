@@ -3,18 +3,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/../../../backend/app/config/database.php';
-// =========================================
-// DATA SESSION
-// =========================================
+
 $isLogin = ($_SESSION["login"] ?? false) === true
   && ($_SESSION["role"] ?? "") === "CUSTOMER";
 $namaUser = $isLogin ? ($_SESSION["nama"] ?? "Pelanggan") : "";
 $jumlahKeranjang = isset($_SESSION["keranjang"]) && is_array($_SESSION["keranjang"])
     ? count($_SESSION["keranjang"])
     : 0;
-// =========================================
-// AMBIL ID PRODUK DARI URL
-// =========================================
+
 $id = filter_var(
     $_GET["id"] ?? null,
     FILTER_VALIDATE_INT,
@@ -55,15 +51,11 @@ $produk = [
     "stok" => (int) $dataProduk["stok"],
     "deskripsi" => $dataProduk["deskripsi"]
 ];
-// =========================================
-// GAMBAR PRODUK
-// =========================================
+
 $gambarProduk = !empty($produk["gambar"])
     ? "/frontend/uploads/produk/" . rawurlencode(basename($produk["gambar"]))
     : "";
-// =========================================
-// DIMENSI KASUR
-// =========================================
+
 $dimensi = [
     [
         "id" => "length",
@@ -92,17 +84,13 @@ $tambahan = [
     ["id" => "qtyBantal", "judul" => "Tambah Sarung Bantal"],
     ["id" => "qtyGuling", "judul" => "Tambah Sarung Guling"]
 ];
-// =========================================
-// MENU NAVIGASI
-// =========================================
+
 $menu = [
   ["label" => "Beranda", "link" => "/frontend/pages/user/index.php"],
   ["label" => "Katalog", "link" => "/frontend/pages/user/katalog.php"],
   ["label" => "Pesanan Saya", "link" => "#"]
 ];
-// =========================================
-// ESCAPE OUTPUT HTML
-// =========================================
+
 function aman($teks)
 {
     return htmlspecialchars(
