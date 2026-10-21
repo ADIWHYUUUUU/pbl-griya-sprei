@@ -1,17 +1,6 @@
 <?php
 // =====================================================
-// HALAMAN CHECKOUT (FRONTEND, TANPA DATABASE) - GRIYA SPREI
-// Letak file: pbl-griya-sprei/frontend/pages/checkout.php
-// CSS: frontend/assets/css/checkout.css
-// JS : frontend/assets/js/checkout.js
-//
-// Dibuka dari tombol "Checkout →" di keranjang.php  -> checkout.php?id=1
-// Produk diambil dari $_SESSION['keranjang'] (sama seperti keranjang.php).
-// Setelah "Kirim Pesanan": produk keluar dari keranjang,
-// pesanan disimpan sementara di $_SESSION['pesanan'].
-// Nanti tim backend tinggal mengganti bagian session dengan query database.
-// =====================================================
-
+// HALAMAN CHECKOUT (FRONTEND) - GRIYA SPREI
 session_start();
 
 // Fungsi kecil supaya teks aman ditampilkan
@@ -97,12 +86,50 @@ if (!isset($pesananBaru)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Griya Sprei</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
     <link rel="stylesheet" href="../assets/css/checkout.css">
 </head>
 <body>
 
-<main class="isi">
+  <!-- ===== HEADER (sama dengan halaman lain) ===== -->
+<?php
+  // Jumlah barang di keranjang untuk badge ikon keranjang
+  $jumlahKeranjang = 0;
+  foreach ($_SESSION['keranjang'] ?? [] as $isi) {
+      $jumlahKeranjang += $isi['jumlah'];
+  }
+?>
+  <header class="header">
+    <div class="brand">
+      <img class="brand__logo" src="../assets/images/image1.png" alt="Logo Griya Sprei">
+      <div>
+        <h1 class="brand__name">Griya Sprei</h1>
+        <p class="brand__tagline">Homemade Pillow, Bolster, Sprei, Bedcover, Etc.</p>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Navigasi utama">
+      <a href="beranda.html" class="nav__link">Beranda</a>
+      <a href="katalog.html" class="nav__link">Katalog</a>
+      <a href="#" class="nav__link">Pembayaran</a>
+      <a href="#" class="nav__link">Riwayat Pesanan</a>
+    </nav>
+    <div class="header__actions">
+      <a href="keranjang.php" class="cart" aria-label="Keranjang">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 11h10.2L20 7H6.5"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></svg>
+        <?php if ($jumlahKeranjang > 0) { ?><span class="cart__badge"><?= $jumlahKeranjang ?></span><?php } ?>
+      </a>
+      <a href="login.html" class="btn-login">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        Masuk / Daftar
+      </a>
+    </div>
+  </header>
+
+<main class="container">
+<div class="isi">
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
@@ -271,7 +298,36 @@ if (!isset($pesananBaru)) {
 
 <?php } ?>
 
+</div>
 </main>
+
+  <!-- ===== FOOTER (sama dengan halaman lain) ===== -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div>
+        <h3 class="footer__title">Griya Sprei Malang</h3>
+        <p class="footer__text">Melayani sprei, bed cover, sarung bantal, dan sarung guling untuk rumah tangga, kos, homestay, hingga rumah sakit sejak 2010.</p>
+        <p class="footer__text">Jl. Kanjuruhan Asri No. 8, Tlogomas, Lowokwaru, Kota Malang</p>
+      </div>
+      <div>
+        <h3 class="footer__title">Kontak Kami</h3>
+        <ul class="footer__list">
+          <li>+62 812-3456-7890</li>
+          <li>@produksispreikatun</li>
+          <li>griyasprei@gmail.com</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="footer__title">Tautan</h3>
+        <ul class="footer__list">
+          <li><a href="katalog.html">Katalog</a></li>
+          <li><a href="#">Pembayaran</a></li>
+          <li><a href="#">Riwayat Pesanan</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
 
 <script src="../assets/js/checkout.js"></script>
 </body>

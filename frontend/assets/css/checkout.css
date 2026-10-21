@@ -5,28 +5,16 @@
 
 /* ---------- Warna utama (sama dengan keranjang) ---------- */
 :root {
-    --hijau: #4b5e45;
+    --hijau: var(--green-dark);   /* ikut base.css */
     --hijau-muda: #e6ece2;
     --merah: #c0453d;
     --merah-muda: #fbe5e2;
-    --latar: #f4f5f0;
-    --garis: #e4e6df;
+    --latar: var(--bg);
+    --garis: var(--border);
     --abu: #8a9086;
 }
 
-/* ---------- Dasar ---------- */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 14px;
-    background: var(--latar);
-    color: #1f2a1c;
-}
+/* Reset, body, header & footer sudah diatur di base.css */
 
 a {
     color: inherit;
@@ -110,7 +98,8 @@ small {
 .isi {
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px 20px 50px;
+    padding: 24px 0 10px;
+    font-size: 14px;
 }
 
 .breadcrumb {
