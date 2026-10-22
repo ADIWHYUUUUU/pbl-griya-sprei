@@ -1,0 +1,581 @@
+
+/* =====================================================
+   STYLE HALAMAN PESANAN SAYA - GRIYA SPREI
+   ===================================================== */
+
+/* ---------- Warna utama ---------- */
+:root {
+    --hijau: var(--green-dark);
+    --hijau-muda: #e6ece2;
+    --merah: #c0453d;
+    --merah-muda: #fbe5e2;
+    --oranye: #b06d1f;
+    --oranye-muda: #fbeedb;
+    --latar: var(--bg);
+    --garis: var(--border);
+    --abu: #8a9086;
+    --teks: #1f2a1c;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+small {
+    color: var(--abu);
+    font-size: 11px;
+}
+
+main.container {
+    width: 100%;
+}
+
+.isi {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 0 50px;
+    font-size: 14px;
+}
+
+.breadcrumb {
+    font-size: 12px;
+    color: var(--abu);
+    margin-bottom: 14px;
+}
+
+.breadcrumb a:hover {
+    color: var(--hijau);
+}
+
+.breadcrumb b {
+    color: var(--teks);
+}
+
+.judul-halaman {
+    font-size: 26px;
+    margin-bottom: 4px;
+}
+
+.sub-judul {
+    color: var(--abu);
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+/* ---------- Tombol ---------- */
+.tombol {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 15px;
+    background: var(--hijau);
+    color: white;
+    border: 1px solid var(--hijau);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tombol:hover {
+    opacity: 0.88;
+}
+
+.tombol:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.tombol-garis {
+    background: white;
+    color: var(--teks);
+    border-color: var(--garis);
+}
+
+.tombol-garis:hover {
+    border-color: var(--hijau);
+    opacity: 1;
+}
+
+/* ---------- Kartu dan pencarian ---------- */
+.kartu {
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 12px;
+}
+
+.kosong {
+    text-align: center;
+    padding: 40px;
+}
+
+.kosong p {
+    margin-bottom: 12px;
+}
+
+.kotak-cari {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    color: var(--abu);
+}
+
+.kotak-cari input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: none;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--teks);
+}
+
+/* ---------- Kartu pesanan ---------- */
+.pesanan-kepala {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--garis);
+    font-size: 12px;
+}
+
+.info-waktu span {
+    color: var(--abu);
+    margin-left: 4px;
+}
+
+.info-waktu .terverifikasi {
+    color: var(--hijau);
+}
+
+/* ---------- Label status pesanan ---------- */
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-tunggu {
+    background: var(--oranye-muda);
+    color: var(--oranye);
+}
+
+.badge-bayar,
+.badge-lunas {
+    background: var(--hijau-muda);
+    color: var(--hijau);
+}
+
+.badge-tolak {
+    background: var(--merah-muda);
+    color: var(--merah);
+}
+
+.badge-selesai {
+    background: #eceee9;
+    color: #4a5246;
+}
+
+.badge-kecil {
+    display: inline-block;
+    padding: 3px 9px;
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ---------- Informasi produk dan tagihan ---------- */
+.pesanan-isi {
+    display: grid;
+    grid-template-columns: 72px 1fr 210px;
+    gap: 16px;
+    padding: 16px 0 12px;
+}
+
+.foto-produk {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border: 1px solid var(--garis);
+    border-radius: 8px;
+    background: #eceee7;
+}
+
+.foto-kosong {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--abu);
+}
+
+.info-produk h3 {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.info-produk p {
+    font-size: 12px;
+    margin-bottom: 3px;
+}
+
+.pil-rincian {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 9px;
+    background: var(--latar);
+    border: 1px solid var(--garis);
+    border-radius: 6px;
+    font-size: 10px;
+    color: var(--abu);
+}
+
+.info-tagihan {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: right;
+}
+
+.info-tagihan .nominal {
+    font-size: 20px;
+}
+
+.info-tagihan .belum {
+    font-size: 18px;
+}
+
+.hijau,
+.lunas {
+    color: var(--hijau);
+}
+
+.lunas {
+    font-weight: 600;
+}
+
+/* ---------- Informasi berdasarkan status pesanan ---------- */
+.kotak-status {
+    margin-bottom: 12px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.kotak-tolak {
+    background: #fdf3f1;
+    border: 1px solid #f1d3ce;
+}
+
+.kotak-tolak p {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f1d3ce;
+}
+
+.kotak-tolak .badge-kecil {
+    color: var(--merah);
+    border-color: #f1d3ce;
+}
+
+.baris-riwayat {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.kotak-bayar,
+.kotak-tunggu {
+    display: flex;
+    background: var(--latar);
+    border: 1px solid var(--garis);
+}
+
+.kotak-bayar {
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.kotak-bayar p {
+    margin: 2px 0;
+}
+
+.kotak-tunggu {
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.kotak-tunggu p {
+    flex: 1;
+}
+
+/* ---------- Tombol aksi pesanan ---------- */
+.pesanan-aksi {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.pesanan-aksi .kiri {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ---------- Modal ---------- */
+.modal-latar {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(31, 42, 28, 0.45);
+}
+
+.modal-latar.tampil {
+    display: flex;
+}
+
+body.ada-modal {
+    overflow: hidden;
+}
+
+.modal {
+    width: 100%;
+    max-width: 460px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+    font-size: 13px;
+    animation: modalMasuk 0.25s ease;
+}
+
+.modal-lebar {
+    max-width: 620px;
+}
+
+@keyframes modalMasuk {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-kepala {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--garis);
+}
+
+.modal-kepala h2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 17px;
+}
+
+.kode-kecil {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--abu);
+}
+
+.tutup-modal {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    background: var(--latar);
+    border: 1px solid var(--garis);
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--abu);
+}
+
+.tutup-modal:hover {
+    color: var(--teks);
+}
+
+.modal-isi {
+    padding: 16px 22px;
+}
+
+.modal-kaki {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 22px 18px;
+    border-top: 1px solid var(--garis);
+}
+
+/* ---------- Informasi status di dalam modal ---------- */
+.kotak-info-status {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 14px;
+    background: var(--latar);
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+}
+
+.kotak-info-status p {
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--abu);
+}
+
+.ikon-status {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--merah-muda);
+    color: var(--merah);
+    font-weight: 700;
+}
+
+.kotak-info-status.bayar .ikon-status {
+    background: var(--hijau-muda);
+    color: var(--hijau);
+}
+
+.ringkas-pesanan {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--garis);
+    border-radius: 8px;
+}
+
+.ringkas-pesanan small {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+}
+
+.ringkas-pesanan .kanan {
+    text-align: right;
+}
+
+.ringkas-pesanan .kanan b {
+    font-size: 16px;
+}
+
+/* ---------- Rincian pesanan di dalam modal ---------- */
+.bagian-detail {
+    margin-bottom: 12px;
+    padding: 14px;
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+}
+
+.bagian-detail h3 {
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.bagian-detail p {
+    line-height: 1.55;
+}
+
+.judul-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+}
+
+.catatan-admin {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: var(--latar);
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.catatan-admin p,
+.kutipan {
+    font-style: italic;
+    color: #555;
+}
+
+.catatan-admin p {
+    margin-top: 3px;
+}
+
+.kutipan {
+    margin-top: 2px;
+}
+
+.kutipan:empty {
+    display: none;
+}
+
+.dua-sisi {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.dua-sisi small {
+    margin-right: 6px;
+}
+
+.grid-spek {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.grid-spek small,
+.grid-spek b {
+    display: block;
+}
+
+.grid-spek b {
+    font-size: 14px;
+    margin: 2px 0;
+}

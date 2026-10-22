@@ -1,9 +1,4 @@
-// =====================================================
-// SCRIPT HALAMAN CHECKOUT - GRIYA SPREI
-// =====================================================
-
-
-// ---------- "Ubah Alamat" tampilkan atau di sembunyikan----------
+// ---------- Ubah Alamat ----------
 var tombolUbah    = document.getElementById('tombolUbahAlamat');
 var alamatTampil  = document.getElementById('alamatTampil');
 var alamatUbah    = document.getElementById('alamatUbah');
@@ -13,7 +8,6 @@ if (tombolUbah) {
         var sedangUbah = !alamatUbah.classList.contains('sembunyi');
 
         if (sedangUbah) {
-            // Simpan
             document.getElementById('teksAlamat').textContent =
                 document.getElementById('inputAlamat').value;
             document.getElementById('teksCatatanAlamat').textContent =
@@ -31,8 +25,7 @@ if (tombolUbah) {
     });
 }
 
-
-// ---------- 2. Kotak metode pengiriman: tandai yang dipilih ----------
+// ---------- metode pengiriman ----------
 var semuaOpsi = document.querySelectorAll('.opsi');
 
 semuaOpsi.forEach(function (opsi) {
@@ -44,8 +37,7 @@ semuaOpsi.forEach(function (opsi) {
     });
 });
 
-
-// ---------- 3. Tombol "Kirim Pesanan" aktif hanya kalau persetujuan dicentang ----------
+// ---------- Kirim Pesanan  ----------
 var cekSetuju   = document.getElementById('cekSetuju');
 var tombolKirim = document.getElementById('tombolKirim');
 
@@ -56,8 +48,7 @@ if (cekSetuju) {
     });
 }
 
-
-// ---------- 4. Konfirmasi terakhir sebelum pesanan dikirim ----------
+// ---------- Konfirmasi  ----------
 var formCheckout = document.getElementById('formCheckout');
 
 if (formCheckout) {
@@ -71,7 +62,7 @@ if (formCheckout) {
         var yakin = confirm('Kirim pesanan sekarang? Pesanan akan diverifikasi Admin maksimal 1×24 jam.');
 
         if (!yakin) {
-            event.preventDefault();   // batal kirim form
+            event.preventDefault();   
         } else {
             tombolKirim.disabled = true;
             tombolKirim.textContent = 'Mengirim pesanan...';
@@ -81,12 +72,9 @@ if (formCheckout) {
 
 
 // =====================================================
-// TAMBAHAN: MODAL UBAH ALAMAT, UBAH SPESIFIKASI & PESANAN BERHASIL
+// UBAH ALAMAT, UBAH SPESIFIKASI & PESANAN BERHASIL
 // =====================================================
 
-// ---------- A. Buka & tutup modal ----------
-// Saat modal dibuka, isiannya disimpan dulu.
-// Kalau "Batal" / × ditekan, isian dikembalikan seperti semula.
 var simpananIsian = {};
 
 function bukaModal(idModal) {
@@ -120,21 +108,18 @@ function tutupModal(modal, batal) {
     document.body.classList.remove('ada-modal');
 }
 
-// Tombol "Ubah Alamat" & "Ubah Spesifikasi"
 document.querySelectorAll('[data-buka-modal]').forEach(function (tombol) {
     tombol.addEventListener('click', function () {
         bukaModal(tombol.dataset.bukaModal);
     });
 });
 
-// Tombol × dan "Batal"
 document.querySelectorAll('[data-tutup-modal]').forEach(function (tombol) {
     tombol.addEventListener('click', function () {
         tutupModal(tombol.closest('.modal-latar'), true);
     });
 });
 
-// Klik area gelap di luar kotak modal = batal (kecuali modal sukses)
 document.querySelectorAll('.modal-latar').forEach(function (latar) {
     latar.addEventListener('click', function (event) {
         if (event.target === latar && latar.id !== 'modalSukses') {
@@ -143,15 +128,13 @@ document.querySelectorAll('.modal-latar').forEach(function (latar) {
     });
 });
 
-// Tombol Esc = batal
 document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
     var terbuka = document.querySelector('.modal-latar.tampil:not(#modalSukses)');
     if (terbuka) tutupModal(terbuka, true);
 });
 
-
-// ---------- B. Modal "Ubah Alamat" -> Simpan Perubahan ----------
+// ---------- Ubah Alamat ----------
 function isi(id) {
     return document.getElementById(id).value.trim();
 }
@@ -170,7 +153,6 @@ if (tombolSimpanAlamat) {
         document.getElementById('teksAlamat').textContent  = isi('inputAlamat');
         document.getElementById('teksCatatanAlamat').textContent = isi('inputCatatanAlamat');
 
-        // Sembunyikan kotak catatan kalau kosong
         document.getElementById('kotakCatatanAlamat').style.display =
             isi('inputCatatanAlamat') === '' ? 'none' : '';
 
@@ -178,17 +160,14 @@ if (tombolSimpanAlamat) {
     });
 }
 
-
-// ---------- C. Modal "Ubah Spesifikasi" ----------
-
-// Tombol − dan + untuk sarung bantal & guling
+// ---------- "Ubah Spesifikasi" ----------
 document.querySelectorAll('[data-tambah], [data-kurang]').forEach(function (tombol) {
     tombol.addEventListener('click', function () {
         var input = document.getElementById(tombol.dataset.tambah || tombol.dataset.kurang);
         var nilai = parseInt(input.value, 10) || 0;
 
         nilai = tombol.dataset.tambah ? nilai + 1 : nilai - 1;
-        input.value = Math.max(0, nilai);   // tidak boleh minus
+        input.value = Math.max(0, nilai);   
     });
 });
 
@@ -205,15 +184,12 @@ if (tombolSimpanSpek) {
             return;
         }
 
-        // Label STANDAR / CUSTOM
         var jenis = document.querySelector('input[name="jenis"]:checked').value;
         var label = document.getElementById('teksJenis');
         label.textContent = jenis.toUpperCase();
         label.className = 'label label-' + jenis;
 
         document.getElementById('teksUkuran').textContent = p + ' × ' + l + ' × ' + t + ' cm';
-
-        // Teks tambahan: "2 sarung bantal + 1 sarung guling"
         var bantal = parseInt(isi('inputBantal'), 10) || 0;
         var guling = parseInt(isi('inputGuling'), 10) || 0;
         var tambahan = [];
@@ -227,9 +203,7 @@ if (tombolSimpanSpek) {
     });
 }
 
-
-// ---------- D. Modal sukses: kunci scroll selama tampil ----------
+// ---------- kunci scroll selama tampil ----------
 if (document.getElementById('modalSukses')) {
     document.body.classList.add('ada-modal');
 }
-// ===== AKHIR TAMBAHAN =====

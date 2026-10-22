@@ -1,0 +1,521 @@
+/* =====================================================
+   STYLE HALAMAN PEMBAYARAN - GRIYA SPREI
+   ===================================================== */
+
+/* ---------- Warna utama ---------- */
+:root {
+    --hijau: var(--green-dark);
+    --hijau-muda: #e6ece2;
+    --merah: #c0453d;
+    --merah-muda: #fbe5e2;
+    --oranye: #b06d1f;
+    --latar: var(--bg);
+    --garis: var(--border);
+    --abu: #8a9086;
+    --abu-kotak: #f7f8f4;
+    --teks: #1f2a1c;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+small {
+    color: var(--abu);
+    font-size: 11px;
+}
+
+main.container {
+    width: 100%;
+}
+
+.isi {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 0 50px;
+    font-size: 13px;
+}
+
+/* ---------- Tombol ---------- */
+.tombol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 16px;
+    background: var(--hijau);
+    color: white;
+    border: 1px solid var(--hijau);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tombol:hover {
+    opacity: 0.88;
+}
+
+.tombol:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tombol-abu {
+    background: #e4e6e1;
+    border-color: #e4e6e1;
+    color: var(--teks);
+}
+
+.tombol-penuh {
+    display: flex;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* ---------- Kartu dan kotak informasi ---------- */
+.kartu {
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 14px;
+    padding: 28px 30px;
+}
+
+.kotak-abu {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: var(--abu-kotak);
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+}
+
+.kotak-abu p {
+    font-size: 12px;
+    color: #555;
+    margin-top: 3px;
+}
+
+.judul-bagian {
+    display: block;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--garis);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.badge-kecil {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 2px 9px;
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--abu);
+}
+
+.badge-kecil.hijau {
+    background: var(--hijau-muda);
+    border-color: var(--hijau-muda);
+    color: var(--hijau);
+}
+
+/* ---------- Kepala invoice ---------- */
+.invoice-kepala {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.toko {
+    display: flex;
+    gap: 14px;
+}
+
+.logo-toko {
+    width: 48px;
+    height: 48px;
+    padding: 5px;
+    object-fit: contain;
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+}
+
+.toko h1 {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.toko p {
+    font-size: 11px;
+    color: var(--abu);
+}
+
+.nomor-invoice {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: right;
+}
+
+.nomor-invoice b {
+    font-size: 15px;
+}
+
+/* ---------- Tabel produk ---------- */
+.tabel-item {
+    width: 100%;
+    margin: 6px 0 20px;
+    border-collapse: collapse;
+    border: 1px solid var(--garis);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.tabel-item th {
+    padding: 10px 14px;
+    background: #f0f1ec;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    color: var(--abu);
+}
+
+.tabel-item td {
+    padding: 12px 14px;
+    border-top: 1px solid var(--garis);
+    vertical-align: top;
+}
+
+.tabel-item th:not(:first-child),
+.tabel-item td:not(:first-child) {
+    width: 120px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tabel-item td b {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.tabel-item td small {
+    display: block;
+    line-height: 1.5;
+}
+
+/* ---------- Kolom pembayaran dan ringkasan ---------- */
+.dua-kolom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: start;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--garis);
+}
+
+.dua-kolom .kotak-abu {
+    margin-bottom: 0;
+}
+
+/* ---------- Rincian pembayaran ---------- */
+.baris-bayar {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 8px;
+}
+
+.baris-bayar small {
+    display: block;
+    margin-top: 2px;
+}
+
+.baris-bayar .kanan {
+    text-align: right;
+}
+
+.menunggu {
+    color: var(--oranye);
+    font-weight: 600;
+}
+
+.baris-total-kecil {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 2px 14px;
+    font-size: 12px;
+}
+
+/* ---------- Pilihan bank ---------- */
+.judul-metode {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.judul-metode .judul-bagian {
+    flex: 1;
+}
+
+.judul-metode .badge-kecil {
+    margin-left: 8px;
+}
+
+.pilihan-bank {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.opsi-bank {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.opsi-bank:hover {
+    border-color: var(--abu);
+}
+
+.opsi-bank.terpilih {
+    border-color: var(--hijau);
+    box-shadow: 0 0 0 1px var(--hijau);
+}
+
+.opsi-bank input {
+    accent-color: var(--hijau);
+}
+
+.kode-bank {
+    min-width: 54px;
+    padding: 2px 6px;
+    text-align: center;
+    background: var(--abu-kotak);
+    border: 1px solid var(--garis);
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.nama-bank {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pilihan-bank + .isian {
+    margin-top: 12px;
+}
+
+/* ---------- Isian rekening pengirim ---------- */
+.isian {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.isian input {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    padding: 9px 12px;
+    background: white;
+    border: 1px solid var(--garis);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--teks);
+}
+
+.isian input:focus {
+    outline: none;
+    border-color: var(--hijau);
+}
+
+/* ---------- Ringkasan biaya ---------- */
+.baris-biaya {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 12px;
+    color: #555;
+}
+
+.baris-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--garis);
+}
+
+.baris-total .nominal {
+    font-size: 20px;
+}
+
+.ringkasan > small {
+    display: block;
+    margin-top: 4px;
+}
+
+/* ---------- Unggah bukti pembayaran ---------- */
+.area-unggah {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 20px;
+    padding: 22px;
+    background: var(--abu-kotak);
+    border: 1.5px dashed #c9ccc4;
+    border-radius: 10px;
+    color: var(--abu);
+    text-align: center;
+    cursor: pointer;
+}
+
+.area-unggah b {
+    font-size: 12px;
+    color: var(--teks);
+}
+
+.area-unggah input {
+    display: none;
+}
+
+.area-unggah:hover,
+.area-unggah.seret,
+.area-unggah.terpilih {
+    border-color: var(--hijau);
+    background: var(--hijau-muda);
+}
+
+.area-unggah.terpilih {
+    border-style: solid;
+    color: var(--hijau);
+}
+
+.pesan-error {
+    margin-top: 10px;
+    padding: 9px 12px;
+    background: var(--merah-muda);
+    color: var(--merah);
+    border-radius: 7px;
+    font-size: 12px;
+}
+
+/* ---------- Popup pembayaran berhasil ---------- */
+.modal-latar {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(31, 42, 28, 0.45);
+}
+
+.modal-latar.tampil {
+    display: flex;
+}
+
+body.ada-modal {
+    overflow: hidden;
+}
+
+.modal {
+    width: 100%;
+    max-width: 400px;
+    padding: 26px 24px 22px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+    text-align: center;
+    animation: modalMasuk 0.25s ease;
+}
+
+@keyframes modalMasuk {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ikon-berhasil {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--hijau-muda);
+    color: #2f8a4c;
+}
+
+.modal h2 {
+    font-size: 17px;
+    margin-bottom: 8px;
+}
+
+.modal > p {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--abu);
+    margin-bottom: 14px;
+}
+
+.kotak-ringkas {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: var(--abu-kotak);
+    border: 1px solid var(--garis);
+    border-radius: 9px;
+    text-align: left;
+}
+
+.kotak-ringkas div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 12px;
+}
+
+.kotak-ringkas span {
+    color: var(--abu);
+}
+
+.kotak-ringkas small {
+    display: block;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+.status-tunggu {
+    color: var(--oranye);
+}
