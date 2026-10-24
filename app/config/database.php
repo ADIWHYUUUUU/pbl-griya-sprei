@@ -41,5 +41,5 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die("Koneksi database gagal: " . $e->getMessage());
+    throw $e;
 }

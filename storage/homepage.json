@@ -1,0 +1,24 @@
+{
+    "hero_pill": "Griya Sprei Malang · Homemade sejak 2010",
+    "hero_title": "Sprei dan bed cover pas di kasur Anda, ukuran standar maupun custom.",
+    "hero_description": "Pilih model kain, tentukan ukuran kasur presisi, dan nikmati tidur nyaman.",
+    "hero_image": "/uploads/beranda/9ba2c724fb5156499957564e.jpg",
+    "explore_title": "Jelajahi katalog",
+    "sprei_title": "Sprei",
+    "sprei_description": "Standar atau custom sesuai kasur.",
+    "sprei_image": "/uploads/beranda/fded1a4134d1faf93d3bdf84.jpg",
+    "bedcover_title": "Bed Cover",
+    "bedcover_description": "Pilih model dan ukuran.",
+    "bedcover_image": "/uploads/beranda/82d64f9deaa5fdf996f662c5.jpg",
+    "featured_title": "Produk Pilihan & Best Seller",
+    "featured": [
+        {
+            "name": "Sprei Katun Asterina Sage",
+            "tag": "Sprei Premium",
+            "description": "abcde",
+            "price": 500000,
+            "color": "#9bb87a",
+            "image": "/uploads/beranda/d4db0f23ff732eb7963a9894.jpg"
+        }
+    ]
+}

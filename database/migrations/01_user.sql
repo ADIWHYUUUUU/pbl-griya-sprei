@@ -1,3 +1,5 @@
+CREATE TYPE role_user AS ENUM ('CUSTOMER', 'ADMIN');
+
 CREATE TABLE "user" (
     id_user    SERIAL PRIMARY KEY,
     nama       VARCHAR(100) NOT NULL,
@@ -7,5 +9,3 @@ CREATE TABLE "user" (
     role       role_user    NOT NULL,
     created_at TIMESTAMP    NOT NULL DEFAULT now()
 );
-
-CREATE TYPE role_user AS ENUM ('CUSTOMER', 'ADMIN');

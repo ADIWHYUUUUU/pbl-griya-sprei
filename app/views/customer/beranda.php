@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-$homepagePath = __DIR__ . '/../../../backend/storage/homepage.json';
+$homepagePath = __DIR__ . '/../../../storage/homepage.json';
 $homepage = is_file($homepagePath)
   ? json_decode(file_get_contents($homepagePath), true)
   : [];
@@ -29,11 +29,11 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/frontend/assets/css/base.css">
-  <link rel="stylesheet" href="/frontend/assets/css/beranda.css">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/customer/beranda.css">
 </head>
 <body>
-<?php require __DIR__ . '/../../components/header.php'; ?>
+<?php require __DIR__ . '/../layouts/header.php'; ?>
   <main class="container">
     <!-- HERO -->
     <section class="hero">
@@ -48,7 +48,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
           <?= $homepageValue('hero_description', 'Pilih model kain, tentukan ukuran panjang × lebar × tinggi kasur presisi cm, tambahkan sarung bantal guling, dan nikmati tidur nyaman dengan bahan MicroSilk & Katun Jepang halus.'); ?>
         </p>
         <a
-          href="/frontend/pages/user/katalog.php  "
+          href="/?page=customer-catalog"
           class="btn btn--lg"
         >
           Lihat Katalog
@@ -60,7 +60,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
       ><?php if (!empty($homepage['hero_image'])): ?><img src="<?= $homepageValue('hero_image'); ?>" alt="Suasana produk Griya Sprei"><?php endif; ?></div>
     </section>
     <!-- ===== JELAJAHI KATALOG ===== -->
-    <section class="section">
+    <section class="section" id="explore">
       <h2 class="section__title">
         <?= $homepageValue('explore_title', 'Jelajahi katalog'); ?>
       </h2>
@@ -79,7 +79,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
               </p>
             </div>
             <a
-              href="/frontend/pages/katalog.php"
+              href="/?page=customer-catalog&category=sprei"
               class="btn"
             >
               Lihat
@@ -100,7 +100,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
               </p>
             </div>
             <a
-              href="/frontend/pages/katalog.php"
+              href="/?page=customer-catalog&category=bedcover"
               class="btn"
             >
               Lihat
@@ -177,9 +177,8 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
       </div>
     </section>
   </main>
-<?php require __DIR__ . '/../../components/footer.php'; ?>
-  <script src="/frontend/assets/js/data.js"></script>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>
   <script>window.homepageContent = <?= json_encode($homepage, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?: '{}'; ?>;</script>
-  <script src="/frontend/assets/js/beranda.js"></script>
+  <script src="/assets/js/customer/beranda.js"></script>
 </body>
 </html>

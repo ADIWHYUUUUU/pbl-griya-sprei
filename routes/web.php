@@ -1,0 +1,14 @@
+<?php
+
+return [
+	'customer-home' => __DIR__ . '/../app/views/customer/beranda.php',
+	'customer-catalog' => __DIR__ . '/../app/views/customer/katalog.php',
+	'customer-login' => __DIR__ . '/../app/views/customer/login.php',
+	'customer-register' => __DIR__ . '/../app/views/customer/register.php',
+	'admin-login' => __DIR__ . '/../app/views/admin/login.php',
+	'admin-dashboard' => __DIR__ . '/../app/views/admin/dashboard.php',
+	'admin-products' => __DIR__ . '/../app/views/admin/produk.php',
+	'admin-add-product' => __DIR__ . '/../app/views/admin/tambah.php',
+	'admin-edit-home' => __DIR__ . '/../app/views/admin/edit_beranda.php',
+	'admin-register' => __DIR__ . '/../app/views/admin/register.php',
+];

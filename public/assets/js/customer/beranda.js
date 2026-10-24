@@ -5,6 +5,12 @@
 const featuredGrid = document.getElementById("featuredGrid");
 
 const featuredList = window.homepageContent?.featured || [];
+const formatRupiah = (amount) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(amount);
 const escapeHtml = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -33,7 +39,7 @@ featuredGrid.innerHTML = featuredList
       <h3 class="featured__title">${escapeHtml(product.name)}</h3>
       <p class="featured__desc">${escapeHtml(product.description)}</p>
       <p class="featured__price">Mulai <strong>${formatRupiah(Number(product.price) || 0)}</strong></p>
-      <a href="/frontend/pages/user/katalog.php" class="btn btn--block">Lihat Katalog</a>
+      <a href="/?page=customer-catalog" class="btn btn--block">Lihat Katalog</a>
     </article>`;
   })
   .join("");

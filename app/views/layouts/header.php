@@ -3,6 +3,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 // Cek apakah customer sudah login
 $isLogin = (
@@ -15,10 +18,10 @@ $namaUser = $isLogin
     ? ($_SESSION['nama'] ?? 'Pelanggan')
     : '';
 
-$currentPage = basename($_SERVER['SCRIPT_NAME'] ?? '');
+$currentPage = $_GET['page'] ?? basename($_SERVER['SCRIPT_NAME'] ?? '');
 $activeNavPage = match ($currentPage) {
-    'index.php' => 'home',
-    'katalog.php', 'detailProduk.php' => 'catalog',
+    'index.php', 'customer-home' => 'home',
+    'customer-catalog' => 'catalog',
     'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
     default => '',
 };
@@ -30,7 +33,7 @@ $activeNavPage = match ($currentPage) {
     <div class="brand">
         <img
             class="brand__logo"
-            src="/frontend/assets/images/logo.png"
+            src="/assets/images/logo.png"
             alt="Logo Griya Sprei">
         <div>
             <h1 class="brand__name">Griya Sprei</h1>
@@ -42,27 +45,27 @@ $activeNavPage = match ($currentPage) {
 
     <!-- NAVBAR -->
     <nav class="nav" aria-label="Navigasi utama">
-        <a href="/frontend/pages/user/index.php"
+        <a href="/?page=customer-home"
             class="nav__link<?= $activeNavPage === 'home' ? ' nav__link--active' : ''; ?>"
             <?= $activeNavPage === 'home' ? 'aria-current="page"' : ''; ?>>
             Beranda
         </a>
-        <a href="/frontend/pages/user/katalog.php"
+        <a href="/?page=customer-catalog"
             class="nav__link<?= $activeNavPage === 'catalog' ? ' nav__link--active' : ''; ?>"
             <?= $activeNavPage === 'catalog' ? 'aria-current="page"' : ''; ?>>
             Katalog
         </a>
-        <a href="#"
+        <span
             class="nav__link<?= $activeNavPage === 'orders' ? ' nav__link--active' : ''; ?>"
-            <?= $activeNavPage === 'orders' ? 'aria-current="page"' : ''; ?>>
+            aria-disabled="true">
             Pesanan Saya
-        </a>
+        </span>
     </nav>
 
     <!-- HEADER ACTIONS -->
     <div class="header__actions">
         <!-- Keranjang -->
-        <a href="#" class="cart" aria-label="Keranjang">
+        <span class="cart" aria-label="Keranjang" aria-disabled="true">
             <svg
                 viewBox="0 0 24 24"
                 width="24"
@@ -75,7 +78,7 @@ $activeNavPage = match ($currentPage) {
                 <circle cx="17" cy="19" r="1.4" />
             </svg>
             <span class="cart__badge">3</span>
-        </a>
+        </span>
 
         <?php if ($isLogin): ?>
             <!-- CUSTOMER SUDAH LOGIN -->
@@ -118,7 +121,7 @@ $activeNavPage = match ($currentPage) {
                 <!-- Isi dropdown -->
                 <div class="user-dropdown__menu">
                     <a
-                        href="/frontend/pages/user/index.php"
+                        href="/?page=customer-home"
                         class="user-dropdown__item">
                         <?= htmlspecialchars(
                             $_SESSION['email'] ?? '',
@@ -130,9 +133,10 @@ $activeNavPage = match ($currentPage) {
                     <div class="user-dropdown__divider"></div>
                     <!-- Logout menggunakan POST -->
                     <form
-                        action="/backend/actions/user/logout.php"
+                        action="/?action=customer-logout"
                         method="POST"
                         class="user-dropdown__form">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
                         <button
                             type="submit"
                             class="user-dropdown__item user-dropdown__logout">
@@ -145,7 +149,7 @@ $activeNavPage = match ($currentPage) {
 
             <!-- CUSTOMER BELUM LOGIN -->
             <a
-                href="/frontend/pages/login.php"
+                href="/?page=customer-login"
                 class="btn-login">
                 <svg
                     viewBox="0 0 24 24"

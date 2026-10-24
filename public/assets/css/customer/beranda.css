@@ -1,0 +1,482 @@
+/* =========================================
+   BERANDA.CSS - khusus halaman beranda
+   ========================================= */
+
+/* 1. HERO */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 545px;
+  gap: 60px;
+  align-items: center;
+  padding: 72px 0 90px;
+}
+.hero__pill {
+  display: inline-block;
+  padding: 5px 12px;
+  margin-bottom: 8px;
+  background: #e8ebe6;
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--green-dark);
+}
+.hero__title {
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+}
+.hero__desc {
+  max-width: 560px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.btn--lg {
+  height: 44px;
+  padding: 0 24px;
+  font-size: 14px;
+}
+.hero__image {
+  height: 356px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+/* 2. JUDUL SECTION */
+.section {
+  margin-bottom: 70px;
+}
+.section__title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 22px;
+}
+
+/* 3. JELAJAHI KATALOG */
+.explore {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.explore__card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+.explore__image {
+  height: 192px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+.explore__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.explore__row h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.explore__row p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* 4. PRODUK PILIHAN */
+.featured {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.featured__card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.featured__image {
+  height: 190px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.featured__tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--price);
+}
+.featured__tag--sprei {
+  color: var(--muted);
+}
+.featured__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 6px 0;
+}
+.featured__desc {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  min-height: 34px;
+}
+.featured__price {
+  margin: 10px 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.featured__price strong {
+  font-size: 16px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* 5. CARA PEMESANAN */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+.step {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.step__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.step__head span {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.step__head h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.step p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* 6. RESPONSIF */
+
+/* Tombol Masuk Daftar - Tablet */
+@media (max-width: 1100px) {
+  .featured__card .btn,
+  .featured__card button,
+  .featured__card a {
+    font-size: 12px;
+  }
+}
+
+/* Tombol Masuk Daftar - HP */
+@media (max-width: 640px) {
+  .featured__card .btn,
+  .featured__card button,
+  .featured__card a {
+    font-size: 10px;
+    padding: 8px 6px;
+    min-height: 32px;
+    line-height: 1.2;
+    box-sizing: border-box;
+  }
+}
+
+/* HP kecil */
+@media (max-width: 380px) {
+  .featured__card .btn,
+  .featured__card button,
+  .featured__card a {
+    font-size: 9px;
+    padding: 7px 4px;
+  }
+}
+
+/* TABLET DAN LAPTOP KECIL */
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 1fr 0.9fr;
+    gap: 24px;
+    padding: 45px 0 55px;
+  }
+
+  .hero__title {
+    font-size: 30px;
+  }
+
+  .hero__desc {
+    font-size: 14px;
+  }
+
+  .hero__image {
+    width: 100%;
+    height: 270px;
+    object-fit: cover;
+  }
+
+  .section {
+    margin-bottom: 48px;
+  }
+
+  .section__title {
+    font-size: 21px;
+  }
+
+  .explore {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .explore__card {
+    padding: 14px;
+    min-width: 0;
+  }
+
+  .explore__image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+
+  .featured {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .featured__card {
+    padding: 12px;
+    min-width: 0;
+  }
+
+  .featured__image {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+  }
+
+  .featured__title {
+    font-size: 14px;
+  }
+
+  .featured__desc,
+  .step p {
+    font-size: 11px;
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .step {
+    padding: 14px;
+  }
+}
+
+/* HP */
+@media (max-width: 640px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 28px 0 36px;
+  }
+
+  .hero__pill {
+    font-size: 10px;
+    padding: 4px 9px;
+  }
+
+  .hero__title {
+    font-size: 25px;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+
+  .hero__desc {
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+
+  .btn--lg {
+    height: 38px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+
+  .hero__image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .section {
+    margin-bottom: 34px;
+  }
+
+  .section__title {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  /* Katalog tetap berjajar ke samping */
+  .explore {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .explore__card {
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .explore__image {
+    width: 100%;
+    height: 115px;
+    object-fit: cover;
+    margin-bottom: 9px;
+  }
+
+  .explore__row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .explore__row h3 {
+    font-size: 12px;
+  }
+
+  .explore__row p {
+    font-size: 10px;
+  }
+
+  /* Produk juga berjajar dua kolom */
+  .featured {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .featured__card {
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .featured__image {
+    width: 100%;
+    height: 125px;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+
+  .featured__tag {
+    font-size: 9px;
+  }
+
+  .featured__title {
+    font-size: 12px;
+    margin: 5px 0;
+  }
+
+  .featured__desc {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  .featured__price {
+    font-size: 10px;
+    margin: 8px 0 10px;
+  }
+
+  .featured__price strong {
+    font-size: 12px;
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .step {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .step__head {
+    gap: 7px;
+    margin-bottom: 10px;
+  }
+
+  .step__head span {
+    width: 26px;
+    height: 26px;
+    font-size: 10px;
+  }
+
+  .step__head h3 {
+    font-size: 11px;
+  }
+
+  .step p {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  /* Logo: gunakan class khusus jika tersedia */
+  .logo img,
+  .header__logo img,
+  .navbar__logo img {
+    max-width: 100px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Footer menyesuaikan layar */
+  footer {
+    padding: 22px 14px;
+    font-size: 12px;
+  }
+}
+
+/* HP KECIL */
+@media (max-width: 380px) {
+  .hero__title {
+    font-size: 22px;
+  }
+
+  .hero__image {
+    height: 175px;
+  }
+
+  .explore__image {
+    height: 100px;
+  }
+
+  .featured__image {
+    height: 110px;
+  }
+
+  .logo img,
+  .header__logo img,
+  .navbar__logo img {
+    max-width: 85px;
+  }
+}
