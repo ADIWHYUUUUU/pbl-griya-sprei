@@ -16,7 +16,7 @@ $action = $_GET['action'] ?? '';
 if ($action !== '') {
 	$isLogout = in_array($action, ['customer-logout', 'admin-logout'], true);
 	$isProductStore = $action === 'admin-product-store';
-	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-remove'], true);
+	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove'], true);
 	if (!$isLogout && !$isProductStore && !$isCartAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
@@ -40,6 +40,8 @@ if ($action !== '') {
 			$controller = new OrderController();
 			if ($action === 'customer-cart-add') {
 				$controller->addToCart();
+			} elseif ($action === 'customer-cart-update') {
+				$controller->updateCart();
 			} else {
 				$controller->removeFromCart();
 			}

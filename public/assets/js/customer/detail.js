@@ -35,7 +35,7 @@ if (orderForm) {
       const hint = document.getElementById(`${input.id}Hint`);
       hint.textContent = isStandard
         ? "Standar katalog"
-        : `Ukuran ${input.min}–${input.max} cm`;
+         : `Tentukan ${input.id.toLowerCase()}`;
     });
   }
 
@@ -84,7 +84,7 @@ if (orderForm) {
       const invalidDimension = dimensionInputs.find((input) => !input.checkValidity());
       if (invalidDimension) {
         invalidDimension.closest(".dim").classList.add("dim--error");
-        showMessage(`Masukkan ${invalidDimension.labels[0].textContent.trim().toLowerCase()} antara ${invalidDimension.min} dan ${invalidDimension.max} cm.`);
+        showMessage(`Masukkan ${invalidDimension.labels[0].textContent.trim().toLowerCase()} minimal ${invalidDimension.min} cm.`);
         invalidDimension.focus();
         event.preventDefault();
         return;
@@ -101,7 +101,7 @@ if (orderForm) {
 
   dimensionInputs.forEach((input) => {
     input.addEventListener("input", () => {
-      input.closest(".dim").classList.toggle("dim--error", !input.checkValidity());
+      input.closest(".dim").classList.remove("dim--error");
     });
   });
 
