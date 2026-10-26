@@ -132,12 +132,27 @@ function renderProducts() {
     });
   }
 
-  pagination.innerHTML = Array.from({ length: pageCount }, (_, index) => {
+  const previousDisabled = currentPage === 1 ? " disabled" : "";
+  const nextDisabled = currentPage === pageCount ? " disabled" : "";
+  const pageButtons = Array.from({ length: pageCount }, (_, index) => {
     const page = index + 1;
     const activeClass = page === currentPage ? " page-btn--active" : "";
     const current = page === currentPage ? ' aria-current="page"' : "";
     return `<button type="button" class="page-btn${activeClass}" data-page="${page}"${current}>${page}</button>`;
   }).join("");
+
+  pagination.innerHTML = `
+    <button type="button" class="page-btn" data-page="${currentPage - 1}" aria-label="Halaman sebelumnya"${previousDisabled}>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+    ${pageButtons}
+    <button type="button" class="page-btn" data-page="${currentPage + 1}" aria-label="Halaman berikutnya"${nextDisabled}>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="m9 18 6-6-6-6"/>
+      </svg>
+    </button>`;
 }
 
 categoryButtons.forEach((button) => {
