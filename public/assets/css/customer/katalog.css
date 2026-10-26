@@ -1,7 +1,12 @@
 /* TOOLBAR */
+main.container {
+  width: 100%;
+}
+
 .toolbar {
   display: flex;
   gap: 10px;
+  width: 100%;
   margin: 32px 0;
 }
 .search {
