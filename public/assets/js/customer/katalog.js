@@ -100,13 +100,11 @@ function renderProducts() {
                   <span class="card__label">Harga Mulai</span>
                   <span class="card__price">${currency.format(Number(product.price) || 0)}</span>
                 </div>
-                <details class="card__details">
-                  <summary class="card__detail-button">Lihat Detail</summary>
-                  <div class="card__detail-content">
-                    <p>${escapeHtml(product.desc || "Belum ada deskripsi produk.")}</p>
-                    <span>Stok tersedia: ${Number(product.stock) || 0}</span>
-                  </div>
-                </details>
+                <a
+                  class="card__detail-button"
+                  href="/?page=customer-detail&id=${Number(product.id) || 0}"
+                  aria-label="Lihat detail ${escapeHtml(product.name)}"
+                >Lihat Detail</a>
               </div>
             </div>
           </article>`;

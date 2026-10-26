@@ -1,0 +1,391 @@
+/* =========================================
+   DETAIL.CSS - detail produk & form pesanan
+   (header & footer ada di base.css)
+   ========================================= */
+
+/* 1. BREADCRUMB */
+.breadcrumb {
+  display: flex;
+  gap: 6px;
+  margin: 24px 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.breadcrumb a:hover {
+  color: var(--green);
+}
+.breadcrumb strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* 2. LAYOUT 2 KOLOM */
+.detail {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.detail__left {
+  display: grid;
+  gap: 24px;
+}
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+/* 3. KOLOM KIRI */
+.panel--image {
+  padding: 24px;
+}
+.product-image {
+  height: 440px;
+  border-radius: 8px;
+}
+.panel--info {
+  padding: 24px;
+}
+.product-title {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.product-size {
+  margin: 6px 0 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.product-size strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.stock-note {
+  margin: -12px 0 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.product-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 440px;
+  margin-bottom: 22px;
+}
+
+.notice {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #f1f1ee;
+  border-radius: 8px;
+}
+.notice svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--green-dark);
+}
+.notice h3 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.notice p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 4. FORM PESANAN */
+.panel--form {
+  padding: 32px;
+}
+.form__title {
+  font-size: 20px;
+  font-weight: 500;
+  padding: 8px 0;
+  margin-bottom: 20px;
+  background: linear-gradient(90deg, transparent, #f7f7f4);
+}
+.form__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 20px 0 10px;
+}
+
+/* Tab Standar / Custom */
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: #efefec;
+  border-radius: 8px;
+}
+.segmented__btn {
+  height: 40px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 14px;
+  color: var(--muted);
+}
+.segmented__btn--active {
+  background: var(--white);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dimensi */
+.dimension {
+  border: 0;
+  margin: 24px 0 8px;
+  padding: 0 16px;
+}
+.dimension__title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.dimension__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.dim label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.dim__input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  margin: 8px 0 10px;
+  padding: 0 14px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.dim__input:focus-within {
+  border-color: var(--green-dark);
+}
+.dim__input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+  -moz-appearance: textfield;
+}
+.dim__input input::-webkit-outer-spin-button,
+.dim__input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.dim__input span {
+  font-size: 11px;
+  color: var(--muted);
+}
+.dim__hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+.dim--error .dim__input {
+  border-color: #c0392b;
+}
+.dim--error .dim__hint {
+  color: #c0392b;
+}
+
+/* Mode standar: kolom ukuran dikunci */
+.is-standard .dim__input {
+  background: #f6f6f3;
+}
+.is-standard .dim__input input {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Jumlah sprei */
+.row-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 20px 16px;
+  background: #f6f6f3;
+  border-radius: 8px;
+}
+.row-box h3 {
+  font-size: 14px;
+  font-weight: 500;
+}
+.row-box p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Stepper +/- */
+.stepper {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.stepper button {
+  width: 36px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: #eeeeea;
+  font-size: 18px;
+  line-height: 1;
+}
+.stepper button:hover:not(:disabled) {
+  background: #e0e0db;
+}
+.stepper button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.stepper output {
+  min-width: 52px;
+  text-align: center;
+  font-weight: 600;
+}
+.stepper--sm button {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+}
+.stepper--sm output {
+  min-width: 44px;
+  font-size: 14px;
+}
+
+/* Tambahan sarung */
+.extras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.extra {
+  padding: 16px;
+  background: #f6f6f3;
+  border-radius: 8px;
+}
+.extra__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.extra__head h3 {
+  font-size: 14px;
+  font-weight: 500;
+}
+.extra__head span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.extra__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Catatan */
+textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #f6f6f3;
+  font-size: 14px;
+  outline: 0;
+}
+textarea::placeholder {
+  color: #aaa9a4;
+}
+textarea:focus {
+  border-color: var(--green-dark);
+}
+
+/* Tombol & pesan */
+.form__message {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.form__message[hidden] {
+  display: none;
+}
+.form__message--ok {
+  background: #e6efe3;
+  color: #35592f;
+}
+.form__message--error {
+  background: #f8e3e0;
+  color: #a0301f;
+}
+
+.btn-cart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 54px;
+  margin-top: 22px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--green-dark);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.btn-cart:hover {
+  background: #3f523f;
+}
+.btn-cart:disabled {
+  background: #9a9a94;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* 5. RESPONSIF */
+@media (max-width: 1000px) {
+  .detail {
+    grid-template-columns: 1fr;
+  }
+  .product-image {
+    height: 320px;
+  }
+}
+@media (max-width: 640px) {
+  .panel--form {
+    padding: 20px;
+  }
+  .dimension {
+    padding: 0;
+  }
+  .dimension__grid,
+  .extras {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .row-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

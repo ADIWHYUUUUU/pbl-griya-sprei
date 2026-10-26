@@ -1,0 +1,184 @@
+<?php
+
+require_once __DIR__ . '/ProductController.php';
+
+class OrderController
+{
+    public function addToCart(): void
+    {
+        if (!$this->hasValidCsrfToken()) {
+            http_response_code(403);
+            exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
+        }
+
+        $rawProductId = $_POST['id_produk'] ?? null;
+        $productId = is_string($rawProductId) || is_int($rawProductId)
+            ? filter_var($rawProductId, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 1],
+            ])
+            : false;
+
+        if ($productId === false || $productId === null) {
+            $this->setCartMessage('Produk tidak valid.', 'error');
+            $this->redirect('/?page=customer-catalog');
+        }
+
+        $product = (new ProductController())->getProductById($productId);
+        if (!$product) {
+            http_response_code(404);
+            $this->setCartMessage('Produk tidak ditemukan.', 'error');
+            $this->redirect('/?page=customer-catalog');
+        }
+
+        $stock = (int) $product['stok'];
+        $quantity = $this->readInteger($_POST['qtySprei'] ?? null);
+        $mode = $_POST['mode'] ?? '';
+
+        if ($stock < 1 || $quantity === null || $quantity < 1 || $quantity > min(50, $stock)) {
+            $this->setCartMessage('Jumlah produk melebihi stok yang tersedia.', 'error');
+            $this->redirect('/?page=customer-detail&id=' . $productId);
+        }
+
+        if (!in_array($mode, ['standard', 'custom'], true)) {
+            $this->setCartMessage('Tipe ukuran tidak valid.', 'error');
+            $this->redirect('/?page=customer-detail&id=' . $productId);
+        }
+
+        $dimensions = [
+            'length' => (int) $product['panjang_standar'],
+            'width' => (int) $product['lebar_standar'],
+            'height' => (int) $product['tinggi_standar'],
+        ];
+
+        if ($mode === 'custom') {
+            $limits = [
+                'length' => [100, max(300, $dimensions['length'])],
+                'width' => [80, max(260, $dimensions['width'])],
+                'height' => [10, max(50, $dimensions['height'])],
+            ];
+
+            foreach ($limits as $field => [$minimum, $maximum]) {
+                $value = $this->readInteger($_POST[$field] ?? null);
+                if ($value === null || $value < $minimum || $value > $maximum) {
+                    $this->setCartMessage('Ukuran custom tidak valid. Periksa kembali dimensi yang dimasukkan.', 'error');
+                    $this->redirect('/?page=customer-detail&id=' . $productId);
+                }
+                $dimensions[$field] = $value;
+            }
+        }
+
+        $quantityPillow = $this->readInteger($_POST['qtyBantal'] ?? null);
+        $quantityBolster = $this->readInteger($_POST['qtyGuling'] ?? null);
+        if (
+            $quantityPillow === null || $quantityPillow < 0 || $quantityPillow > 20 ||
+            $quantityBolster === null || $quantityBolster < 0 || $quantityBolster > 20
+        ) {
+            $this->setCartMessage('Jumlah sarung tambahan tidak valid.', 'error');
+            $this->redirect('/?page=customer-detail&id=' . $productId);
+        }
+
+        $note = $_POST['catatan'] ?? '';
+        $noteCharacterCount = is_string($note)
+            ? preg_match_all('/./us', $note, $matches)
+            : false;
+        if (
+            !is_string($note) ||
+            strlen($note) > 4000 ||
+            $noteCharacterCount === false ||
+            $noteCharacterCount > 1000
+        ) {
+            $this->setCartMessage('Catatan terlalu panjang.', 'error');
+            $this->redirect('/?page=customer-detail&id=' . $productId);
+        }
+
+        $cart = $_SESSION['cart'] ?? [];
+        if (!is_array($cart)) {
+            $cart = [];
+        }
+
+        $existingQuantity = 0;
+        foreach ($cart as $cartItem) {
+            if (is_array($cartItem) && (int) ($cartItem['id_produk'] ?? 0) === $productId) {
+                $existingQuantity += max(0, (int) ($cartItem['qtySprei'] ?? 0));
+            }
+        }
+
+        if ($existingQuantity + $quantity > $stock) {
+            $this->setCartMessage('Jumlah pesanan di keranjang melebihi stok yang tersedia.', 'error');
+            $this->redirect('/?page=customer-detail&id=' . $productId);
+        }
+
+        $itemId = bin2hex(random_bytes(16));
+        $cart[$itemId] = [
+            'id_produk' => $productId,
+            'nama_produk' => (string) $product['nama_produk'],
+            'gambar_produk' => (string) ($product['gambar_produk'] ?? ''),
+            'harga_dasar' => (float) $product['harga_dasar'],
+            'mode' => $mode,
+            'panjang' => $dimensions['length'],
+            'lebar' => $dimensions['width'],
+            'tinggi' => $dimensions['height'],
+            'qtySprei' => $quantity,
+            'qtyBantal' => $quantityPillow,
+            'qtyGuling' => $quantityBolster,
+            'catatan' => trim($note),
+        ];
+        $_SESSION['cart'] = $cart;
+
+        $this->setCartMessage('Produk berhasil ditambahkan ke keranjang.', 'success');
+        $this->redirect('/?page=customer-detail&id=' . $productId);
+    }
+
+    public function removeFromCart(): void
+    {
+        if (!$this->hasValidCsrfToken()) {
+            http_response_code(403);
+            exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
+        }
+
+        $itemId = $_POST['item_id'] ?? '';
+        if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId)) {
+            $this->setCartMessage('Item keranjang tidak valid.', 'error');
+            $this->redirect('/?page=customer-cart');
+        }
+
+        if (!isset($_SESSION['cart'][$itemId])) {
+            $this->setCartMessage('Item tersebut tidak ditemukan di keranjang.', 'error');
+            $this->redirect('/?page=customer-cart');
+        }
+
+        unset($_SESSION['cart'][$itemId]);
+        $this->setCartMessage('Item berhasil dihapus dari keranjang.', 'success');
+        $this->redirect('/?page=customer-cart');
+    }
+
+    private function readInteger($value): ?int
+    {
+        if (!is_string($value) && !is_int($value)) {
+            return null;
+        }
+
+        $integer = filter_var($value, FILTER_VALIDATE_INT);
+        return $integer === false ? null : $integer;
+    }
+
+    private function hasValidCsrfToken(): bool
+    {
+        $token = $_POST['csrf_token'] ?? '';
+        return is_string($token)
+            && isset($_SESSION['csrf_token'])
+            && hash_equals((string) $_SESSION['csrf_token'], $token);
+    }
+
+    private function setCartMessage(string $message, string $type): void
+    {
+        $_SESSION['cart_message'] = $message;
+        $_SESSION['cart_message_type'] = $type;
+    }
+
+    private function redirect(string $url): void
+    {
+        header('Location: ' . $url, true, 303);
+        exit;
+    }
+}

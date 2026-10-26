@@ -6,6 +6,15 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+$cartCount = 0;
+$cart = $_SESSION['cart'] ?? [];
+if (is_array($cart)) {
+    foreach ($cart as $cartItem) {
+        if (is_array($cartItem)) {
+            $cartCount += max(0, (int) ($cartItem['qtySprei'] ?? 0));
+        }
+    }
+}
 
 // Cek apakah customer sudah login
 $isLogin = (
@@ -21,7 +30,8 @@ $namaUser = $isLogin
 $currentPage = $_GET['page'] ?? basename($_SERVER['SCRIPT_NAME'] ?? '');
 $activeNavPage = match ($currentPage) {
     'index.php', 'customer-home' => 'home',
-    'customer-catalog' => 'catalog',
+    'customer-catalog', 'customer-detail' => 'catalog',
+    'customer-cart' => '',
     'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
     default => '',
 };
@@ -65,7 +75,7 @@ $activeNavPage = match ($currentPage) {
     <!-- HEADER ACTIONS -->
     <div class="header__actions">
         <!-- Keranjang -->
-        <span class="cart" aria-label="Keranjang" aria-disabled="true">
+        <a class="cart" href="/?page=customer-cart" aria-label="Keranjang">
             <svg
                 viewBox="0 0 24 24"
                 width="24"
@@ -77,8 +87,10 @@ $activeNavPage = match ($currentPage) {
                 <circle cx="9" cy="19" r="1.4" />
                 <circle cx="17" cy="19" r="1.4" />
             </svg>
-            <span class="cart__badge">3</span>
-        </span>
+            <span class="cart__badge"<?= $cartCount === 0 ? ' hidden' : ''; ?>>
+                <?= $cartCount ?>
+            </span>
+        </a>
 
         <?php if ($isLogin): ?>
             <!-- CUSTOMER SUDAH LOGIN -->

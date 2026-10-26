@@ -149,10 +149,6 @@ main.container {
   font-weight: 600;
   color: var(--price);
 }
-.card__details {
-  position: relative;
-  flex: 0 0 auto;
-}
 .card__detail-button {
   display: inline-flex;
   align-items: center;
@@ -164,34 +160,10 @@ main.container {
   color: #fff;
   font-size: 9px;
   font-weight: 600;
-  list-style: none;
   cursor: pointer;
-}
-.card__detail-button::-webkit-details-marker {
-  display: none;
 }
 .card__detail-button:hover {
   background: #5d7357;
-}
-.card__detail-content {
-  position: absolute;
-  z-index: 5;
-  right: 0;
-  bottom: calc(100% + 8px);
-  width: min(220px, 70vw);
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--white);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  font-size: 11px;
-  line-height: 1.5;
-}
-.card__detail-content p {
-  margin-bottom: 8px;
-}
-.card__detail-content span {
-  color: var(--muted);
 }
 .empty {
   grid-column: 1 / -1;

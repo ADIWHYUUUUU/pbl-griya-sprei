@@ -16,7 +16,8 @@ $action = $_GET['action'] ?? '';
 if ($action !== '') {
 	$isLogout = in_array($action, ['customer-logout', 'admin-logout'], true);
 	$isProductStore = $action === 'admin-product-store';
-	if (!$isLogout && !$isProductStore) {
+	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-remove'], true);
+	if (!$isLogout && !$isProductStore && !$isCartAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -27,14 +28,22 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductStore) {
+	if (!isset($actions[$action]) && !$isProductStore && !$isCartAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
 	}
 
 	try {
-		if ($isProductStore) {
+		if ($isCartAction) {
+			require_once __DIR__ . '/../app/controllers/OrderController.php';
+			$controller = new OrderController();
+			if ($action === 'customer-cart-add') {
+				$controller->addToCart();
+			} else {
+				$controller->removeFromCart();
+			}
+		} elseif ($isProductStore) {
 			require_once __DIR__ . '/../app/controllers/ProductController.php';
 			$controller = new ProductController();
 			$controller->store();
@@ -46,7 +55,9 @@ if ($action !== '') {
 	} catch (Throwable $error) {
 		error_log($error->getMessage());
 		http_response_code(500);
-		if ($isProductStore) {
+		if ($isCartAction) {
+			echo 'Keranjang gagal diproses. Silakan coba lagi.';
+		} elseif ($isProductStore) {
 			echo 'Produk gagal disimpan. Silakan coba lagi.';
 		} else {
 			echo json_encode(['success' => false, 'message' => 'Login gagal diproses. Silakan coba lagi.']);

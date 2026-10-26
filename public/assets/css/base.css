@@ -178,6 +178,9 @@ button {
   font-size: 10px;
   font-weight: 600;
 }
+.cart__badge[hidden] {
+  display: none;
+}
 .btn-login {
   display: inline-flex;
   align-items: center;
