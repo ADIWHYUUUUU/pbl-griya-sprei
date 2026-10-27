@@ -5,6 +5,12 @@ if (orderForm) {
   const modeButtons = [...orderForm.querySelectorAll("[data-mode]")];
   const dimensionInputs = [...orderForm.querySelectorAll(".dim__input input")];
   const message = document.getElementById("formMessage");
+  const stockStatus = document.getElementById("stockStatus");
+  const dimensionHints = {
+    length: "Tentukan panjang",
+    width: "Tentukan lebar",
+    height: "Tentukan tebal kasur",
+  };
   const hiddenQuantities = {
     qtySprei: document.getElementById("qtySpreiInput"),
     qtyBantal: document.getElementById("qtyBantalInput"),
@@ -21,6 +27,7 @@ if (orderForm) {
     const isStandard = mode === "standard";
     modeInput.value = mode;
     orderForm.classList.toggle("is-standard", isStandard);
+    stockStatus.hidden = !isStandard;
 
     modeButtons.forEach((button) => {
       const selected = button.dataset.mode === mode;
@@ -35,7 +42,7 @@ if (orderForm) {
       const hint = document.getElementById(`${input.id}Hint`);
       hint.textContent = isStandard
         ? "Standar katalog"
-         : `Tentukan ${input.id.toLowerCase()}`;
+        : dimensionHints[input.id];
     });
   }
 
