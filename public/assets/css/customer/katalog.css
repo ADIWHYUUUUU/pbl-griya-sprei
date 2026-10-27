@@ -153,12 +153,12 @@ main.container {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 28px;
-  padding: 0 10px;
+  min-height: 40px;
+  padding: 0 16px;
   border-radius: 7px;
   background: #718a70;
   color: #fff;
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
