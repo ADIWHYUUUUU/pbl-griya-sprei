@@ -21,6 +21,10 @@ function e($value)
 {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
+
+$isEdit = isset($product) && is_array($product);
+$product = $product ?? [];
+$formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +32,7 @@ function e($value)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Produk - Griya Sprei</title>
+    <title><?= $isEdit ? 'Edit' : 'Tambah' ?> Produk - Griya Sprei</title>
 
     <style>
         * { box-sizing: border-box; }
@@ -124,11 +128,11 @@ function e($value)
 
     <div class="form-card">
 
-        <h1>Tambah Produk</h1>
-        <p>Masukkan informasi produk baru Griya Sprei.</p>
+        <h1><?= $isEdit ? 'Edit' : 'Tambah' ?> Produk</h1>
+        <p><?= $isEdit ? 'Perbarui informasi produk Griya Sprei.' : 'Masukkan informasi produk baru Griya Sprei.' ?></p>
 
         <form
-            action="/?action=admin-product-store"
+            action="/?action=<?= e($formAction) ?>"
             method="POST"
             enctype="multipart/form-data"
         >
@@ -139,6 +143,10 @@ function e($value)
                 value="<?= e($_SESSION['csrf_token']) ?>"
             >
 
+            <?php if ($isEdit): ?>
+                <input type="hidden" name="id_produk" value="<?= (int) $product['id_produk'] ?>">
+            <?php endif; ?>
+
             <div class="form-group">
                 <label for="nama_produk">Nama Produk</label>
                 <input
@@ -146,6 +154,7 @@ function e($value)
                     id="nama_produk"
                     name="nama_produk"
                     maxlength="150"
+                    value="<?= e($product['nama_produk'] ?? '') ?>"
                     required
                 >
             </div>
@@ -159,8 +168,8 @@ function e($value)
                     required
                 >
                     <option value="">-- Pilih Kategori --</option>
-                    <option value="SPREI">Sprei</option>
-                    <option value="BEDCOVER">Bedcover</option>
+                    <option value="SPREI" <?= ($product['kategori_produk'] ?? '') === 'SPREI' ? 'selected' : '' ?>>Sprei</option>
+                    <option value="BEDCOVER" <?= ($product['kategori_produk'] ?? '') === 'BEDCOVER' ? 'selected' : '' ?>>Bedcover</option>
                 </select>
             </div>
 
@@ -177,6 +186,7 @@ function e($value)
                             name="panjang_standar"
                             min="1"
                             step="0.01"
+                            value="<?= e($product['panjang_standar'] ?? '') ?>"
                             required
                         >
                     </div>
@@ -189,6 +199,7 @@ function e($value)
                             name="lebar_standar"
                             min="1"
                             step="0.01"
+                            value="<?= e($product['lebar_standar'] ?? '') ?>"
                             required
                         >
                     </div>
@@ -201,6 +212,7 @@ function e($value)
                             name="tinggi_standar"
                             min="1"
                             step="0.01"
+                            value="<?= e($product['tinggi_standar'] ?? '') ?>"
                             required
                         >
                     </div>
@@ -216,6 +228,7 @@ function e($value)
                     name="harga_dasar"
                     min="0"
                     step="1"
+                    value="<?= e($product['harga_dasar'] ?? '') ?>"
                     required
                 >
             </div>
@@ -228,6 +241,7 @@ function e($value)
                     name="stok"
                     min="0"
                     step="1"
+                    value="<?= e($product['stok'] ?? '') ?>"
                     required
                 >
             </div>
@@ -238,21 +252,32 @@ function e($value)
                     id="deskripsi"
                     name="deskripsi"
                     required
-                ></textarea>
+                ><?= e($product['deskripsi'] ?? '') ?></textarea>
             </div>
 
             <div class="form-group">
                 <label for="gambar_produk">Gambar Produk</label>
+
+                <?php if ($isEdit && !empty($product['gambar_produk'])): ?>
+                    <p class="hint">Gambar saat ini:</p>
+                    <img
+                        src="/uploads/produk/<?= rawurlencode(basename($product['gambar_produk'])) ?>"
+                        class="product-image"
+                        alt="<?= e($product['nama_produk']) ?>"
+                        style="display: block; width: 140px; height: 140px; object-fit: cover; margin-bottom: 12px;"
+                    >
+                <?php endif; ?>
 
                 <input
                     type="file"
                     id="gambar_produk"
                     name="gambar_produk"
                     accept=".jpg,.jpeg,.png,.webp"
-                    required
+                    <?= $isEdit ? '' : 'required' ?>
                 >
 
                 <p class="hint">
+                    <?= $isEdit ? 'Pilih gambar baru jika ingin mengganti gambar yang sekarang. ' : '' ?>
                     Format JPG, PNG, atau WEBP. Maksimal 2 MB.
                 </p>
             </div>
@@ -260,11 +285,11 @@ function e($value)
             <div class="actions">
 
                 <button type="submit" class="btn btn-save">
-                    Simpan Produk
+                    <?= $isEdit ? 'Simpan Perubahan' : 'Simpan Produk' ?>
                 </button>
 
                 <a
-                    href="/?page=admin-dashboard"
+                    href="/?page=admin-products"
                     class="btn btn-back"
                 >
                     Kembali

@@ -296,12 +296,15 @@ small {
   background: #f5f5f2;
 }
 
-.edit-cart__segments span {
+.edit-cart__segments button {
+  border: 0;
+  background: transparent;
   padding: 8px 10px;
   border-radius: 6px;
   color: var(--teks-abu);
   font-size: 11px;
   text-align: center;
+  cursor: pointer;
 }
 
 .edit-cart__segments .is-active {

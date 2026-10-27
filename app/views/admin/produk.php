@@ -95,10 +95,10 @@ function e($value)
                             <div class="actions">
                                 <a
                                     class="btn btn-edit"
-                                    href="/frontend/pages/admin/edit.php?id=<?= (int) $product['id_produk'] ?>"
+                                    href="/?page=admin-edit-product&amp;id=<?= (int) $product['id_produk'] ?>"
                                 >Edit</a>
                                 <form
-                                    action="/backend/actions/admin/delete.php"
+                                    action="/?action=admin-product-delete"
                                     method="POST"
                                     onsubmit="return confirm('Yakin ingin menghapus produk ini?');"
                                 >

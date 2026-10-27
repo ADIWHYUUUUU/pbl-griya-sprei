@@ -216,11 +216,7 @@ class ProductController
             exit('Produk gagal disimpan.');
         }
 
-        header(
-            'Location: /?page=admin-dashboard&success=created',
-            true,
-            303
-        );
+        header('Location: /?page=admin-products&success=created', true, 303);
         exit;
     }
 
@@ -236,7 +232,7 @@ class ProductController
             exit('Produk tidak ditemukan.');
         }
 
-        require_once __DIR__ . '/../../../frontend/pages/admin/edit.php';
+        require_once __DIR__ . '/../views/admin/edit.php';
     }
 
     // =========================================
@@ -370,8 +366,8 @@ class ProductController
                 }
 
                 // Folder penyimpanan gambar
-                $uploadDir = dirname(__DIR__, 3)
-                    . '/frontend/uploads/produk/';
+                $uploadDir = dirname(__DIR__, 2)
+                    . '/public/uploads/produk/';
 
                 if (
                     !is_dir($uploadDir) &&
@@ -445,12 +441,7 @@ class ProductController
         // REDIRECT SETELAH BERHASIL
         // =====================================
 
-        header(
-            'Location: /frontend/pages/admin/produk.php?success=updated',
-            true,
-            303
-        );
-
+        header('Location: /?page=admin-products&success=updated', true, 303);
         exit;
     }
 
@@ -492,12 +483,14 @@ class ProductController
             exit('Produk gagal dihapus.');
         }
 
-        header(
-            'Location: /frontend/pages/admin/produk.php?success=deleted',
-            true,
-            303
-        );
+        $imagePath = dirname(__DIR__, 2)
+            . '/public/uploads/produk/'
+            . basename((string) ($product['gambar_produk'] ?? ''));
+        if (is_file($imagePath) && !unlink($imagePath)) {
+            error_log('[DELETE PRODUCT] Gambar produk gagal dihapus: ' . $imagePath);
+        }
 
+        header('Location: /?page=admin-products&success=deleted', true, 303);
         exit;
     }
 }

@@ -184,8 +184,8 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                             <fieldset class="edit-cart__section edit-cart__type">
                                                                 <legend>Tipe ukuran</legend>
                                                                 <div class="edit-cart__segments" aria-label="Tipe ukuran pesanan">
-                                                                    <span class="<?= $mode === 'STANDAR' ? 'is-active' : '' ?>">Standar</span>
-                                                                    <span class="<?= $mode === 'CUSTOM' ? 'is-active' : '' ?>">Custom</span>
+                                                                    <button type="button" class="<?= $mode === 'STANDAR' ? 'is-active' : '' ?>" data-edit-mode="standard" aria-pressed="<?= $mode === 'STANDAR' ? 'true' : 'false' ?>">Standar</button>
+                                                                    <button type="button" class="<?= $mode === 'CUSTOM' ? 'is-active' : '' ?>" data-edit-mode="custom" aria-pressed="<?= $mode === 'CUSTOM' ? 'true' : 'false' ?>">Custom</button>
                                                                 </div>
                                                             </fieldset>
 
@@ -193,18 +193,16 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                                 <legend>Dimensi kasur</legend>
                                                                 <div class="edit-cart__dimensions">
                                                                     <label class="edit-cart__field">Panjang
-                                                                        <span class="edit-cart__input-wrap"><input type="number" name="panjang" min="1" step="1" value="<?= $itemLength ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
+                                                                        <span class="edit-cart__input-wrap"><input type="number" name="panjang" min="1" step="1" value="<?= $itemLength ?>" data-standard="<?= aman($product['panjang_standar']) ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
                                                                     </label>
                                                                     <label class="edit-cart__field">Lebar
-                                                                        <span class="edit-cart__input-wrap"><input type="number" name="lebar" min="1" step="1" value="<?= $itemWidth ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
+                                                                        <span class="edit-cart__input-wrap"><input type="number" name="lebar" min="1" step="1" value="<?= $itemWidth ?>" data-standard="<?= aman($product['lebar_standar']) ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
                                                                     </label>
                                                                     <label class="edit-cart__field">Tinggi kasur
-                                                                        <span class="edit-cart__input-wrap"><input type="number" name="tinggi" min="1" step="1" value="<?= $itemHeight ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
+                                                                        <span class="edit-cart__input-wrap"><input type="number" name="tinggi" min="1" step="1" value="<?= $itemHeight ?>" data-standard="<?= aman($product['tinggi_standar']) ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
                                                                     </label>
                                                                 </div>
-                                                                <?php if ($mode === 'STANDAR'): ?>
-                                                                    <p class="edit-cart__hint">Dimensi standar produk. Ukuran standar tidak dapat diubah.</p>
-                                                                <?php endif; ?>
+                                                                <p class="edit-cart__hint" data-edit-dimension-hint>Dimensi standar produk. Ukuran standar tidak dapat diubah.</p>
                                                             </fieldset>
 
                                                             <fieldset class="edit-cart__section">

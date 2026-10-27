@@ -16,6 +16,37 @@ document.querySelectorAll("[data-edit-cart-open]").forEach(function (trigger) {
     });
   });
 
+  var editForm = dialog.querySelector(".edit-cart__form");
+  var modeInput = editForm.querySelector('input[name="mode"]');
+  var modeButtons = editForm.querySelectorAll("[data-edit-mode]");
+  var dimensionInputs = editForm.querySelectorAll('.edit-cart__dimensions input[type="number"]');
+  var dimensionHint = editForm.querySelector("[data-edit-dimension-hint]");
+
+  function setEditMode(mode) {
+    var isStandard = mode === "standard";
+    modeInput.value = mode;
+
+    modeButtons.forEach(function (modeButton) {
+      var isSelected = modeButton.dataset.editMode === mode;
+      modeButton.classList.toggle("is-active", isSelected);
+      modeButton.setAttribute("aria-pressed", String(isSelected));
+    });
+
+    dimensionInputs.forEach(function (input) {
+      input.disabled = isStandard;
+      if (isStandard) input.value = input.dataset.standard;
+    });
+
+    dimensionHint.hidden = !isStandard;
+  }
+
+  modeButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      setEditMode(button.dataset.editMode);
+    });
+  });
+  setEditMode(modeInput.value);
+
   dialog.addEventListener("click", function (event) {
     if (event.target === dialog) dialog.close();
   });

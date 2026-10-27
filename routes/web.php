@@ -11,6 +11,7 @@ return [
 	'admin-dashboard' => __DIR__ . '/../app/views/admin/dashboard.php',
 	'admin-products' => __DIR__ . '/../app/views/admin/produk.php',
 	'admin-add-product' => __DIR__ . '/../app/views/admin/tambah.php',
+	'admin-edit-product' => __DIR__ . '/../app/views/admin/edit.php',
 	'admin-edit-home' => __DIR__ . '/../app/views/admin/edit_beranda.php',
 	'admin-register' => __DIR__ . '/../app/views/admin/register.php',
 ];

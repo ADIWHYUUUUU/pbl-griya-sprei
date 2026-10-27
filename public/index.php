@@ -15,9 +15,14 @@ $action = $_GET['action'] ?? '';
 
 if ($action !== '') {
 	$isLogout = in_array($action, ['customer-logout', 'admin-logout'], true);
-	$isProductStore = $action === 'admin-product-store';
+	$productActions = [
+		'admin-product-store',
+		'admin-product-update',
+		'admin-product-delete',
+	];
+	$isProductAction = in_array($action, $productActions, true);
 	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove'], true);
-	if (!$isLogout && !$isProductStore && !$isCartAction) {
+	if (!$isLogout && !$isProductAction && !$isCartAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -28,7 +33,7 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductStore && !$isCartAction) {
+	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
@@ -45,10 +50,16 @@ if ($action !== '') {
 			} else {
 				$controller->removeFromCart();
 			}
-		} elseif ($isProductStore) {
+		} elseif ($isProductAction) {
 			require_once __DIR__ . '/../app/controllers/ProductController.php';
 			$controller = new ProductController();
-			$controller->store();
+			if ($action === 'admin-product-store') {
+				$controller->store();
+			} elseif ($action === 'admin-product-update') {
+				$controller->update($_POST['id_produk'] ?? null);
+			} else {
+				$controller->delete($_POST['id_produk'] ?? null);
+			}
 		} else {
 			require_once __DIR__ . '/../app/controllers/AuthController.php';
 			$controller = new AuthController(!$isLogout);
@@ -59,7 +70,7 @@ if ($action !== '') {
 		http_response_code(500);
 		if ($isCartAction) {
 			echo 'Keranjang gagal diproses. Silakan coba lagi.';
-		} elseif ($isProductStore) {
+		} elseif ($isProductAction) {
 			echo 'Produk gagal disimpan. Silakan coba lagi.';
 		} else {
 			echo json_encode(['success' => false, 'message' => 'Login gagal diproses. Silakan coba lagi.']);
