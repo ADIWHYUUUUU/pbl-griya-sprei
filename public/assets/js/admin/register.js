@@ -5,13 +5,13 @@ form.addEventListener("submit", async (event) => {
   if (!form.reportValidity()) return;
 
   try {
-    const response = await fetch("/backend/actions/admin/register.php", {
+    const response = await fetch(form.action, {
       method: "POST",
       body: new FormData(form),
     });
     const result = await response.json();
-    if (!result.success) {
-      alert(result.message);
+    if (!response.ok || !result.success) {
+      alert(result.message || "Pendaftaran admin gagal. Periksa data dan coba lagi.");
       return;
     }
     alert(result.message);

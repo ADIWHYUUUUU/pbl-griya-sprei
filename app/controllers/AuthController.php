@@ -136,7 +136,9 @@ class AuthController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($_POST['csrf_token'] ?? ''))) {
+        $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
+        $submittedToken = (string) ($_POST['csrf_token'] ?? '');
+        if ($sessionToken === '' || $submittedToken === '' || !hash_equals($sessionToken, $submittedToken)) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Token keamanan tidak valid. Muat ulang halaman dan coba lagi.']);
             return;

@@ -8,6 +8,7 @@ $actions = [
 	'customer-login' => 'login',
 	'customer-register' => 'register',
 	'admin-login' => 'loginAdmin',
+	'admin-register' => 'registerAdmin',
 	'customer-logout' => 'logoutCustomer',
 	'admin-logout' => 'logoutAdmin',
 ];
@@ -73,7 +74,7 @@ if ($action !== '') {
 		} elseif ($isProductAction) {
 			echo 'Produk gagal disimpan. Silakan coba lagi.';
 		} else {
-			echo json_encode(['success' => false, 'message' => 'Login gagal diproses. Silakan coba lagi.']);
+			echo json_encode(['success' => false, 'message' => 'Permintaan gagal diproses. Silakan coba lagi.']);
 		}
 	}
 	exit;
