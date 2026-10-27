@@ -43,54 +43,6 @@
             "price": 325000,
             "color": "#9bb87a",
             "image": "/uploads/beranda/34951216c8eee04c0ade7cd5.jpg"
-        },
-        {
-            "name": "Sprei Katun Tropical Leaf",
-            "tag": "Sprei Premium",
-            "description": "Sprei bermotif dedaunan tropis dengan perpaduan hijau sage dan putih. Motif alami ini memberikan suasana kamar yang segar dan nyaman.",
-            "price": 175000,
-            "color": "#9bb87a",
-            "image": "/uploads/beranda/69c9081e874525532f360ee0.jpg"
-        },
-        {
-            "name": "Sprei Polos Stripe Beige",
-            "tag": "Sprei Premium",
-            "description": "Sprei dengan motif garis tipis berwarna beige dan krem. Desain minimalis dengan warna netral yang cocok dipadukan dengan berbagai dekorasi kamar tidur.",
-            "price": 145000,
-            "color": "#9bb87a",
-            "image": "/uploads/beranda/f1b2caaddab36617cbd5ba43.jpg"
-        },
-        {
-            "name": "Sprei Cloudy Sky Blue",
-            "tag": "125000",
-            "description": "Sprei dengan motif awan putih dan bintang kecil pada latar biru muda. Desain ceria bernuansa pastel yang cocok untuk kamar anak maupun remaja.",
-            "price": 125000,
-            "color": "#9bb87a",
-            "image": "/uploads/beranda/8b7244456d2ebc2b2a6ca940.jpg"
-        },
-        {
-            "name": "Sprei Marble Charcoal",
-            "tag": "Sprei Premium",
-            "description": "Sprei dengan motif marmer abstrak berwarna abu-abu gelap dan putih. Kombinasi warnanya memberikan kesan modern, mewah, dan elegan pada kamar tidur.",
-            "price": 195000,
-            "color": "#9bb87a",
-            "image": "/uploads/beranda/e6aaa2d82765945d26e94038.jpg"
-        },
-        {
-            "name": "Bedcover Tropical Forest",
-            "tag": "Bedcover",
-            "description": "Bedcover bermotif dedaunan hutan tropis dengan kombinasi hijau tua dan hijau sage. Memberikan kesan alami dan menenangkan pada suasana kamar tidur.",
-            "price": 365000,
-            "color": "#9bb87a",
-            "image": "/uploads/beranda/804ce1dee9398717fcb94f37.jpg"
-        },
-        {
-            "name": "Bedcover Dreamy Lavender",
-            "tag": "Bedcover",
-            "description": "Bedcover dengan motif bulan sabit dan bintang kecil pada latar ungu lavender. Warna pastel lembut memberikan tampilan kamar yang manis dan nyaman.",
-            "price": 285000,
-            "color": "#9bb87a",
-            "image": "/uploads/beranda/5d3a7a1728d4a16656c0fe21.jpg"
         }
     ]
 }
