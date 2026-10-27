@@ -2,7 +2,7 @@
     <div class="footer__inner">
 
         <!-- Kolom 1: tentang & alamat -->
-        <div>
+        <div class="footer__column">
             <h3 class="footer__title">Griya Sprei Malang</h3>
             <p class="footer__text">
                 Melayani sprei, bed cover, sarung bantal,
@@ -22,15 +22,15 @@
         </div>
 
         <!-- Kolom 2: kontak -->
-        <div>
+        <div class="footer__column">
             <h3 class="footer__title">Kontak Kami</h3>
             <ul class="footer__list">
                 <li>
-                    <a class="footer__link" href="https://wa.me/+6281335306976" target="_blank" rel="noopener">
+                    <a class="footer__link" href="https://wa.me/+6285814626335" target="_blank" rel="noopener">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />
                         </svg>
-                        +62 813-3530-6976
+                        +62 858-1462-6335
                     </a>
                 </li>
                 <li>
@@ -55,8 +55,7 @@
             </ul>
         </div>
 
-        <!-- Kolom 3: tautan (tidak berubah) -->
-        <div>
+        <div class="footer__column">
             <h3 class="footer__title">Tautan</h3>
             <ul class="footer__list">
                 <li><a href="/?page=customer-catalog">Katalog</a></li>
