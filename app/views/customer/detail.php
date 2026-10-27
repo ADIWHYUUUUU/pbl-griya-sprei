@@ -65,19 +65,16 @@ $dimensi = [
     [
         'id' => 'length',
         'label' => 'Panjang',
-        'min' => 100,
         'nilai' => $produk['panjang']
     ],
     [
         'id' => 'width',
         'label' => 'Lebar',
-        'min' => 80,
         'nilai' => $produk['lebar']
     ],
     [
         'id' => 'height',
         'label' => 'Tinggi',
-        'min' => 10,
         'nilai' => $produk['tinggi']
     ]
 ];
@@ -412,7 +409,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                                         type="number"
                                         id="<?= aman($d['id']) ?>"
                                         name="<?= aman($d['id']) ?>"
-                                        min="<?= aman($d['min']) ?>"
+                                        min="1"
                                         step="1"
                                         value="<?= aman($d['nilai']) ?>"
                                         data-standard="<?= aman($d['nilai']) ?>"

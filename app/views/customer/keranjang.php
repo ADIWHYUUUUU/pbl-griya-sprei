@@ -193,13 +193,13 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                                 <legend>Dimensi kasur</legend>
                                                                 <div class="edit-cart__dimensions">
                                                                     <label class="edit-cart__field">Panjang
-                                                                        <span class="edit-cart__input-wrap"><input type="number" name="panjang" min="100" step="1" value="<?= $itemLength ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
+                                                                        <span class="edit-cart__input-wrap"><input type="number" name="panjang" min="1" step="1" value="<?= $itemLength ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
                                                                     </label>
                                                                     <label class="edit-cart__field">Lebar
-                                                                        <span class="edit-cart__input-wrap"><input type="number" name="lebar" min="80" step="1" value="<?= $itemWidth ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
+                                                                        <span class="edit-cart__input-wrap"><input type="number" name="lebar" min="1" step="1" value="<?= $itemWidth ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
                                                                     </label>
                                                                     <label class="edit-cart__field">Tinggi kasur
-                                                                        <span class="edit-cart__input-wrap"><input type="number" name="tinggi" min="10" step="1" value="<?= $itemHeight ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
+                                                                        <span class="edit-cart__input-wrap"><input type="number" name="tinggi" min="1" step="1" value="<?= $itemHeight ?>" <?= $mode === 'STANDAR' ? 'disabled' : '' ?> required><span>cm</span></span>
                                                                     </label>
                                                                 </div>
                                                                 <?php if ($mode === 'STANDAR'): ?>

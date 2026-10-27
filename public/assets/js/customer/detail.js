@@ -81,10 +81,14 @@ if (orderForm) {
     message.classList.remove("form__message--error");
 
     if (modeInput.value === "custom") {
-      const invalidDimension = dimensionInputs.find((input) => !input.checkValidity());
+      const invalidDimension = dimensionInputs.find(
+        (input) => !input.checkValidity() || Number(input.value) < 1,
+      );
       if (invalidDimension) {
         invalidDimension.closest(".dim").classList.add("dim--error");
-        showMessage(`Masukkan ${invalidDimension.labels[0].textContent.trim().toLowerCase()} minimal ${invalidDimension.min} cm.`);
+        showMessage(
+          `Masukkan ${invalidDimension.labels[0].textContent.trim().toLowerCase()} dalam bilangan bulat lebih besar dari 0.`,
+        );
         invalidDimension.focus();
         event.preventDefault();
         return;

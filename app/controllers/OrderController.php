@@ -51,15 +51,9 @@ class OrderController
         ];
 
         if ($mode === 'custom') {
-            $limits = [
-                'length' => [100, max(300, $dimensions['length'])],
-                'width' => [80, max(260, $dimensions['width'])],
-                'height' => [10, max(50, $dimensions['height'])],
-            ];
-
-            foreach ($limits as $field => [$minimum, $maximum]) {
+            foreach (['length', 'width', 'height'] as $field) {
                 $value = $this->readInteger($_POST[$field] ?? null);
-                if ($value === null || $value < $minimum || $value > $maximum) {
+                if ($value === null || $value < 1) {
                     $this->setCartMessage('Ukuran custom tidak valid. Periksa kembali dimensi yang dimasukkan.', 'error');
                     $this->redirect('/?page=customer-detail&id=' . $productId);
                 }
@@ -185,14 +179,9 @@ class OrderController
                 'tinggi' => (int) $product['tinggi_standar'],
             ];
             if ($mode === 'custom') {
-                $minimums = [
-                    'panjang' => 100,
-                    'lebar' => 80,
-                    'tinggi' => 10,
-                ];
-                foreach ($minimums as $field => $minimum) {
+                foreach (['panjang', 'lebar', 'tinggi'] as $field) {
                     $value = $this->readInteger($_POST[$field] ?? null);
-                    if ($value === null || $value < $minimum) {
+                    if ($value === null || $value < 1) {
                         $this->setCartMessage('Ukuran custom tidak valid. Periksa kembali dimensi yang dimasukkan.', 'error');
                         $this->redirect('/?page=customer-cart');
                     }
