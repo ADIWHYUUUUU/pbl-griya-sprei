@@ -45,6 +45,11 @@ class ProductController
         }
     }
 
+    private function normalizeProductCategory($category)
+    {
+        return $category === 'BEDCOVER' ? 'BED_COVER' : $category;
+    }
+
 
     public function getAllProducts()
     {
@@ -76,7 +81,9 @@ class ProductController
 
         // Ambil input
         $nama = trim($_POST['nama_produk'] ?? '');
-        $kategori = trim($_POST['kategori_produk'] ?? '');
+        $kategori = $this->normalizeProductCategory(
+            trim($_POST['kategori_produk'] ?? '')
+        );
         $deskripsi = trim($_POST['deskripsi'] ?? '');
 
         $panjang = filter_var(
@@ -108,7 +115,7 @@ class ProductController
         if (
             $nama === '' ||
             strlen($nama) > 150 ||
-            !in_array($kategori, ['SPREI', 'BEDCOVER'], true) ||
+            !in_array($kategori, ['SPREI', 'BED_COVER'], true) ||
             $deskripsi === '' ||
             $panjang === false || !is_finite($panjang) || $panjang <= 0 ||
             $lebar === false || !is_finite($lebar) || $lebar <= 0 ||
@@ -265,7 +272,9 @@ class ProductController
         // =====================================
 
         $nama = trim($_POST['nama_produk'] ?? '');
-        $kategori = trim($_POST['kategori_produk'] ?? '');
+        $kategori = $this->normalizeProductCategory(
+            trim($_POST['kategori_produk'] ?? '')
+        );
         $deskripsi = trim($_POST['deskripsi'] ?? '');
 
         $panjang = filter_var(
@@ -300,7 +309,7 @@ class ProductController
         if (
             $nama === '' ||
             strlen($nama) > 150 ||
-            !in_array($kategori, ['SPREI', 'BEDCOVER'], true) ||
+            !in_array($kategori, ['SPREI', 'BED_COVER'], true) ||
             $deskripsi === '' ||
             $panjang === false || !is_finite($panjang) || $panjang <= 0 ||
             $lebar === false || !is_finite($lebar) || $lebar <= 0 ||

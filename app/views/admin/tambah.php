@@ -169,7 +169,7 @@ $formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
                 >
                     <option value="">-- Pilih Kategori --</option>
                     <option value="SPREI" <?= ($product['kategori_produk'] ?? '') === 'SPREI' ? 'selected' : '' ?>>Sprei</option>
-                    <option value="BEDCOVER" <?= ($product['kategori_produk'] ?? '') === 'BEDCOVER' ? 'selected' : '' ?>>Bedcover</option>
+                    <option value="BED_COVER" <?= in_array(($product['kategori_produk'] ?? ''), ['BED_COVER', 'BEDCOVER'], true) ? 'selected' : '' ?>>Bedcover</option>
                 </select>
             </div>
 
