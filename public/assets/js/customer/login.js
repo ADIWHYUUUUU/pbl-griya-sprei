@@ -15,8 +15,10 @@ const loginMessage = document.getElementById("loginMessage");
 
 const clearEmailBtn = document.getElementById("clearEmail");
 const toggleBtn = document.getElementById("togglePassword");
+const submitButton = form.querySelector('button[type="submit"]');
 
 const rememberBox = document.getElementById("remember");
+let isSubmitting = false;
 
 rememberBox.addEventListener("change", () => {
   if (!rememberBox.checked) {
@@ -124,7 +126,9 @@ emailInput.addEventListener("blur", () => {
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  clearLoginMessage();
+  if (isSubmitting) {
+    return;
+  }
 
   const emailOk = validateEmail();
   const passwordOk = validatePassword();
@@ -141,6 +145,9 @@ form.addEventListener("submit", async (e) => {
   formData.append("email", email);
   formData.append("password", password);
 
+  isSubmitting = true;
+  submitButton.disabled = true;
+
   try {
     const response = await fetch("/?action=customer-login", {
       method: "POST",
@@ -152,6 +159,8 @@ form.addEventListener("submit", async (e) => {
     // Login gagal
     if (!result.success) {
       showLoginMessage(result.message || "email atau kata sandi salah.");
+      isSubmitting = false;
+      submitButton.disabled = false;
       return;
     }
 
@@ -168,6 +177,8 @@ form.addEventListener("submit", async (e) => {
     console.error("ERROR LOGIN:", error);
 
     showLoginMessage("Terjadi kesalahan saat login. Silakan coba lagi.");
+    isSubmitting = false;
+    submitButton.disabled = false;
   }
 });
 
