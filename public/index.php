@@ -89,4 +89,11 @@ if (!isset($pages[$page])) {
 	exit;
 }
 
+if ($page === 'customer-cart' && (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'CUSTOMER')) {
+	$_SESSION['cart_message'] = 'Silakan login dengan akun customer terlebih dahulu untuk mengakses keranjang.';
+	$_SESSION['cart_message_type'] = 'error';
+	header('Location: /?page=customer-login', true, 303);
+	exit;
+}
+
 require $pages[$page];

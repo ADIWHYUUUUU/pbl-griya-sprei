@@ -1,3 +1,8 @@
+<?php
+$loginMessage = (string) ($_SESSION['cart_message'] ?? '');
+$loginMessageType = ($_SESSION['cart_message_type'] ?? '') === 'success' ? 'success' : 'error';
+unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
+?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -26,7 +31,7 @@
 
         <!-- ===== FORM LOGIN ===== -->
         <form id="loginForm" novalidate>
-            <p class="flash-message" id="loginMessage" role="alert" hidden></p>
+            <p class="flash-message<?= $loginMessageType === 'success' ? ' flash-message--success' : '' ?>" id="loginMessage" role="<?= $loginMessageType === 'success' ? 'status' : 'alert' ?>"<?= $loginMessage === '' ? ' hidden' : '' ?>><?= htmlspecialchars($loginMessage, ENT_QUOTES, 'UTF-8') ?></p>
 
             <!-- Email -->
             <div class="field" id="emailField">

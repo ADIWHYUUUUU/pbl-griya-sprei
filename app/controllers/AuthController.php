@@ -70,6 +70,9 @@ class AuthController
             return;
         }
 
+        $pendingCart = $_SESSION['pending_cart'] ?? [];
+        $pendingCart = is_array($pendingCart) ? $pendingCart : [];
+
         // Simpan session customer
         session_regenerate_id(true);
         $_SESSION = [];
@@ -79,12 +82,19 @@ class AuthController
         $_SESSION['email'] = $user['email'];
         $_SESSION['role'] = 'CUSTOMER';
 
+        $redirect = '/?page=customer-home';
+        if ($pendingCart !== []) {
+            $_SESSION['cart'] = $pendingCart;
+            $_SESSION['cart_message'] = 'Pesanan Anda berhasil ditambahkan ke keranjang.';
+            $_SESSION['cart_message_type'] = 'success';
+            $redirect = '/?page=customer-cart';
+        }
 
         echo json_encode([
             'success' => true,
             'message' => 'Login berhasil.',
             'role' => 'CUSTOMER',
-            'redirect' => '/?page=customer-home'
+            'redirect' => $redirect
         ]);
 
         return;

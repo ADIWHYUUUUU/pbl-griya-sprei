@@ -103,7 +103,7 @@ class OrderController
         }
 
         $itemId = bin2hex(random_bytes(16));
-        $cart[$itemId] = [
+        $item = [
             'id_produk' => $productId,
             'nama_produk' => (string) $product['nama_produk'],
             'gambar_produk' => (string) ($product['gambar_produk'] ?? ''),
@@ -117,6 +117,19 @@ class OrderController
             'qtyGuling' => $quantityBolster,
             'catatan' => trim($note),
         ];
+
+        if (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'CUSTOMER') {
+            $pendingCart = $_SESSION['pending_cart'] ?? [];
+            if (!is_array($pendingCart)) {
+                $pendingCart = [];
+            }
+            $pendingCart[$itemId] = $item;
+            $_SESSION['pending_cart'] = $pendingCart;
+            $this->setCartMessage('Silakan login dengan akun customer terlebih dahulu. Pesanan Anda akan otomatis masuk ke keranjang setelah login.', 'error');
+            $this->redirect('/?page=customer-login');
+        }
+
+        $cart[$itemId] = $item;
         $_SESSION['cart'] = $cart;
 
         $this->setCartMessage('Produk berhasil ditambahkan ke keranjang.', 'success');
@@ -129,6 +142,7 @@ class OrderController
             http_response_code(403);
             exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
         }
+        $this->requireCustomer();
 
         $itemId = $_POST['item_id'] ?? '';
         if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId)) {
@@ -239,6 +253,7 @@ class OrderController
             http_response_code(403);
             exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
         }
+        $this->requireCustomer();
 
         $itemId = $_POST['item_id'] ?? '';
         if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId)) {
@@ -272,6 +287,16 @@ class OrderController
         return is_string($token)
             && isset($_SESSION['csrf_token'])
             && hash_equals((string) $_SESSION['csrf_token'], $token);
+    }
+
+    private function requireCustomer(): void
+    {
+        if (($_SESSION['login'] ?? false) === true && ($_SESSION['role'] ?? '') === 'CUSTOMER') {
+            return;
+        }
+
+        $this->setCartMessage('Silakan login terlebih dahulu untuk mengakses keranjang.', 'error');
+        $this->redirect('/?page=customer-login');
     }
 
     private function setCartMessage(string $message, string $type): void
