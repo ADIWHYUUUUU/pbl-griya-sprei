@@ -53,10 +53,6 @@
                 <small>Transaksi selesai</small>
                 <div class="m-val" id="mSelesai"></div>
             </div>
-            <div class="metric-item">
-                <small>Rata-rata pesanan</small>
-                <div class="m-val" id="mRata"></div>
-            </div>
         </div>
 
         <div class="bar-chart" id="barChart" role="img" aria-label="Grafik penjualan per minggu"></div>
