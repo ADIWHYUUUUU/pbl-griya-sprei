@@ -72,7 +72,7 @@
     <section class="table-box" id="daftarPesanan">
         <div class="section-header">
             <h3>Daftar pesanan</h3>
-            <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
+            <button type="button" class="btn-text btn-disabled" disabled>Lihat Pesanan</button>
         </div>
         <div class="table-wrap">
             <table>

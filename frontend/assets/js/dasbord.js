@@ -269,7 +269,7 @@
                         h('strong', {}, p.kode + ' \u00B7 ' + p.pelanggan.nama),
                         h('span', {}, 'Bukti transfer ' + rupiah(hitungTotal(p)))
                     ),
-                    h('span', { class: 'btn-text' }, 'Cek pesanan')
+                    h('button', { type: 'button', class: 'btn-text', disabled: true }, 'Cek pesanan')
                 )
             );
         });
