@@ -123,8 +123,18 @@ class OrderController
             if (!is_array($pendingCart)) {
                 $pendingCart = [];
             }
-            $pendingCart[$itemId] = $item;
+            $isDuplicate = false;
+            foreach ($pendingCart as $pendingItem) {
+                if ($pendingItem === $item) {
+                    $isDuplicate = true;
+                    break;
+                }
+            }
+            if (!$isDuplicate) {
+                $pendingCart[$itemId] = $item;
+            }
             $_SESSION['pending_cart'] = $pendingCart;
+            $_SESSION['login_return_url'] = '/?page=customer-detail&id=' . $productId;
             $this->setCartMessage('Silakan login dengan akun customer terlebih dahulu. Pesanan Anda akan otomatis masuk ke keranjang setelah login.', 'error');
             $this->redirect('/?page=customer-login');
         }

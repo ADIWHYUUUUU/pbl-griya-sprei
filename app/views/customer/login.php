@@ -2,6 +2,11 @@
 $loginMessage = (string) ($_SESSION['cart_message'] ?? '');
 $loginMessageType = ($_SESSION['cart_message_type'] ?? '') === 'success' ? 'success' : 'error';
 unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
+$returnUrl = $_SESSION['login_return_url'] ?? '';
+if (!is_string($returnUrl) || !preg_match('/^\/\?page=customer-detail&id=[1-9][0-9]*$/D', $returnUrl)) {
+    $returnUrl = '/?page=customer-home';
+}
+unset($_SESSION['login_return_url']);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -100,7 +105,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
             </button>
         </form>
 
-        <a class="btn-home" href="/?page=customer-home">Kembali ke Beranda</a>
+        <a class="btn-home" href="<?= htmlspecialchars($returnUrl, ENT_QUOTES, 'UTF-8') ?>"><?= $returnUrl === '/?page=customer-home' ? 'Kembali ke Beranda' : 'Kembali ke Halaman Sebelumnya' ?></a>
         <p class="register">Belum memiliki akun? <a href="/?page=customer-register">Daftar Sekarang</a></p>
     </main>
 
