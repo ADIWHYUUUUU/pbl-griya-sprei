@@ -1,0 +1,248 @@
+.admin-orders .orders-main {
+  max-width: 1440px;
+}
+
+.admin-orders .orders-header {
+  margin-bottom: 24px;
+}
+
+.orders-panel {
+  overflow: hidden;
+  border: 1px solid var(--garis);
+  border-radius: 12px;
+  background: var(--putih);
+  box-shadow: 0 3px 12px rgba(34, 51, 35, 0.035);
+}
+
+.orders-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--garis);
+}
+
+.order-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.order-tab {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 11px;
+  border-radius: 7px;
+  color: var(--teks-abu);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.order-tab:hover,
+.order-tab.is-active {
+  background: #edf2eb;
+  color: var(--hijau-tua);
+}
+
+.order-tab span {
+  display: inline-grid;
+  min-width: 21px;
+  height: 21px;
+  place-items: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(82, 121, 111, 0.12);
+  font-size: 10px;
+}
+
+.order-search {
+  display: flex;
+  flex: 0 0 290px;
+  min-width: 0;
+}
+
+.order-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--garis);
+  border-right: 0;
+  border-radius: 7px 0 0 7px;
+  color: var(--teks);
+  font: inherit;
+  font-size: 12px;
+}
+
+.order-search button {
+  padding: 0 14px;
+  border: 0;
+  border-radius: 0 7px 7px 0;
+  background: var(--hijau-tua);
+  color: var(--putih);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.orders-result-count {
+  margin: 0;
+  padding: 14px 20px 10px;
+  color: var(--teks-abu);
+  font-size: 12px;
+}
+
+.orders-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.orders-table th {
+  padding: 12px 16px;
+  background: #f7f8f6;
+  color: var(--teks-abu);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.orders-table td {
+  padding: 15px 16px;
+  border-top: 1px solid var(--garis);
+  color: var(--teks);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.orders-table td > strong,
+.orders-table td > small {
+  display: block;
+}
+
+.orders-table td > strong {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.orders-table td > small {
+  color: var(--teks-abu);
+  font-size: 11px;
+}
+
+.orders-table .order-invoice {
+  color: var(--hijau-tua);
+}
+
+.orders-table .order-products {
+  max-width: 250px;
+  line-height: 1.6;
+}
+
+.orders-table .order-total {
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.order-status,
+.order-payment {
+  display: inline-flex;
+  align-items: center;
+  max-width: 180px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.order-status--waiting,
+.order-payment--waiting {
+  background: #fff3d9;
+  color: #885c00;
+}
+
+.order-status--processing {
+  background: #e8f0fb;
+  color: #315d92;
+}
+
+.order-status--complete,
+.order-payment--complete {
+  background: #e6f3e8;
+  color: #35663c;
+}
+
+.order-status--cancelled,
+.order-payment--cancelled {
+  background: #fbe9e7;
+  color: #9c3d36;
+}
+
+.order-status--other,
+.order-payment--other {
+  background: #eef0ed;
+  color: #59645a;
+}
+
+.orders-empty td {
+  padding: 36px 16px;
+  color: var(--teks-abu);
+  text-align: center;
+}
+
+.admin-orders [hidden] {
+  display: none !important;
+}
+
+.admin-orders .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media (max-width: 900px) {
+  .orders-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .order-search {
+    flex-basis: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-orders .orders-main {
+    padding: 24px 16px;
+  }
+
+  .orders-toolbar {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .orders-result-count {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+}

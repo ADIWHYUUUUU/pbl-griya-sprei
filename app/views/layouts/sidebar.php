@@ -32,7 +32,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M19 8v6M22 11h-6"/></svg>
                 <span>Tambah Admin</span>
             </a>
-            <a class="nav-item" href="/?page=admin-dashboard#daftarPesanan">
+            <a class="nav-item <?= $halamanAktif === 'admin-orders' ? 'active' : '' ?>" href="/?page=admin-orders" <?= $halamanAktif === 'admin-orders' ? 'aria-current="page"' : '' ?>>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 10h6M9 14h6M9 18h3"/></svg>
                 <span>Cek Pesanan</span>
             </a>

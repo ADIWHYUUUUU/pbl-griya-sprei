@@ -9,6 +9,7 @@ return [
 	'customer-register' => __DIR__ . '/../app/views/customer/register.php',
 	'admin-login' => __DIR__ . '/../app/views/admin/login.php',
 	'admin-dashboard' => __DIR__ . '/../app/views/admin/dashboard.php',
+	'admin-orders' => __DIR__ . '/../app/views/admin/cekpesanan.php',
 	'admin-products' => __DIR__ . '/../app/views/admin/produk.php',
 	'admin-add-product' => __DIR__ . '/../app/views/admin/tambah.php',
 	'admin-edit-product' => __DIR__ . '/../app/views/admin/edit.php',
