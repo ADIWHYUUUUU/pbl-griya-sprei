@@ -276,11 +276,19 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                         <?php endforeach; ?>
 
                         <nav class="paginasi" aria-label="Halaman keranjang">
-                            <a href="/?page=customer-cart&amp;page_num=<?= max(1, $page - 1) ?>&amp;cari=<?= rawurlencode($search) ?>" aria-label="Halaman sebelumnya" <?= $page === 1 ? 'aria-disabled="true"' : '' ?>>‹</a>
+                            <a href="/?page=customer-cart&amp;page_num=<?= max(1, $page - 1) ?>&amp;cari=<?= rawurlencode($search) ?>" aria-label="Halaman sebelumnya" <?= $page === 1 ? 'aria-disabled="true"' : '' ?>>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="m15 18-6-6 6-6" />
+                                </svg>
+                            </a>
                             <?php for ($number = 1; $number <= $totalPages; $number++): ?>
                                 <a href="/?page=customer-cart&amp;page_num=<?= $number ?>&amp;cari=<?= rawurlencode($search) ?>" class="<?= $page === $number ? 'aktif' : '' ?>" <?= $page === $number ? 'aria-current="page"' : '' ?>><?= $number ?></a>
                             <?php endfor; ?>
-                            <a href="/?page=customer-cart&amp;page_num=<?= min($totalPages, $page + 1) ?>&amp;cari=<?= rawurlencode($search) ?>" aria-label="Halaman berikutnya" <?= $page === $totalPages ? 'aria-disabled="true"' : '' ?>>›</a>
+                            <a href="/?page=customer-cart&amp;page_num=<?= min($totalPages, $page + 1) ?>&amp;cari=<?= rawurlencode($search) ?>" aria-label="Halaman berikutnya" <?= $page === $totalPages ? 'aria-disabled="true"' : '' ?>>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="m9 18 6-6-6-6" />
+                                </svg>
+                            </a>
                         </nav>
                     <?php endif; ?>
                 </section>

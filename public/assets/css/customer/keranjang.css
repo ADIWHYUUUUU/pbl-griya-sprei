@@ -586,22 +586,29 @@ small {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 20px;
+  margin: 20px 0 0;
 }
 
 .paginasi a {
   display: grid;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   place-items: center;
-  background: white;
-  border: 1px solid var(--garis);
-  border-radius: 6px;
+  background: #e4e4e1;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.paginasi a:hover:not([aria-disabled="true"]) {
+  background: #d6d6d2;
 }
 
 .paginasi a[aria-disabled="true"] {
   color: #9aa196;
   pointer-events: none;
+  opacity: 0.5;
 }
 
 .paginasi a.aktif {
