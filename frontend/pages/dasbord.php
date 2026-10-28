@@ -53,10 +53,6 @@
                 <small>Transaksi selesai</small>
                 <div class="m-val" id="mSelesai"></div>
             </div>
-            <div class="metric-item">
-                <small>Rata-rata pesanan</small>
-                <div class="m-val" id="mRata"></div>
-            </div>
         </div>
 
         <div class="bar-chart" id="barChart" role="img" aria-label="Grafik penjualan per minggu"></div>
@@ -76,7 +72,7 @@
     <section class="table-box" id="daftarPesanan">
         <div class="section-header">
             <h3>Daftar pesanan</h3>
-            <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
+            <button type="button" class="btn-text btn-disabled" disabled>Lihat Pesanan</button>
         </div>
         <div class="table-wrap">
             <table>

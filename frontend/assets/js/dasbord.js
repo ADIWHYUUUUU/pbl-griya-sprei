@@ -1,12 +1,4 @@
-/* =========================================================
-   DASHBOARD GRIYA SPREI  (frontend saja, tanpa backend)
 
-   Alur: DATA -> LOGIKA -> RENDER
-   - Semua data ada di satu objek `state`.
-   - Semua perhitungan (total, stok, ringkasan) hanya ditulis sekali.
-   - Semua tampilan dibuat ulang oleh renderAll() dari `state`.
-   - Data hanya tersimpan di memori: refresh halaman = data contoh kembali.
-   ========================================================= */
 (function () {
     'use strict';
 
@@ -22,7 +14,6 @@
         dibatalkan:          { label: 'Dibatalkan',          kelas: 'badge-danger' }
     };
 
-    /* Status yang dihitung sebagai penjualan dan memotong stok */
     var STATUS_PENJUALAN = ['diproses', 'dikirim', 'selesai'];
 
     var SUMBER_STOK = {
@@ -35,10 +26,7 @@
     var NAMA_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli',
                       'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-    /* ---------------------------------------------------------
-       2. DATA CONTOH (satu-satunya sumber data)
-       Tanggal dibuat relatif terhadap bulan berjalan agar grafik terisi.
-       --------------------------------------------------------- */
+
     var sekarang = new Date();
     var TAHUN = sekarang.getFullYear();
     var BULAN = sekarang.getMonth(); // 0-11
@@ -112,7 +100,6 @@
         return String(b[2]).padStart(2, '0') + ' ' + NAMA_BULAN[b[1] - 1].slice(0, 3) + ' ' + b[0];
     }
 
-    /* Membuat elemen DOM dengan aman (teks selalu lewat textContent) */
     function h(tag, props) {
         var el = document.createElement(tag);
         Object.keys(props || {}).forEach(function (k) {
@@ -134,9 +121,6 @@
 
     function kosongkan(el) { el.textContent = ''; }
 
-    /* ---------------------------------------------------------
-       4. LOGIKA BISNIS (ditulis sekali)
-       --------------------------------------------------------- */
     function cariProduk(id) {
         return state.produk.filter(function (p) { return p.id === Number(id); })[0];
     }
@@ -248,7 +232,6 @@
         $('mLabelTotal').textContent = 'Total penjualan (' + NAMA_BULAN[BULAN] + ' ' + TAHUN + ')';
         $('mTotal').textContent = rupiah(r.total);
         $('mSelesai').textContent = r.selesai + ' pesanan';
-        $('mRata').textContent = rupiah(r.rataRata);
 
         var chart = $('barChart');
         kosongkan(chart);
@@ -286,7 +269,7 @@
                         h('strong', {}, p.kode + ' \u00B7 ' + p.pelanggan.nama),
                         h('span', {}, 'Bukti transfer ' + rupiah(hitungTotal(p)))
                     ),
-                    h('span', { class: 'btn-text' }, 'Cek pesanan')
+                    h('button', { type: 'button', class: 'btn-text', disabled: true }, 'Cek pesanan')
                 )
             );
         });
