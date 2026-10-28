@@ -95,6 +95,7 @@
             </button>
         </form>
 
+        <a class="btn-home" href="/?page=customer-home">Kembali ke Beranda</a>
         <p class="register">Belum memiliki akun? <a href="/?page=customer-register">Daftar Sekarang</a></p>
     </main>
 

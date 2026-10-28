@@ -204,6 +204,21 @@ button { cursor: pointer; }
 .btn-submit:hover { background: var(--green-dark); }
 .btn-submit:disabled { opacity: .6; cursor: default; }
 
+.btn-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  margin-top: 10px;
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 500;
+}
+.btn-home:hover { background: var(--bg); }
+
 .register {
   margin-top: 24px;
   text-align: center;
