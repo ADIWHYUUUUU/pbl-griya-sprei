@@ -91,8 +91,7 @@ function showMessage(text, type) {
 }
 function hideMessage() { $("formMessage").hidden = true; }
 
-/* 8. TAMBAHKAN KE KERANJANG
-   TODO: ganti dengan request ke backend. Sementara disimpan di localStorage. */
+/* 8. TAMBAHKAN KE KERANJANG */
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -101,32 +100,39 @@ form.addEventListener("submit", (e) => {
     return;
   }
 
-  const item = {
-    productId,
-    name: product.name,
-    type: mode,                                   // "standard" atau "custom"
-    length: Number(dims.length.input.value),
-    width: Number(dims.width.input.value),
-    height: Number(dims.height.input.value),
-    qty: Number($("qtySprei").textContent),
-    extraPillow: Number($("qtyBantal").textContent),
-    extraBolster: Number($("qtyGuling").textContent),
-    note: $("note").value.trim(),
+  const addToCartForm = document.createElement("form");
+  addToCartForm.method = "post";
+  addToCartForm.action = "keranjang.php";
+
+  const fields = {
+    aksi: "tambah_produk",
+    nama: product.name,
+    jenis: mode,
+    panjang: dims.length.input.value,
+    lebar: dims.width.input.value,
+    tinggi: dims.height.input.value,
+    jumlah: $("qtySprei").textContent,
+    bantal: $("qtyBantal").textContent,
+    guling: $("qtyGuling").textContent,
+    catatan: $("note").value.trim(),
+    warna: product.color,
   };
 
-  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-  cart.push(item);
-  localStorage.setItem("cart", JSON.stringify(cart));
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    addToCartForm.appendChild(input);
+  });
 
-  updateCartBadge();
-  showMessage("Berhasil ditambahkan ke keranjang. Harga final akan dikonfirmasi Admin.", "ok");
+  document.body.appendChild(addToCartForm);
+  addToCartForm.submit();
 });
 
 /* 9. HEADER: BADGE KERANJANG & NAMA USER */
 function updateCartBadge() {
-  const count = JSON.parse(localStorage.getItem("cart") || "[]").length;
-  $("cartBadge").textContent = count;
-  $("cartBadge").hidden = count === 0;
+  $("cartBadge").hidden = true;
 }
 
 function showLoggedInUser() {

@@ -1,0 +1,36 @@
+{
+    "hero_foto": "screenshot-2026-10-23-110635-88b014.png",
+    "hero_label": "Griya Sprei Malang · Homemade sejak 2010",
+    "hero_judul": "Sprei dan bed cover pas di kasur Anda, ukuran standar maupun custom.",
+    "hero_deskripsi": "Pilih model kain, tentukan ukuran panjang × lebar × tinggi kasur presisi cm, tambahkan sarung bantal guling, dan nikmati tidur nyaman dengan bahan MicroSilk & Katun Jepang halus.",
+    "kategori": [
+        {
+            "nama": "Sprei",
+            "deskripsi": "Standar atau custom sesuai kasur.",
+            "foto": "code-1-20e848.png"
+        },
+        {
+            "nama": "Bed Cover",
+            "deskripsi": "Pilih model dan ukuran.",
+            "foto": "code-8cb12a.png"
+        }
+    ],
+    "produk_pilihan": [
+        1,
+        9,
+        2,
+        10
+    ],
+    "produk_badge": [
+        "Paling Laris Minggu Ini",
+        "Set Hemat Lengkap",
+        "100% Katun Adem",
+        "Rekomendasi Favorit"
+    ],
+    "produk_tampil": [
+        true,
+        true,
+        true,
+        true
+    ]
+}
