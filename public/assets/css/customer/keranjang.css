@@ -971,6 +971,15 @@ small {
   opacity: 1;
 }
 
+.checkout-button:not(:disabled) {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.checkout-button:not(:disabled):hover {
+  opacity: 0.88;
+}
+
 .checkout-button span {
   font-size: 14px;
   line-height: 1;

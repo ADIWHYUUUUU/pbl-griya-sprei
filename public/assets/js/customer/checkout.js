@@ -37,6 +37,26 @@ semuaOpsi.forEach(function (opsi) {
     });
 });
 
+// ---------- tipe dan dimensi ukuran ----------
+var pilihanJenis = document.querySelectorAll('input[name="jenis"]');
+var inputDimensi = document.querySelectorAll('#inputPanjang, #inputLebar, #inputTinggi');
+
+function terapkanJenisUkuran(jenis) {
+    var standar = jenis === 'standar';
+    inputDimensi.forEach(function (input) {
+        input.disabled = standar;
+        if (standar) input.value = input.dataset.standard;
+    });
+}
+
+pilihanJenis.forEach(function (pilihan) {
+    pilihan.addEventListener('change', function () {
+        terapkanJenisUkuran(pilihan.value);
+    });
+});
+var jenisTerpilih = document.querySelector('input[name="jenis"]:checked');
+if (jenisTerpilih) terapkanJenisUkuran(jenisTerpilih.value);
+
 // ---------- Kirim Pesanan  ----------
 var cekSetuju   = document.getElementById('cekSetuju');
 var tombolKirim = document.getElementById('tombolKirim');
@@ -56,6 +76,14 @@ if (formCheckout) {
         if (!cekSetuju.checked) {
             event.preventDefault();
             cekSetuju.closest('.persetujuan').classList.add('perlu');
+            return;
+        }
+
+        if (isi('inputAlamat') === '') {
+            event.preventDefault();
+            alert('Alamat pengiriman wajib diisi.');
+            bukaModal('modalAlamat');
+            document.getElementById('inputAlamat').focus();
             return;
         }
 
@@ -143,13 +171,12 @@ var tombolSimpanAlamat = document.getElementById('simpanAlamat');
 
 if (tombolSimpanAlamat) {
     tombolSimpanAlamat.addEventListener('click', function () {
-        if (isi('inputNama') === '' || isi('inputTelepon') === '' || isi('inputAlamat') === '') {
-            alert('Nama penerima, nomor WhatsApp, dan alamat wajib diisi.');
+        if (isi('inputAlamat') === '') {
+            alert('Alamat pengiriman wajib diisi.');
+            document.getElementById('inputAlamat').focus();
             return;
         }
 
-        document.getElementById('teksNama').textContent    = isi('inputNama');
-        document.getElementById('teksTelepon').textContent = isi('inputTelepon');
         document.getElementById('teksAlamat').textContent  = isi('inputAlamat');
         document.getElementById('teksCatatanAlamat').textContent = isi('inputCatatanAlamat');
 
@@ -164,10 +191,11 @@ if (tombolSimpanAlamat) {
 document.querySelectorAll('[data-tambah], [data-kurang]').forEach(function (tombol) {
     tombol.addEventListener('click', function () {
         var input = document.getElementById(tombol.dataset.tambah || tombol.dataset.kurang);
+        var maximum = parseInt(input.max, 10) || 20;
         var nilai = parseInt(input.value, 10) || 0;
 
         nilai = tombol.dataset.tambah ? nilai + 1 : nilai - 1;
-        input.value = Math.max(0, nilai);   
+        input.value = Math.max(0, Math.min(maximum, nilai));
     });
 });
 

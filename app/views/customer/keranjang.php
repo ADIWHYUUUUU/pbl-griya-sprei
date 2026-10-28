@@ -269,7 +269,11 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                         <?php else: ?>
                                             <span class="cart-error">Item tidak tersedia; hapus dari keranjang untuk melanjutkan.</span>
                                         <?php endif; ?>
-                                        <button type="button" class="checkout-button" disabled title="Checkout belum tersedia">Checkout <span aria-hidden="true">→</span></button>
+                                        <?php if ($product && $maxQuantity > 0 && $entry['quantity'] <= $stock): ?>
+                                            <a class="checkout-button" href="/?page=customer-checkout&amp;item_id=<?= aman($entry['id']) ?>">Checkout <span aria-hidden="true">→</span></a>
+                                        <?php else: ?>
+                                            <button type="button" class="checkout-button" disabled title="Produk tidak tersedia">Checkout <span aria-hidden="true">→</span></button>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </article>

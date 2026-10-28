@@ -4,6 +4,133 @@ require_once __DIR__ . '/ProductController.php';
 
 class OrderController
 {
+    public function createOrder(): void
+    {
+        if (!$this->hasValidCsrfToken()) {
+            http_response_code(403);
+            exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
+        }
+        $this->requireCustomer();
+
+        $itemId = $_POST['item_id'] ?? '';
+        if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId)) {
+            $this->checkoutError('Item keranjang tidak valid.', '');
+        }
+
+        $cart = $_SESSION['cart'] ?? [];
+        if (!is_array($cart) || !isset($cart[$itemId]) || !is_array($cart[$itemId])) {
+            $this->checkoutError('Item tersebut tidak ditemukan di keranjang.', $itemId);
+        }
+
+        $item = $cart[$itemId];
+        $productId = filter_var($item['id_produk'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        $product = $productId === false ? false : (new ProductController())->getProductById($productId);
+        $quantity = $this->readInteger($item['qtySprei'] ?? null);
+        if (
+            !$product || $quantity === null || $quantity < 1 ||
+            $quantity > min(50, (int) $product['stok'])
+        ) {
+            $this->checkoutError('Produk atau stok sudah tidak tersedia. Periksa kembali keranjang Anda.', $itemId);
+        }
+
+        $shippingMethods = [
+            'instan' => 'INSTANT_GOJEK',
+            'jne' => 'EKSPEDISI_JNE',
+            'jnt' => 'EKSPEDISI_JNT',
+        ];
+        $shippingMethod = $_POST['metode'] ?? '';
+        if (!is_string($shippingMethod) || !isset($shippingMethods[$shippingMethod])) {
+            $this->checkoutError('Pilih metode pengiriman yang valid.', $itemId);
+        }
+        if (($_POST['setuju'] ?? '') !== '1') {
+            $this->checkoutError('Konfirmasi ukuran wajib disetujui sebelum pesanan dikirim.', $itemId);
+        }
+
+        $mode = $_POST['jenis'] ?? '';
+        if (!in_array($mode, ['standar', 'custom'], true)) {
+            $this->checkoutError('Tipe ukuran tidak valid.', $itemId);
+        }
+
+        $dimensions = [
+            'panjang' => (int) $product['panjang_standar'],
+            'lebar' => (int) $product['lebar_standar'],
+            'tinggi' => (int) $product['tinggi_standar'],
+        ];
+        if ($mode === 'custom') {
+            foreach (array_keys($dimensions) as $field) {
+                $value = $this->readInteger($_POST[$field] ?? null);
+                if ($value === null || $value < 1 || $value > 1000) {
+                    $this->checkoutError('Ukuran custom harus berupa angka antara 1 dan 1000 cm.', $itemId);
+                }
+                $dimensions[$field] = $value;
+            }
+        }
+
+        $pillows = $this->readInteger($_POST['bantal'] ?? null);
+        $bolsters = $this->readInteger($_POST['guling'] ?? null);
+        if (
+            $pillows === null || $pillows < 0 || $pillows > 20 ||
+            $bolsters === null || $bolsters < 0 || $bolsters > 20
+        ) {
+            $this->checkoutError('Jumlah sarung tambahan tidak valid.', $itemId);
+        }
+
+        $fields = [
+            'alamat' => [2000, true],
+            'catatan_alamat' => [1000, false],
+            'catatan_kirim' => [1000, false],
+            'catatan_produk' => [1000, false],
+        ];
+        $orderData = [];
+        foreach ($fields as $field => [$maxLength, $required]) {
+            $value = $_POST[$field] ?? '';
+            if (!is_string($value) || !$this->isWithinLength($value, $maxLength)) {
+                $this->checkoutError('Periksa kembali data pengiriman dan catatan pesanan Anda.', $itemId);
+            }
+            $value = trim($value);
+            if ($required && $value === '') {
+                $this->checkoutError('Alamat pengiriman wajib diisi.', $itemId);
+            }
+            $orderData[$field] = $value;
+        }
+
+        global $pdo;
+        require_once __DIR__ . '/../models/OrderModel.php';
+        $invoice = 'GS-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(5)));
+        $orderId = (new OrderModel($pdo))->createOrder(
+            [
+                'id_user' => (int) $_SESSION['id_user'],
+                'no_invoice' => $invoice,
+                'alamat_pengiriman' => $orderData['alamat'],
+                'catatan_alamat' => $orderData['catatan_alamat'],
+                'metode_pengiriman' => $shippingMethods[$shippingMethod],
+                'catatan_pengiriman' => $orderData['catatan_kirim'],
+            ],
+            [
+                'id_produk' => (int) $product['id_produk'],
+                'tipe_ukuran' => strtoupper($mode),
+                'jumlah' => $quantity,
+                'harga_satuan' => (float) $product['harga_dasar'],
+                'panjang' => $dimensions['panjang'],
+                'lebar' => $dimensions['lebar'],
+                'tinggi' => $dimensions['tinggi'],
+                'tambah_sarban' => $pillows,
+                'tambah_sargul' => $bolsters,
+                'catatan_pesanan' => $orderData['catatan_produk'],
+            ]
+        );
+
+        unset($_SESSION['cart'][$itemId], $_SESSION['checkout_form'], $_SESSION['checkout_message']);
+        $_SESSION['pesanan_terakhir'] = [
+            'id' => $orderId,
+            'kode' => $invoice,
+            'produk' => ['nama' => (string) $product['nama_produk']],
+        ];
+        $this->redirect('/?page=customer-checkout&berhasil=1');
+    }
+
     public function addToCart(): void
     {
         if (!$this->hasValidCsrfToken()) {
@@ -313,6 +440,36 @@ class OrderController
     {
         $_SESSION['cart_message'] = $message;
         $_SESSION['cart_message_type'] = $type;
+    }
+
+    private function isWithinLength(string $value, int $maxLength): bool
+    {
+        $characterCount = preg_match_all('/./us', $value, $matches);
+        return strlen($value) <= $maxLength * 4
+            && $characterCount !== false
+            && $characterCount <= $maxLength;
+    }
+
+    private function checkoutError(string $message, string $itemId): void
+    {
+        $_SESSION['checkout_message'] = $message;
+        $formFields = [
+            'alamat', 'catatan_alamat', 'metode',
+            'catatan_kirim', 'jenis', 'panjang', 'lebar', 'tinggi',
+            'bantal', 'guling', 'catatan_produk',
+        ];
+        $_SESSION['checkout_form'] = [];
+        foreach ($formFields as $field) {
+            if (isset($_POST[$field]) && is_string($_POST[$field])) {
+                $_SESSION['checkout_form'][$field] = $_POST[$field];
+            }
+        }
+
+        $url = '/?page=customer-cart';
+        if (preg_match('/^[a-f0-9]{32}$/D', $itemId)) {
+            $url = '/?page=customer-checkout&item_id=' . rawurlencode($itemId);
+        }
+        $this->redirect($url);
     }
 
     private function redirect(string $url): void

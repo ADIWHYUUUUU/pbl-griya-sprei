@@ -23,7 +23,8 @@ if ($action !== '') {
 	];
 	$isProductAction = in_array($action, $productActions, true);
 	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove'], true);
-	if (!$isLogout && !$isProductAction && !$isCartAction) {
+	$isOrderAction = $action === 'customer-order-create';
+	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -34,17 +35,19 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction) {
+	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
 	}
 
 	try {
-		if ($isCartAction) {
+		if ($isCartAction || $isOrderAction) {
 			require_once __DIR__ . '/../app/controllers/OrderController.php';
 			$controller = new OrderController();
-			if ($action === 'customer-cart-add') {
+			if ($isOrderAction) {
+				$controller->createOrder();
+			} elseif ($action === 'customer-cart-add') {
 				$controller->addToCart();
 			} elseif ($action === 'customer-cart-update') {
 				$controller->updateCart();
@@ -71,6 +74,13 @@ if ($action !== '') {
 		http_response_code(500);
 		if ($isCartAction) {
 			echo 'Keranjang gagal diproses. Silakan coba lagi.';
+		} elseif ($isOrderAction) {
+			$_SESSION['checkout_message'] = 'Pesanan gagal disimpan. Silakan coba lagi.';
+			$itemId = $_POST['item_id'] ?? '';
+			$checkoutUrl = is_string($itemId) && preg_match('/^[a-f0-9]{32}$/D', $itemId)
+				? '/?page=customer-checkout&item_id=' . rawurlencode($itemId)
+				: '/?page=customer-cart';
+			header('Location: ' . $checkoutUrl, true, 303);
 		} elseif ($isProductAction) {
 			echo 'Produk gagal disimpan. Silakan coba lagi.';
 		} else {
@@ -100,8 +110,11 @@ if (!isset($pages[$page])) {
 	exit;
 }
 
-if ($page === 'customer-cart' && (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'CUSTOMER')) {
-	$_SESSION['cart_message'] = 'Silakan login dengan akun customer terlebih dahulu untuk mengakses keranjang.';
+if (
+	in_array($page, ['customer-cart', 'customer-checkout'], true)
+	&& (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'CUSTOMER')
+) {
+	$_SESSION['cart_message'] = 'Silakan login dengan akun customer terlebih dahulu untuk melanjutkan pesanan.';
 	$_SESSION['cart_message_type'] = 'error';
 	header('Location: /?page=customer-login', true, 303);
 	exit;

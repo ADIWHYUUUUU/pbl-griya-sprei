@@ -80,6 +80,7 @@ class AuthController
         $_SESSION['id_user'] = $user['id_user'];
         $_SESSION['nama'] = $user['nama'];
         $_SESSION['email'] = $user['email'];
+        $_SESSION['no_hp'] = $user['no_hp'];
         $_SESSION['role'] = 'CUSTOMER';
 
         $redirect = '/?page=customer-home';

@@ -125,6 +125,16 @@ main.container {
     color: var(--hijau);
 }
 
+.checkout-message {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border: 1px solid #e2b9b2;
+    border-radius: 8px;
+    background: #fff3f0;
+    color: #8d3528;
+    font-size: 13px;
+}
+
 .kartu {
     background: white;
     border: 1px solid var(--garis);
