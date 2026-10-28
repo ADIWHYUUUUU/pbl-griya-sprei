@@ -21,10 +21,26 @@ document.querySelectorAll("[data-edit-cart-open]").forEach(function (trigger) {
   var modeButtons = editForm.querySelectorAll("[data-edit-mode]");
   var dimensionInputs = editForm.querySelectorAll('.edit-cart__dimensions input[type="number"]');
   var dimensionHint = editForm.querySelector("[data-edit-dimension-hint]");
+  var customDimensions = Array.from(dimensionInputs, function (input) {
+    return input.value;
+  });
+  var currentMode = modeInput.value;
 
   function setEditMode(mode) {
     var isStandard = mode === "standard";
+
+    if (currentMode === "custom" && isStandard) {
+      customDimensions = Array.from(dimensionInputs, function (input) {
+        return input.value;
+      });
+    } else if (currentMode === "standard" && !isStandard) {
+      dimensionInputs.forEach(function (input, index) {
+        input.value = customDimensions[index];
+      });
+    }
+
     modeInput.value = mode;
+    currentMode = mode;
 
     modeButtons.forEach(function (modeButton) {
       var isSelected = modeButton.dataset.editMode === mode;
