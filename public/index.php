@@ -83,6 +83,17 @@ if ($action !== '') {
 $pages = require __DIR__ . '/../routes/web.php';
 $page = $_GET['page'] ?? 'customer-home';
 
+$orderPages = ['customer-orders', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php'];
+if (
+	in_array($page, $orderPages, true)
+	&& (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'CUSTOMER')
+) {
+	$_SESSION['cart_message'] = 'Silakan login dengan akun customer untuk mengakses Pesanan Saya.';
+	$_SESSION['cart_message_type'] = 'error';
+	header('Location: /?page=customer-login', true, 303);
+	exit;
+}
+
 if (!isset($pages[$page])) {
 	http_response_code(404);
 	echo 'Halaman tidak ditemukan.';

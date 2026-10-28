@@ -65,11 +65,13 @@ $activeNavPage = match ($currentPage) {
             <?= $activeNavPage === 'catalog' ? 'aria-current="page"' : ''; ?>>
             Katalog
         </a>
-        <span
-            class="nav__link<?= $activeNavPage === 'orders' ? ' nav__link--active' : ''; ?>"
-            aria-disabled="true">
-            Pesanan Saya
-        </span>
+        <?php if ($isLogin): ?>
+            <span
+                class="nav__link<?= $activeNavPage === 'orders' ? ' nav__link--active' : ''; ?>"
+                aria-disabled="true">
+                Pesanan Saya
+            </span>
+        <?php endif; ?>
     </nav>
 
     <!-- HEADER ACTIONS -->

@@ -1,3 +1,10 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$isCustomerLoggedIn = ($_SESSION['login'] ?? false) === true
+    && ($_SESSION['role'] ?? '') === 'CUSTOMER';
+?>
 <footer class="footer">
     <div class="footer__inner">
 
@@ -59,7 +66,9 @@
             <h3 class="footer__title">Tautan</h3>
             <ul class="footer__list">
                 <li><a href="/?page=customer-catalog">Katalog</a></li>
-                <li><span aria-disabled="true">Pesanan Saya</span></li>
+                <?php if ($isCustomerLoggedIn): ?>
+                    <li><span aria-disabled="true">Pesanan Saya</span></li>
+                <?php endif; ?>
             </ul>
         </div>
 
