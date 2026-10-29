@@ -76,11 +76,7 @@ if ($action !== '') {
 			echo 'Keranjang gagal diproses. Silakan coba lagi.';
 		} elseif ($isOrderAction) {
 			$_SESSION['checkout_message'] = 'Pesanan gagal disimpan. Silakan coba lagi.';
-			$itemId = $_POST['item_id'] ?? '';
-			$checkoutUrl = is_string($itemId) && preg_match('/^[a-f0-9]{32}$/D', $itemId)
-				? '/?page=customer-checkout&item_id=' . rawurlencode($itemId)
-				: '/?page=customer-cart';
-			header('Location: ' . $checkoutUrl, true, 303);
+			header('Location: /?page=customer-checkout', true, 303);
 		} elseif ($isProductAction) {
 			echo 'Produk gagal disimpan. Silakan coba lagi.';
 		} else {

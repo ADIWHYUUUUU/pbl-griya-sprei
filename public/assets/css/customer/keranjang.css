@@ -985,6 +985,17 @@ small {
   line-height: 1;
 }
 
+.checkout-button--all {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 14px;
+}
+
+.checkout-button--all:disabled {
+  opacity: 0.65;
+}
+
 .ringkasan {
   padding: 16px;
   border-radius: 7px;

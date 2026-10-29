@@ -30,9 +30,12 @@ $cart = is_array($cart) ? $cart : [];
 $products = new ProductController();
 $items = [];
 $totalConfigurations = 0;
+$checkoutAvailable = true;
+$cartQuantities = [];
 
 foreach ($cart as $itemId => $item) {
     if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId) || !is_array($item)) {
+        $checkoutAvailable = false;
         continue;
     }
 
@@ -43,6 +46,14 @@ foreach ($cart as $itemId => $item) {
     $product = $productId === false ? false : $products->getProductById($productId);
     $name = (string) ($product['nama_produk'] ?? $item['nama_produk'] ?? 'Produk tidak tersedia');
     $quantity = max(0, (int) ($item['qtySprei'] ?? 0));
+    if (!$product || $quantity < 1) {
+        $checkoutAvailable = false;
+    } elseif ($productId !== false) {
+        $cartQuantities[$productId] = ($cartQuantities[$productId] ?? 0) + $quantity;
+        if ($cartQuantities[$productId] > min(50, (int) $product['stok'])) {
+            $checkoutAvailable = false;
+        }
+    }
     if ($search !== '' && stripos($name, $search) === false) {
         continue;
     }
@@ -54,6 +65,9 @@ foreach ($cart as $itemId => $item) {
         'name' => $name,
         'quantity' => $quantity,
     ];
+}
+if ($cart === []) {
+    $checkoutAvailable = false;
 }
 
 $perPage = 3;
@@ -269,11 +283,6 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                         <?php else: ?>
                                             <span class="cart-error">Item tidak tersedia; hapus dari keranjang untuk melanjutkan.</span>
                                         <?php endif; ?>
-                                        <?php if ($product && $maxQuantity > 0 && $entry['quantity'] <= $stock): ?>
-                                            <a class="checkout-button" href="/?page=customer-checkout&amp;item_id=<?= aman($entry['id']) ?>">Checkout <span aria-hidden="true">→</span></a>
-                                        <?php else: ?>
-                                            <button type="button" class="checkout-button" disabled title="Produk tidak tersedia">Checkout <span aria-hidden="true">→</span></button>
-                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </article>
@@ -303,7 +312,14 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                         <div class="baris"><span>Produk di keranjang</span><b><?= $totalConfigurations ?> item</b></div>
                         <div class="baris"><span>Total tagihan</span><b>Dikonfirmasi admin</b></div>
                     </div>
-                    <p>Tekan Checkout pada produk yang ingin dipesan. Alamat dan metode pengiriman diisi pada langkah checkout untuk item tersebut.</p>
+                    <?php if ($checkoutAvailable): ?>
+                        <a class="checkout-button checkout-button--all" href="/?page=customer-checkout">
+                            Checkout Semua Pesanan <span aria-hidden="true">→</span>
+                        </a>
+                    <?php else: ?>
+                        <button type="button" class="checkout-button checkout-button--all" disabled>Periksa produk dan stok</button>
+                    <?php endif; ?>
+                    <p>Tombol checkout akan memproses seluruh produk di keranjang, termasuk yang ada di halaman lain atau tersembunyi oleh pencarian.</p>
                     <p>Setelah checkout, pesanan berstatus <strong>Menunggu Verifikasi</strong>. Total tagihan akan muncul di halaman Pesanan Saya setelah admin memeriksa spesifikasi pesanan.</p>
                 </aside>
             </div>

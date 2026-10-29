@@ -12,6 +12,7 @@ class AuthController
 
             require_once __DIR__ . '/../config/database.php';
             require_once __DIR__ . '/../models/UserModel.php';
+            require_once __DIR__ . '/../models/CartModel.php';
 
             $this->model = new UserModel($pdo);
         }
@@ -72,6 +73,24 @@ class AuthController
 
         $pendingCart = $_SESSION['pending_cart'] ?? [];
         $pendingCart = is_array($pendingCart) ? $pendingCart : [];
+        $sessionCart = $_SESSION['cart'] ?? [];
+        $sessionCart = is_array($sessionCart) ? $sessionCart : [];
+
+        global $pdo;
+        $cartModel = new CartModel($pdo);
+        $cartStorageReady = $cartModel->isStorageReady();
+        $cart = array_replace(
+            $cartStorageReady ? $cartModel->getCart((int) $user['id_user']) : [],
+            $sessionCart,
+            $pendingCart
+        );
+        if ($cartStorageReady) {
+            foreach ($cart as $itemId => $item) {
+                if (is_string($itemId) && is_array($item)) {
+                    $cartModel->saveItem((int) $user['id_user'], $itemId, $item);
+                }
+            }
+        }
 
         // Simpan session customer
         session_regenerate_id(true);
@@ -84,10 +103,14 @@ class AuthController
         $_SESSION['role'] = 'CUSTOMER';
 
         $redirect = '/?page=customer-home';
+        if ($cart !== []) {
+            $_SESSION['cart'] = $cart;
+        }
         if ($pendingCart !== []) {
-            $_SESSION['cart'] = $pendingCart;
             $_SESSION['cart_message'] = 'Pesanan Anda berhasil ditambahkan ke keranjang.';
             $_SESSION['cart_message_type'] = 'success';
+        }
+        if ($cart !== []) {
             $redirect = '/?page=customer-cart';
         }
 
@@ -354,12 +377,19 @@ class AuthController
             return;
         }
 
-        $_SESSION = [];
-        if (ini_get('session.use_cookies')) {
-            $cookie = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000, $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httponly']);
+        if ($role === 'CUSTOMER') {
+            $anonymousSession = array_intersect_key($_SESSION, array_flip(['cart', 'pending_cart']));
+            session_regenerate_id(true);
+            $_SESSION = $anonymousSession;
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        } else {
+            $_SESSION = [];
+            if (ini_get('session.use_cookies')) {
+                $cookie = session_get_cookie_params();
+                setcookie(session_name(), '', time() - 42000, $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httponly']);
+            }
+            session_destroy();
         }
-        session_destroy();
 
         header('Location: ' . $redirect);
         exit;

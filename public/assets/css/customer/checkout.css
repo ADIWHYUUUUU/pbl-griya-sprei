@@ -216,6 +216,12 @@ main.container {
     padding-left: 44px;
 }
 
+.produk + .produk {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--garis);
+}
+
 .foto-produk {
     width: 86px;
     height: 86px;

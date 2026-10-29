@@ -37,26 +37,6 @@ semuaOpsi.forEach(function (opsi) {
     });
 });
 
-// ---------- tipe dan dimensi ukuran ----------
-var pilihanJenis = document.querySelectorAll('input[name="jenis"]');
-var inputDimensi = document.querySelectorAll('#inputPanjang, #inputLebar, #inputTinggi');
-
-function terapkanJenisUkuran(jenis) {
-    var standar = jenis === 'standar';
-    inputDimensi.forEach(function (input) {
-        input.disabled = standar;
-        if (standar) input.value = input.dataset.standard;
-    });
-}
-
-pilihanJenis.forEach(function (pilihan) {
-    pilihan.addEventListener('change', function () {
-        terapkanJenisUkuran(pilihan.value);
-    });
-});
-var jenisTerpilih = document.querySelector('input[name="jenis"]:checked');
-if (jenisTerpilih) terapkanJenisUkuran(jenisTerpilih.value);
-
 // ---------- Kirim Pesanan  ----------
 var cekSetuju   = document.getElementById('cekSetuju');
 var tombolKirim = document.getElementById('tombolKirim');
@@ -184,50 +164,6 @@ if (tombolSimpanAlamat) {
             isi('inputCatatanAlamat') === '' ? 'none' : '';
 
         tutupModal(document.getElementById('modalAlamat'), false);
-    });
-}
-
-// ---------- "Ubah Spesifikasi" ----------
-document.querySelectorAll('[data-tambah], [data-kurang]').forEach(function (tombol) {
-    tombol.addEventListener('click', function () {
-        var input = document.getElementById(tombol.dataset.tambah || tombol.dataset.kurang);
-        var maximum = parseInt(input.max, 10) || 20;
-        var nilai = parseInt(input.value, 10) || 0;
-
-        nilai = tombol.dataset.tambah ? nilai + 1 : nilai - 1;
-        input.value = Math.max(0, Math.min(maximum, nilai));
-    });
-});
-
-var tombolSimpanSpek = document.getElementById('simpanSpesifikasi');
-
-if (tombolSimpanSpek) {
-    tombolSimpanSpek.addEventListener('click', function () {
-        var p = parseInt(isi('inputPanjang'), 10);
-        var l = parseInt(isi('inputLebar'), 10);
-        var t = parseInt(isi('inputTinggi'), 10);
-
-        if (!(p > 0 && l > 0 && t > 0)) {
-            alert('Panjang, lebar, dan tinggi kasur wajib diisi dengan angka lebih dari 0.');
-            return;
-        }
-
-        var jenis = document.querySelector('input[name="jenis"]:checked').value;
-        var label = document.getElementById('teksJenis');
-        label.textContent = jenis.toUpperCase();
-        label.className = 'label label-' + jenis;
-
-        document.getElementById('teksUkuran').textContent = p + ' × ' + l + ' × ' + t + ' cm';
-        var bantal = parseInt(isi('inputBantal'), 10) || 0;
-        var guling = parseInt(isi('inputGuling'), 10) || 0;
-        var tambahan = [];
-        if (bantal > 0) tambahan.push(bantal + ' sarung bantal');
-        if (guling > 0) tambahan.push(guling + ' sarung guling');
-        document.getElementById('teksTambahan').textContent = tambahan.length ? tambahan.join(' + ') : '-';
-
-        document.getElementById('teksCatatanProduk').textContent = isi('inputCatatanProduk') || '-';
-
-        tutupModal(document.getElementById('modalSpesifikasi'), false);
     });
 }
 

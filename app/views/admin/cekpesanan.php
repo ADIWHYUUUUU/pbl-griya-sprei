@@ -21,7 +21,7 @@ $escape = static function ($value): string {
 $orderStatuses = [
     'MENUNGGU_VERIFIKASI' => ['Menunggu Verifikasi', 'waiting'],
     'MENUNGGU_PEMBAYARAN' => ['Menunggu Pembayaran', 'waiting'],
-    'DIPROSES' => ['Diproses', 'processing'],
+    'DIPROSES' => ['Diproses (Sedang Dijahit)', 'processing'],
     'DIKIRIM' => ['Dikirim', 'processing'],
     'SELESAI' => ['Selesai', 'complete'],
     'DIBATALKAN' => ['Dibatalkan', 'cancelled'],
@@ -31,6 +31,7 @@ $paymentStatuses = [
     'TERVERIFIKASI' => 'Terverifikasi',
     'DITOLAK' => 'Ditolak',
 ];
+$bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 $categoryFor = static function (array $order): string {
     if (
         ($order['status_pembayaran'] ?? '') === 'MENUNGGU_VERIFIKASI' ||
@@ -100,15 +101,15 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
         <main class="dashboard-main orders-main">
             <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
 
+            <div class="orders-breadcrumb"><span>Admin</span><span aria-hidden="true">›</span><strong>Cek Pesanan</strong></div>
+
             <header class="dashboard-header orders-header">
                 <div>
-                    <p class="eyebrow">PANEL ADMIN</p>
                     <h1>Cek Pesanan</h1>
-                    <p class="dashboard-intro">Pantau pesanan terbaru dan status pembayarannya.</p>
                 </div>
             </header>
 
-            <section class="orders-panel" aria-label="Daftar pesanan">
+            <section class="orders-content" aria-label="Daftar pesanan">
                 <div class="orders-toolbar">
                     <nav class="order-tabs" aria-label="Filter pesanan">
                         <?php
@@ -144,24 +145,22 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
                             value="<?= $escape($searchTerm) ?>"
                             placeholder="Cari invoice / nama..."
                         >
-                        <button type="submit">Cari</button>
+                        <button type="submit" aria-label="Cari">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+                        </button>
                     </form>
                 </div>
 
-                <p class="orders-result-count" id="ordersResultCount" aria-live="polite">
-                    Menampilkan <?= count($visibleOrders) ?> dari <?= count($orders) ?> pesanan terbaru
-                </p>
-
-                <div class="orders-table-scroll">
+                <div class="orders-panel orders-table-scroll">
                     <table class="orders-table">
                         <thead>
                             <tr>
-                                <th scope="col">Invoice &amp; tanggal</th>
+                                <th scope="col">No. Invoice &amp; Tanggal</th>
                                 <th scope="col">Pelanggan</th>
-                                <th scope="col">Produk</th>
+                                <th scope="col">Spesifikasi Sprei</th>
                                 <th scope="col">Tagihan</th>
                                 <th scope="col">Status pesanan</th>
-                                <th scope="col">Pembayaran</th>
+                                <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -175,20 +174,51 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
                                     'DITOLAK' => 'cancelled',
                                     default => 'other',
                                 };
+                                $tanggalPesanan = strtotime((string) $order['tanggal_pesan']);
+                                $tanggalLabel = $tanggalPesanan
+                                    ? date('d', $tanggalPesanan) . ' ' . $bulanPendek[(int) date('n', $tanggalPesanan)] . date(' Y, H:i', $tanggalPesanan) . ' WIB'
+                                    : (string) $order['tanggal_pesan'];
+                                $aksiLabel = ($order['status_pesanan'] ?? '') === 'MENUNGGU_VERIFIKASI' ? 'Verifikasi' : 'Detail';
                                 ?>
                                 <tr data-order-row data-category="<?= $escape($categoryFor($order)) ?>"<?= isset($visibleOrderIds[$order['id_pesanan']]) ? '' : ' hidden' ?>>
                                     <td>
                                         <strong class="order-invoice"><?= $escape($order['kode']) ?></strong>
-                                        <small><?= $escape(date('d/m/Y H:i', strtotime($order['tanggal_pesan']))) ?></small>
+                                        <small><?= $escape($tanggalLabel) ?></small>
+                                        <span class="order-size-label"><?= $escape(strtolower((string) ($order['daftar_spesifikasi'] ?? '')) !== '' && str_contains((string) $order['daftar_spesifikasi'], 'Custom:') ? 'Custom' : 'Standar') ?></span>
                                     </td>
                                     <td>
                                         <strong><?= $escape($order['nama_pelanggan']) ?></strong>
-                                        <small><?= $escape($order['telepon']) ?></small>
+                                        <small class="order-phone">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h3l2 5-2 1.5a15 15 0 0 0 4.5 4.5L16 12l5 2v3c0 1.1-.9 2-2 2C10 19 5 14 5 5c0-1.1.9-2 2-2Z"></path></svg>
+                                            <?= $escape($order['telepon']) ?>
+                                        </small>
                                     </td>
-                                    <td class="order-products"><?= $escape($order['daftar_produk']) ?></td>
-                                    <td class="order-total">Rp <?= number_format((float) $order['total'], 0, ',', '.') ?></td>
-                                    <td><span class="order-status order-status--<?= $escape($status[1]) ?>"><?= $escape($status[0]) ?></span></td>
-                                    <td><span class="order-payment order-payment--<?= $escape($paymentClass) ?>"><?= $escape($paymentStatus) ?></span></td>
+                                    <td class="order-products"><?= $escape($order['daftar_spesifikasi'] ?? $order['daftar_produk']) ?></td>
+                                    <td class="order-total">
+                                        <strong>Rp <?= number_format((float) $order['total'], 0, ',', '.') ?></strong>
+                                        <?php if ((float) ($order['ongkir'] ?? 0) <= 0): ?><small>(+ Ongkir manual)</small><?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <span class="order-status order-status--<?= $escape($status[1]) ?>">
+                                            <?= $escape($status[0]) ?>
+                                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"></path></svg>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="order-action<?= $aksiLabel === 'Verifikasi' ? ' order-action--verify' : '' ?>" type="button" data-toggle-details aria-expanded="false" aria-controls="order-detail-<?= (int) $order['id_pesanan'] ?>">
+                                            <?= $escape($aksiLabel) ?>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="order-details-row" id="order-detail-<?= (int) $order['id_pesanan'] ?>" data-order-details hidden>
+                                    <td colspan="6">
+                                        <div class="order-details">
+                                            <div><small>Alamat Pengiriman</small><p><?= $escape($order['alamat_pengiriman'] ?: '-') ?></p></div>
+                                            <div><small>Metode Pengiriman</small><p><?= $escape(str_replace('_', ' ', (string) $order['metode_pengiriman'])) ?></p></div>
+                                            <div><small>Status Pembayaran</small><p><span class="order-payment order-payment--<?= $escape($paymentClass) ?>"><?= $escape($paymentStatus) ?></span></p></div>
+                                            <?php if (!empty($order['catatan_pengiriman'])): ?><div><small>Catatan Pengiriman</small><p><?= $escape($order['catatan_pengiriman']) ?></p></div><?php endif; ?>
+                                        </div>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr class="orders-empty" id="ordersEmpty"<?= $visibleOrders ? ' hidden' : '' ?>>

@@ -15,16 +15,9 @@ function checkoutEscape($value): string
 if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     $pesananBaru = $_SESSION['pesanan_terakhir'];
 } else {
-    $itemId = $_GET['item_id'] ?? '';
     $cart = $_SESSION['cart'] ?? [];
-    if (
-        !is_string($itemId)
-        || !preg_match('/^[a-f0-9]{32}$/D', $itemId)
-        || !is_array($cart)
-        || !isset($cart[$itemId])
-        || !is_array($cart[$itemId])
-    ) {
-        $_SESSION['cart_message'] = 'Pilih item keranjang yang ingin di-checkout.';
+    if (!is_array($cart) || $cart === []) {
+        $_SESSION['cart_message'] = 'Keranjang Anda masih kosong.';
         $_SESSION['cart_message_type'] = 'error';
         header('Location: /?page=customer-cart', true, 303);
         exit;
@@ -32,23 +25,57 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
 
     require_once __DIR__ . '/../../controllers/ProductController.php';
     $productController = new ProductController();
-    $cartItem = $cart[$itemId];
-    $productId = filter_var($cartItem['id_produk'] ?? null, FILTER_VALIDATE_INT, [
-        'options' => ['min_range' => 1],
-    ]);
-    $product = $productId === false ? false : $productController->getProductById($productId);
-    if (!$product) {
-        $_SESSION['cart_message'] = 'Produk sudah tidak tersedia. Hapus item tersebut dari keranjang.';
-        $_SESSION['cart_message_type'] = 'error';
-        header('Location: /?page=customer-cart', true, 303);
-        exit;
-    }
-
     $formValues = $_SESSION['checkout_form'] ?? [];
     $formValues = is_array($formValues) ? $formValues : [];
     unset($_SESSION['checkout_form']);
     $checkoutMessage = (string) ($_SESSION['checkout_message'] ?? '');
     unset($_SESSION['checkout_message']);
+    $produkPesanan = [];
+    foreach ($cart as $itemId => $cartItem) {
+        if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId) || !is_array($cartItem)) {
+            $_SESSION['cart_message'] = 'Data keranjang tidak valid. Periksa kembali keranjang Anda.';
+            $_SESSION['cart_message_type'] = 'error';
+            header('Location: /?page=customer-cart', true, 303);
+            exit;
+        }
+
+        $productId = filter_var($cartItem['id_produk'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        $product = $productId === false ? false : $productController->getProductById($productId);
+        if (!$product) {
+            $_SESSION['cart_message'] = 'Produk sudah tidak tersedia. Hapus item tersebut dari keranjang.';
+            $_SESSION['cart_message_type'] = 'error';
+            header('Location: /?page=customer-cart', true, 303);
+            exit;
+        }
+
+        $quantityPillow = (int) ($cartItem['qtyBantal'] ?? 0);
+        $quantityBolster = (int) ($cartItem['qtyGuling'] ?? 0);
+        $extras = [];
+        if ($quantityPillow > 0) {
+            $extras[] = $quantityPillow . ' sarung bantal';
+        }
+        if ($quantityBolster > 0) {
+            $extras[] = $quantityBolster . ' sarung guling';
+        }
+        $dimensions = [
+            (int) ($cartItem['panjang'] ?? $product['panjang_standar']),
+            (int) ($cartItem['lebar'] ?? $product['lebar_standar']),
+            (int) ($cartItem['tinggi'] ?? $product['tinggi_standar']),
+        ];
+        $produkPesanan[] = [
+            'nama' => (string) $product['nama_produk'],
+            'gambar' => !empty($product['gambar_produk'])
+                ? '/uploads/produk/' . rawurlencode(basename($product['gambar_produk']))
+                : '',
+            'jenis' => ($cartItem['mode'] ?? '') === 'custom' ? 'custom' : 'standar',
+            'ukuran' => implode(' × ', $dimensions) . ' cm',
+            'jumlah' => (int) ($cartItem['qtySprei'] ?? 0),
+            'tambahan' => $extras === [] ? '-' : implode(' + ', $extras),
+            'catatan' => (string) ($cartItem['catatan'] ?? ''),
+        ];
+    }
 
     $pemesan = [
         'nama' => (string) ($_SESSION['nama'] ?? ''),
@@ -63,48 +90,6 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
         'jnt' => ['kelompok' => 'Ekspedisi Reguler', 'jenis' => 'reguler', 'nama' => 'J&T Express', 'info' => $infoReguler, 'waktu' => 'Perkiraan: 1–3 hari'],
         'jne' => ['kelompok' => 'Ekspedisi Reguler', 'jenis' => 'reguler', 'nama' => 'JNE Express', 'info' => $infoReguler, 'waktu' => 'Perkiraan: 1–3 hari'],
     ];
-
-    $dimensions = [
-        'panjang' => (int) $cartItem['panjang'],
-        'lebar' => (int) $cartItem['lebar'],
-        'tinggi' => (int) $cartItem['tinggi'],
-    ];
-    foreach (array_keys($dimensions) as $field) {
-        if (isset($formValues[$field]) && ctype_digit((string) $formValues[$field])) {
-            $dimensions[$field] = (int) $formValues[$field];
-        }
-    }
-
-    $quantityPillow = (int) ($cartItem['qtyBantal'] ?? 0);
-    $quantityBolster = (int) ($cartItem['qtyGuling'] ?? 0);
-    if (isset($formValues['bantal']) && ctype_digit((string) $formValues['bantal'])) {
-        $quantityPillow = (int) $formValues['bantal'];
-    }
-    if (isset($formValues['guling']) && ctype_digit((string) $formValues['guling'])) {
-        $quantityBolster = (int) $formValues['guling'];
-    }
-
-    $extras = [];
-    if ($quantityPillow > 0) {
-        $extras[] = $quantityPillow . ' sarung bantal';
-    }
-    if ($quantityBolster > 0) {
-        $extras[] = $quantityBolster . ' sarung guling';
-    }
-    $mode = (string) ($formValues['jenis'] ?? $cartItem['mode'] ?? 'standard');
-    $produk = [
-        'nama' => (string) $product['nama_produk'],
-        'gambar' => !empty($product['gambar_produk'])
-            ? '/uploads/produk/' . rawurlencode(basename($product['gambar_produk']))
-            : '',
-        'jenis' => $mode === 'custom' ? 'custom' : 'standar',
-        'ukuran' => implode(' × ', $dimensions) . ' cm',
-        'jumlah' => (int) ($cartItem['qtySprei'] ?? 0),
-        'tambahan' => $extras === [] ? '-' : implode(' + ', $extras),
-        'catatan' => (string) ($formValues['catatan_produk'] ?? $cartItem['catatan'] ?? ''),
-    ];
-    $dimensi = $dimensions;
-    $jumlahSarung = ['bantal' => $quantityPillow, 'guling' => $quantityBolster];
 }
 
 $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
@@ -144,7 +129,10 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
             <h2 id="judulSukses">Pesanan Berhasil Dikirim!</h2>
             <p>Pesanan Anda telah diterima oleh sistem kami. Admin sedang memverifikasi pesanan dan
                menghitung total biaya + ongkos kirim.</p>
-            <p class="kode-pesanan">Kode pesanan: <b><?= checkoutEscape($pesananBaru['kode']) ?></b> · <?= checkoutEscape($pesananBaru['produk']['nama']) ?></p>
+            <p class="kode-pesanan">
+                Kode pesanan: <b><?= checkoutEscape($pesananBaru['kode']) ?></b><br>
+                Produk: <?= checkoutEscape(implode(', ', $pesananBaru['produk'] ?? [])) ?>
+            </p>
             <div class="aksi-sukses">
                 <a href="/?page=customer-catalog" class="tombol tombol-lebar">Lanjut Belanja</a>
                 <a href="/?page=customer-cart" class="tombol tombol-abu">Tutup</a>
@@ -160,7 +148,6 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
 
     <form method="post" action="/?action=customer-order-create" id="formCheckout">
         <input type="hidden" name="csrf_token" value="<?= checkoutEscape($_SESSION['csrf_token']) ?>">
-        <input type="hidden" name="item_id" value="<?= checkoutEscape($itemId) ?>">
 
         <!-- ================= DATA & ALAMAT ================= -->
         <section class="kartu">
@@ -201,26 +188,28 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
                 </span>
                 <div>
                     <h2>Detail Pesanan</h2>
-                    <small>Konfirmasi detail spesifikasi pesanan</small>
+                    <small><?= count($produkPesanan) ?> produk dalam pesanan Anda. Ubah spesifikasi dari keranjang sebelum checkout.</small>
                 </div>
-                <button type="button" class="tombol-kecil" data-buka-modal="modalSpesifikasi">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20 20 4M7 4h-3v3M20 17v3h-3"/></svg>
-                    Ubah Spesifikasi
-                </button>
             </div>
 
+            <?php foreach ($produkPesanan as $produk): ?>
             <div class="produk">
-                <img src="<?= checkoutEscape($produk['gambar']) ?>" alt="<?= checkoutEscape($produk['nama']) ?>" class="foto-produk">
+                <?php if ($produk['gambar'] !== ''): ?>
+                    <img src="<?= checkoutEscape($produk['gambar']) ?>" alt="<?= checkoutEscape($produk['nama']) ?>" class="foto-produk">
+                <?php else: ?>
+                    <div class="foto-produk foto-placeholder" aria-hidden="true">Gambar tidak tersedia</div>
+                <?php endif; ?>
                 <div class="detail">
                     <h3>
                         <?= checkoutEscape($produk['nama']) ?>
-                        <span class="label label-<?= checkoutEscape($produk['jenis']) ?>" id="teksJenis"><?= strtoupper(checkoutEscape($produk['jenis'])) ?></span>
+                        <span class="label label-<?= checkoutEscape($produk['jenis']) ?>"><?= strtoupper(checkoutEscape($produk['jenis'])) ?></span>
                     </h3>
-                    <p><small>Ukuran:</small> <span id="teksUkuran"><?= checkoutEscape($produk['ukuran']) ?></span> &nbsp;&nbsp; <small>Jumlah:</small> <?= (int) $produk['jumlah'] ?> pcs</p>
-                    <p><small>Tambahan:</small> <span id="teksTambahan"><?= checkoutEscape($produk['tambahan']) ?></span></p>
-                    <p class="catatan-produk"><b>Catatan:</b> <span id="teksCatatanProduk"><?= checkoutEscape($produk['catatan'] ?: '-') ?></span></p>
+                    <p><small>Ukuran:</small> <?= checkoutEscape($produk['ukuran']) ?> &nbsp;&nbsp; <small>Jumlah:</small> <?= (int) $produk['jumlah'] ?> pcs</p>
+                    <p><small>Tambahan:</small> <?= checkoutEscape($produk['tambahan']) ?></p>
+                    <p class="catatan-produk"><b>Catatan:</b> <?= checkoutEscape($produk['catatan'] ?: '-') ?></p>
                 </div>
             </div>
+            <?php endforeach; ?>
         </section>
 
         <!-- ================= METODE PENGIRIMAN ================= -->
@@ -313,72 +302,6 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
                 </div>
             </div>
         </div>
-
-
-        <!-- ================= MODAL: UBAH SPESIFIKASI PESANAN ================= -->
-        <div class="modal-latar" id="modalSpesifikasi">
-            <div class="modal modal-lebar" role="dialog" aria-modal="true" aria-labelledby="judulModalSpek">
-                <div class="modal-kepala">
-                    <div>
-                        <h2 id="judulModalSpek">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21H3z"/><path d="m8 12 2 2M11 9l2 2M14 6l2 2"/></svg>
-                            Ubah Spesifikasi Pesanan
-                        </h2>
-                        <small><?= checkoutEscape($produk['nama']) ?></small>
-                    </div>
-                    <button type="button" class="tutup-modal" data-tutup-modal aria-label="Tutup">×</button>
-                </div>
-
-                <div class="modal-isi">
-                    <small class="judul-bagian">TIPE UKURAN</small>
-                    <div class="pilih-tipe">
-                        <?php foreach (['standar' => 'Standar', 'custom' => 'Custom'] as $nilai => $teks) { ?>
-                        <label>
-                            <input type="radio" name="jenis" value="<?= $nilai ?>" <?= $produk['jenis'] === $nilai ? 'checked' : '' ?>>
-                            <span><?= $teks ?></span>
-                        </label>
-                        <?php } ?>
-                    </div>
-
-                    <small class="judul-bagian">DIMENSI KASUR</small>
-                    <div class="tiga-kolom">
-                        <?php foreach (['panjang' => 'Panjang', 'lebar' => 'Lebar', 'tinggi' => 'Tinggi Kasur'] as $nama => $teks) { ?>
-                        <label class="isian"><?= $teks ?>
-                            <?php $standardDimension = ['panjang' => 'panjang_standar', 'lebar' => 'lebar_standar', 'tinggi' => 'tinggi_standar'][$nama]; ?>
-                            <span class="input-satuan"><input type="number" min="1" max="1000" name="<?= $nama ?>" id="input<?= ucfirst($nama) ?>" value="<?= checkoutEscape($dimensi[$nama]) ?>" data-standard="<?= (int) $product[$standardDimension] ?>" <?= $produk['jenis'] === 'standar' ? 'disabled' : '' ?>><i>cm</i></span>
-                        </label>
-                        <?php } ?>
-                    </div>
-                    <p class="info-tinggi">ⓘ Tinggi standar produk: <?= (int) $product['tinggi_standar'] ?> cm. Harga akhir dikonfirmasi oleh admin.</p>
-
-                    <small class="judul-bagian">TAMBAHKAN SARUNG BANTAL DAN GULING</small>
-                    <div class="dua-penghitung">
-                        <?php foreach ($jumlahSarung as $nama => $jumlah) { $idInput = 'input' . ucfirst($nama); ?>
-                        <div class="penghitung-kotak">
-                            <div>
-                                <b>Sarung <?= ucfirst($nama) ?></b>
-                                <small>+Rp 25.000 / pcs</small>
-                            </div>
-                            <div class="penghitung">
-                                <button type="button" data-kurang="<?= $idInput ?>">−</button>
-                                <input type="number" min="0" max="20" name="<?= $nama ?>" id="<?= $idInput ?>" value="<?= $jumlah ?>" readonly>
-                                <button type="button" data-tambah="<?= $idInput ?>">+</button>
-                            </div>
-                        </div>
-                        <?php } ?>
-                    </div>
-
-                    <small class="judul-bagian">CATATAN JAHITAN KHUSUS WORKSHOP</small>
-                    <textarea class="isian-lepas" name="catatan_produk" id="inputCatatanProduk" rows="3" maxlength="1000"><?= checkoutEscape($produk['catatan']) ?></textarea>
-                </div>
-
-                <div class="modal-kaki">
-                    <button type="button" class="tombol tombol-garis" data-tutup-modal>Batal</button>
-                    <button type="button" class="tombol" id="simpanSpesifikasi"><?= $ikonCentang ?> Simpan Spesifikasi</button>
-                </div>
-            </div>
-        </div>
-
     </form>
 
 <?php } ?>

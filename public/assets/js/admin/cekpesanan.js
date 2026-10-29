@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const isVisible = matchesCategory && matchesSearch;
 
             row.hidden = !isVisible;
+            const detailRow = row.nextElementSibling;
+            if (!isVisible && detailRow && detailRow.matches('[data-order-details]')) {
+                detailRow.hidden = true;
+                const toggle = row.querySelector('[data-toggle-details]');
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                    toggle.textContent = toggle.classList.contains('order-action--verify') ? 'Verifikasi' : 'Detail';
+                }
+            }
             if (isVisible) visibleCount++;
         });
 
@@ -65,6 +74,23 @@ document.addEventListener('DOMContentLoaded', function () {
     if (searchInput) {
         searchInput.addEventListener('input', filterOrders);
     }
+
+    rows.forEach(function (row) {
+        const toggle = row.querySelector('[data-toggle-details]');
+        if (!toggle) return;
+
+        toggle.addEventListener('click', function () {
+            const detailRow = row.nextElementSibling;
+            if (!detailRow || !detailRow.matches('[data-order-details]')) return;
+
+            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+            detailRow.hidden = isExpanded;
+            toggle.setAttribute('aria-expanded', String(!isExpanded));
+            toggle.textContent = isExpanded
+                ? (toggle.classList.contains('order-action--verify') ? 'Verifikasi' : 'Detail')
+                : 'Tutup';
+        });
+    });
 
     filterOrders();
 });

@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/CartModel.php';
+
 class OrderModel
 {
     private PDO $pdo;
@@ -9,7 +11,7 @@ class OrderModel
         $this->pdo = $pdo;
     }
 
-    public function createOrder(array $order, array $item): int
+    public function createOrder(array $order, array $items): int
     {
         $this->pdo->beginTransaction();
 
@@ -69,19 +71,29 @@ class OrderModel
                     :catatan_pesanan
                 )'
             );
-            $itemStatement->execute([
-                ':id_pesanan' => $orderId,
-                ':id_produk' => $item['id_produk'],
-                ':tipe_ukuran' => $item['tipe_ukuran'],
-                ':jumlah' => $item['jumlah'],
-                ':harga_satuan' => $item['harga_satuan'],
-                ':panjang' => $item['panjang'],
-                ':lebar' => $item['lebar'],
-                ':tinggi' => $item['tinggi'],
-                ':tambah_sarban' => $item['tambah_sarban'],
-                ':tambah_sargul' => $item['tambah_sargul'],
-                ':catatan_pesanan' => $item['catatan_pesanan'],
-            ]);
+            foreach ($items as $item) {
+                $itemStatement->execute([
+                    ':id_pesanan' => $orderId,
+                    ':id_produk' => $item['id_produk'],
+                    ':tipe_ukuran' => $item['tipe_ukuran'],
+                    ':jumlah' => $item['jumlah'],
+                    ':harga_satuan' => $item['harga_satuan'],
+                    ':panjang' => $item['panjang'],
+                    ':lebar' => $item['lebar'],
+                    ':tinggi' => $item['tinggi'],
+                    ':tambah_sarban' => $item['tambah_sarban'],
+                    ':tambah_sargul' => $item['tambah_sargul'],
+                    ':catatan_pesanan' => $item['catatan_pesanan'],
+                ]);
+            }
+
+            $cartModel = new CartModel($this->pdo);
+            if ($cartModel->isStorageReady()) {
+                $cartStatement = $this->pdo->prepare(
+                    'DELETE FROM keranjang_pelanggan WHERE id_user = :id_user'
+                );
+                $cartStatement->execute([':id_user' => $order['id_user']]);
+            }
 
             $this->pdo->commit();
             return $orderId;
