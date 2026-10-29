@@ -5,7 +5,7 @@ require_once __DIR__ . '/../models/CartModel.php';
 
 class OrderController
 {
-    public function createOrder(): void
+    public function startCheckout(): void
     {
         if (!$this->hasValidCsrfToken()) {
             http_response_code(403);
@@ -14,8 +14,55 @@ class OrderController
         $this->requireCustomer();
 
         $cart = $_SESSION['cart'] ?? [];
-        if (!is_array($cart) || $cart === []) {
-            $this->checkoutError('Keranjang Anda masih kosong.');
+        $selectedIds = $_POST['item_ids'] ?? null;
+        if (!is_array($cart) || !is_array($selectedIds) || $selectedIds === []) {
+            $this->setCartMessage('Pilih setidaknya satu produk untuk checkout.', 'error');
+            $this->redirect('/?page=customer-cart');
+        }
+
+        $validatedIds = [];
+        foreach ($selectedIds as $itemId) {
+            if (
+                !is_string($itemId)
+                || !preg_match('/^[a-f0-9]{32}$/D', $itemId)
+                || !isset($cart[$itemId])
+                || !is_array($cart[$itemId])
+            ) {
+                $this->setCartMessage('Pilihan produk tidak valid. Pilih kembali dari keranjang.', 'error');
+                $this->redirect('/?page=customer-cart');
+            }
+            $validatedIds[$itemId] = true;
+        }
+
+        $_SESSION['checkout_item_ids'] = array_keys($validatedIds);
+        $this->redirect('/?page=customer-checkout');
+    }
+
+    public function createOrder(): void
+    {
+        if (!$this->hasValidCsrfToken()) {
+            http_response_code(403);
+            exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
+        }
+        $this->requireCustomer();
+
+        $fullCart = $_SESSION['cart'] ?? [];
+        $selectedIds = $_SESSION['checkout_item_ids'] ?? [];
+        if (!is_array($fullCart) || !is_array($selectedIds) || $selectedIds === []) {
+            $this->checkoutError('Pilih produk dari keranjang sebelum checkout.');
+        }
+
+        $cart = [];
+        foreach ($selectedIds as $itemId) {
+            if (
+                !is_string($itemId)
+                || !preg_match('/^[a-f0-9]{32}$/D', $itemId)
+                || !isset($fullCart[$itemId])
+                || !is_array($fullCart[$itemId])
+            ) {
+                $this->checkoutError('Pilihan produk tidak valid. Pilih kembali dari keranjang.');
+            }
+            $cart[$itemId] = $fullCart[$itemId];
         }
 
         $productController = new ProductController();
@@ -131,6 +178,7 @@ class OrderController
                 'catatan_alamat' => $orderData['catatan_alamat'],
                 'metode_pengiriman' => $shippingMethods[$shippingMethod],
                 'catatan_pengiriman' => $orderData['catatan_kirim'],
+                'cart_item_ids' => array_keys($cart),
             ],
             array_map(static function (array $item): array {
                 return [
@@ -148,7 +196,13 @@ class OrderController
             }, $items)
         );
 
-        unset($_SESSION['cart'], $_SESSION['checkout_form'], $_SESSION['checkout_message']);
+        foreach (array_keys($cart) as $itemId) {
+            unset($_SESSION['cart'][$itemId]);
+        }
+        if (($_SESSION['cart'] ?? []) === []) {
+            unset($_SESSION['cart']);
+        }
+        unset($_SESSION['checkout_item_ids'], $_SESSION['checkout_form'], $_SESSION['checkout_message']);
         $_SESSION['pesanan_terakhir'] = [
             'id' => $orderId,
             'kode' => $invoice,

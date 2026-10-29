@@ -90,9 +90,14 @@ class OrderModel
             $cartModel = new CartModel($this->pdo);
             if ($cartModel->isStorageReady()) {
                 $cartStatement = $this->pdo->prepare(
-                    'DELETE FROM keranjang_pelanggan WHERE id_user = :id_user'
+                    'DELETE FROM keranjang_pelanggan WHERE id_user = :id_user AND item_id = :item_id'
                 );
-                $cartStatement->execute([':id_user' => $order['id_user']]);
+                foreach ($order['cart_item_ids'] as $itemId) {
+                    $cartStatement->execute([
+                        ':id_user' => $order['id_user'],
+                        ':item_id' => $itemId,
+                    ]);
+                }
             }
 
             $this->pdo->commit();

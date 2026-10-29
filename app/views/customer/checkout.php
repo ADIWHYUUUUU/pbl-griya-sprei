@@ -15,12 +15,36 @@ function checkoutEscape($value): string
 if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     $pesananBaru = $_SESSION['pesanan_terakhir'];
 } else {
-    $cart = $_SESSION['cart'] ?? [];
+    $cart = $_SESSION['cart'] ?? [];    
     if (!is_array($cart) || $cart === []) {
         $_SESSION['cart_message'] = 'Keranjang Anda masih kosong.';
         $_SESSION['cart_message_type'] = 'error';
         header('Location: /?page=customer-cart', true, 303);
         exit;
+    }
+    $selectedCartIds = $_SESSION['checkout_item_ids'] ?? [];
+    if (!is_array($selectedCartIds) || $selectedCartIds === []) {
+        $_SESSION['cart_message'] = 'Pilih produk dari keranjang sebelum checkout.';
+        $_SESSION['cart_message_type'] = 'error';
+        header('Location: /?page=customer-cart', true, 303);
+        exit;
+    }
+
+    $checkoutCart = [];
+    foreach ($selectedCartIds as $itemId) {
+        if (
+            !is_string($itemId)
+            || !preg_match('/^[a-f0-9]{32}$/D', $itemId)
+            || !isset($cart[$itemId])
+            || !is_array($cart[$itemId])
+        ) {
+            unset($_SESSION['checkout_item_ids']);
+            $_SESSION['cart_message'] = 'Pilihan produk tidak valid. Pilih kembali dari keranjang.';
+            $_SESSION['cart_message_type'] = 'error';
+            header('Location: /?page=customer-cart', true, 303);
+            exit;
+        }
+        $checkoutCart[$itemId] = $cart[$itemId];
     }
 
     require_once __DIR__ . '/../../controllers/ProductController.php';
@@ -31,7 +55,7 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     $checkoutMessage = (string) ($_SESSION['checkout_message'] ?? '');
     unset($_SESSION['checkout_message']);
     $produkPesanan = [];
-    foreach ($cart as $itemId => $cartItem) {
+    foreach ($checkoutCart as $itemId => $cartItem) {
         if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId) || !is_array($cartItem)) {
             $_SESSION['cart_message'] = 'Data keranjang tidak valid. Periksa kembali keranjang Anda.';
             $_SESSION['cart_message_type'] = 'error';

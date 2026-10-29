@@ -30,12 +30,12 @@ $cart = is_array($cart) ? $cart : [];
 $products = new ProductController();
 $items = [];
 $totalConfigurations = 0;
-$checkoutAvailable = true;
+$selectableCartIds = [];
 $cartQuantities = [];
+$cartProductsByItem = [];
 
 foreach ($cart as $itemId => $item) {
     if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId) || !is_array($item)) {
-        $checkoutAvailable = false;
         continue;
     }
 
@@ -46,14 +46,14 @@ foreach ($cart as $itemId => $item) {
     $product = $productId === false ? false : $products->getProductById($productId);
     $name = (string) ($product['nama_produk'] ?? $item['nama_produk'] ?? 'Produk tidak tersedia');
     $quantity = max(0, (int) ($item['qtySprei'] ?? 0));
-    if (!$product || $quantity < 1) {
-        $checkoutAvailable = false;
-    } elseif ($productId !== false) {
+    if ($product && $quantity > 0 && $productId !== false) {
         $cartQuantities[$productId] = ($cartQuantities[$productId] ?? 0) + $quantity;
-        if ($cartQuantities[$productId] > min(50, (int) $product['stok'])) {
-            $checkoutAvailable = false;
-        }
     }
+    $cartProductsByItem[$itemId] = [
+        'product' => $product,
+        'product_id' => $productId,
+        'quantity' => $quantity,
+    ];
     if ($search !== '' && stripos($name, $search) === false) {
         continue;
     }
@@ -64,11 +64,26 @@ foreach ($cart as $itemId => $item) {
         'product' => $product,
         'name' => $name,
         'quantity' => $quantity,
+        'product_id' => $productId,
     ];
 }
-if ($cart === []) {
-    $checkoutAvailable = false;
+
+foreach ($cartProductsByItem as $itemId => $cartItem) {
+    $productId = $cartItem['product_id'];
+    if (
+        $cartItem['product']
+        && $cartItem['quantity'] > 0
+        && $productId !== false
+        && $cartQuantities[$productId] <= min(50, (int) $cartItem['product']['stok'])
+    ) {
+        $selectableCartIds[] = $itemId;
+    }
 }
+
+foreach ($items as &$entry) {
+    $entry['checkout_available'] = in_array($entry['id'], $selectableCartIds, true);
+}
+unset($entry);
 
 $perPage = 3;
 $totalPages = max(1, (int) ceil(count($items) / $perPage));
@@ -119,7 +134,7 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                 </a>
             </div>
 
-            <div class="dua-kolom">
+            <div class="dua-kolom" data-cart-selectable-ids="<?= aman(json_encode($selectableCartIds)) ?>">
                 <section aria-label="Daftar produk keranjang">
                     <?php if ($visibleItems === []): ?>
                         <div class="kartu kosong">
@@ -132,6 +147,13 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             <?php endif; ?>
                         </div>
                     <?php else: ?>
+                        <div class="cart-select-all">
+                            <label>
+                                <input type="checkbox" id="cartSelectAll" aria-label="Pilih semua produk yang tersedia">
+                                <span>Pilih semua</span>
+                            </label>
+                            <span id="cartSelectionCount" aria-live="polite">0 produk dipilih</span>
+                        </div>
                         <?php foreach ($visibleItems as $entry): ?>
                             <?php
                             $item = $entry['data'];
@@ -162,6 +184,16 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             }
                             ?>
                             <article class="kartu produk">
+                                <label class="cart-item-select">
+                                    <input
+                                        type="checkbox"
+                                        class="cart-item-checkbox"
+                                        value="<?= aman($entry['id']) ?>"
+                                        aria-label="Pilih <?= aman($entry['name']) ?>"
+                                        <?= !$entry['checkout_available'] ? 'disabled' : '' ?>
+                                    >
+                                    <span class="sr-only">Pilih <?= aman($entry['name']) ?> untuk checkout</span>
+                                </label>
                                 <?php if ($imageUrl !== ''): ?>
                                     <img class="foto-produk" src="<?= aman($imageUrl) ?>" alt="<?= aman($entry['name']) ?>" loading="lazy">
                                 <?php else: ?>
@@ -312,14 +344,14 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                         <div class="baris"><span>Produk di keranjang</span><b><?= $totalConfigurations ?> item</b></div>
                         <div class="baris"><span>Total tagihan</span><b>Dikonfirmasi admin</b></div>
                     </div>
-                    <?php if ($checkoutAvailable): ?>
-                        <a class="checkout-button checkout-button--all" href="/?page=customer-checkout">
-                            Checkout Semua Pesanan <span aria-hidden="true">→</span>
-                        </a>
-                    <?php else: ?>
-                        <button type="button" class="checkout-button checkout-button--all" disabled>Periksa produk dan stok</button>
-                    <?php endif; ?>
-                    <p>Tombol checkout akan memproses seluruh produk di keranjang, termasuk yang ada di halaman lain atau tersembunyi oleh pencarian.</p>
+                    <form id="checkoutSelectionForm" action="/?action=customer-checkout-start" method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= aman($_SESSION['csrf_token']) ?>">
+                        <div id="selectedCartItems"></div>
+                        <button type="submit" class="checkout-button checkout-button--all" id="checkoutSelectedButton" disabled>
+                            Checkout <span id="checkoutSelectedCount">0</span> Produk <span aria-hidden="true">→</span>
+                        </button>
+                    </form>
+                    <p>Pilih produk yang ingin dibeli. Pilihan tetap tersimpan saat Anda berpindah halaman keranjang.</p>
                     <p>Setelah checkout, pesanan berstatus <strong>Menunggu Verifikasi</strong>. Total tagihan akan muncul di halaman Pesanan Saya setelah admin memeriksa spesifikasi pesanan.</p>
                 </aside>
             </div>

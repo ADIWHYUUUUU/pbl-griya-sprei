@@ -141,3 +141,97 @@ window.addEventListener("pageshow", function () {
     tombolKatalog.style.pointerEvents = "";
   }
 });
+
+var cartSelectionRoot = document.querySelector("[data-cart-selectable-ids]");
+
+if (cartSelectionRoot) {
+  var selectableCartIds = JSON.parse(cartSelectionRoot.dataset.cartSelectableIds || "[]");
+  var selectableCartIdSet = new Set(selectableCartIds);
+  var selectionStorageKey = "griya-sprei-cart-selection";
+  var selectedCartIds = new Set(
+    JSON.parse(sessionStorage.getItem(selectionStorageKey) || "[]").filter(function (itemId) {
+      return selectableCartIdSet.has(itemId);
+    })
+  );
+  var selectAllCheckbox = document.getElementById("cartSelectAll");
+  var selectionCount = document.getElementById("cartSelectionCount");
+  var checkoutCount = document.getElementById("checkoutSelectedCount");
+  var checkoutButton = document.getElementById("checkoutSelectedButton");
+  var selectedItemsContainer = document.getElementById("selectedCartItems");
+  var checkoutSelectionForm = document.getElementById("checkoutSelectionForm");
+  var itemCheckboxes = document.querySelectorAll(".cart-item-checkbox");
+
+  function updateCartSelection() {
+    itemCheckboxes.forEach(function (checkbox) {
+      checkbox.checked = selectedCartIds.has(checkbox.value);
+    });
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.checked =
+        selectableCartIds.length > 0 &&
+        selectableCartIds.every(function (itemId) {
+          return selectedCartIds.has(itemId);
+        });
+      selectAllCheckbox.indeterminate =
+        selectedCartIds.size > 0 && !selectAllCheckbox.checked;
+    }
+
+    if (selectionCount) {
+      selectionCount.textContent = selectedCartIds.size + " produk dipilih";
+    }
+    if (checkoutCount) {
+      checkoutCount.textContent = String(selectedCartIds.size);
+    }
+    if (checkoutButton) {
+      checkoutButton.disabled = selectedCartIds.size === 0;
+    }
+    if (selectedItemsContainer) {
+      selectedItemsContainer.replaceChildren();
+      selectedCartIds.forEach(function (itemId) {
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "item_ids[]";
+        input.value = itemId;
+        selectedItemsContainer.appendChild(input);
+      });
+    }
+
+    sessionStorage.setItem(selectionStorageKey, JSON.stringify(Array.from(selectedCartIds)));
+  }
+
+  itemCheckboxes.forEach(function (checkbox) {
+    checkbox.addEventListener("change", function () {
+      if (checkbox.checked) {
+        selectedCartIds.add(checkbox.value);
+      } else {
+        selectedCartIds.delete(checkbox.value);
+      }
+      updateCartSelection();
+    });
+  });
+
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", function () {
+      selectableCartIds.forEach(function (itemId) {
+        if (selectAllCheckbox.checked) {
+          selectedCartIds.add(itemId);
+        } else {
+          selectedCartIds.delete(itemId);
+        }
+      });
+      updateCartSelection();
+    });
+  }
+
+  if (checkoutSelectionForm) {
+    checkoutSelectionForm.addEventListener("submit", function (event) {
+      if (selectedCartIds.size === 0) {
+        event.preventDefault();
+        return;
+      }
+      sessionStorage.removeItem(selectionStorageKey);
+    });
+  }
+
+  updateCartSelection();
+}

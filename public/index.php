@@ -22,7 +22,7 @@ if ($action !== '') {
 		'admin-product-delete',
 	];
 	$isProductAction = in_array($action, $productActions, true);
-	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove'], true);
+	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove', 'customer-checkout-start'], true);
 	$isOrderAction = $action === 'customer-order-create';
 	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction) {
 		header('Content-Type: application/json; charset=utf-8');
@@ -47,6 +47,8 @@ if ($action !== '') {
 			$controller = new OrderController();
 			if ($isOrderAction) {
 				$controller->createOrder();
+			} elseif ($action === 'customer-checkout-start') {
+				$controller->startCheckout();
 			} elseif ($action === 'customer-cart-add') {
 				$controller->addToCart();
 			} elseif ($action === 'customer-cart-update') {
