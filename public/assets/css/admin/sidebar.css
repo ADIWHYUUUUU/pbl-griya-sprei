@@ -1,4 +1,7 @@
 .sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
     display: flex;
     flex: 0 0 256px;
     flex-direction: column;
@@ -171,6 +174,7 @@
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
+        align-self: auto;
         top: 0;
         bottom: 0;
         left: 0;

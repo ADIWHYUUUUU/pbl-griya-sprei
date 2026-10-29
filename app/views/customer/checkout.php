@@ -301,17 +301,22 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
 
         <!-- ================= MODAL: UBAH ALAMAT PENGIRIMAN ================= -->
         <div class="modal-latar" id="modalAlamat">
-            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="judulModalAlamat">
+            <div class="modal modal-alamat" role="dialog" aria-modal="true" aria-labelledby="judulModalAlamat">
                 <div class="modal-kepala">
                     <h2 id="judulModalAlamat">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><path d="m9 10 2 2 4-4"/></svg>
                         Ubah Alamat Pengiriman
                     </h2>
                     <button type="button" class="tutup-modal" data-tutup-modal aria-label="Tutup">×</button>
                 </div>
 
                 <div class="modal-isi">
-                    <p class="catatan-alamat">Nama dan nomor WhatsApp pelanggan diambil dari data akun yang sedang login.</p>
+                    <label class="isian">Nama Penerima
+                        <input type="text" value="<?= checkoutEscape($pemesan['nama']) ?>" readonly>
+                    </label>
+                    <label class="isian">Nomor WhatsApp
+                        <input type="tel" value="<?= checkoutEscape($pemesan['telepon']) ?>" readonly>
+                    </label>
                     <label class="isian">Alamat Lengkap &amp; Kota
                         <textarea name="alamat" id="inputAlamat" rows="3" maxlength="2000"><?= checkoutEscape($alamatAwal) ?></textarea>
                     </label>

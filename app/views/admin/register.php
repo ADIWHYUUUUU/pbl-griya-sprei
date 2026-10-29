@@ -25,7 +25,7 @@ if (empty($_SESSION['csrf_token'])) {
     <header class="brand">
 
         <img class="brand__logo" src="../../assets/images/logo.png" alt="Logo Griya Sprei">
-
+    
         <div>
             <h1 class="brand__name">Griya Sprei</h1>
             <p class="brand__tagline">Akses pengelolaan toko</p>

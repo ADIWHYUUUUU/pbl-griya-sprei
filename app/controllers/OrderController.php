@@ -350,12 +350,7 @@ class OrderController
         $cartPersisted = $this->persistCartItem($itemId, $item);
         $_SESSION['cart'] = $cart;
 
-        $this->setCartMessage(
-            $cartPersisted
-                ? 'Produk berhasil ditambahkan ke keranjang.'
-                : 'Produk ditambahkan ke keranjang sesi. Jalankan migrasi keranjang agar tersimpan permanen di akun.',
-            'success'
-        );
+        $this->setCartMessage('Produk berhasil ditambahkan ke keranjang.', 'success');
         $this->redirect('/?page=customer-cart');
     }
 

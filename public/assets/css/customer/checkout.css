@@ -448,6 +448,85 @@ body.ada-modal {
     max-width: 560px;
 }
 
+.modal-alamat {
+    max-width: 500px;
+    border: 1px solid #e4e7e4;
+    border-radius: 12px;
+}
+
+.modal-alamat .modal-kepala {
+    align-items: center;
+    padding: 18px 30px 16px;
+}
+
+.modal-alamat .modal-kepala h2 {
+    gap: 7px;
+    color: #303a31;
+    font-size: 18px;
+}
+
+.modal-alamat .modal-kepala h2 svg {
+    flex-shrink: 0;
+    color: #526b50;
+}
+
+.modal-alamat .tutup-modal {
+    cursor: pointer;
+}
+
+.modal-alamat .modal-isi {
+    padding: 22px 30px 2px;
+}
+
+.modal-alamat .isian {
+    margin-bottom: 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.modal-alamat .isian input,
+.modal-alamat .isian textarea {
+    margin-top: 5px;
+    padding: 11px 14px;
+    border-color: #e0e4e8;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.modal-alamat .isian textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-alamat .isian input[readonly] {
+    background: #fff;
+    color: var(--teks);
+    opacity: 1;
+}
+
+.modal-alamat .isian input:focus,
+.modal-alamat .isian textarea:focus {
+    border-color: #526b50;
+    box-shadow: 0 0 0 2px rgba(82, 107, 80, 0.1);
+}
+
+.modal-alamat .modal-kaki {
+    gap: 8px;
+    margin: 0 30px;
+    padding: 16px 0 22px;
+}
+
+.modal-alamat .modal-kaki .tombol {
+    min-height: 38px;
+    padding: 9px 16px;
+    font-size: 12px;
+}
+
+.modal-alamat .modal-kaki .tombol-abu {
+    border-color: transparent;
+}
+
 @keyframes modalMasuk {
     from {
         opacity: 0;
@@ -720,4 +799,26 @@ body.ada-modal {
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 18px;
+}
+
+@media (max-width: 520px) {
+    #modalAlamat {
+        padding: 12px;
+    }
+
+    .modal-alamat .modal-kepala {
+        padding: 16px 20px 14px;
+    }
+
+    .modal-alamat .modal-kepala h2 {
+        font-size: 16px;
+    }
+
+    .modal-alamat .modal-isi {
+        padding: 18px 20px 2px;
+    }
+
+    .modal-alamat .modal-kaki {
+        margin: 0 20px;
+    }
 }
