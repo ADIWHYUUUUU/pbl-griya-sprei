@@ -102,7 +102,7 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
 
             <header class="dashboard-header orders-header">
                 <div>
-                    <p class="eyebrow">PANEL ADMIN</p>
+                    <p class="eyebrow">PANEL SURYA</p>
                     <h1>Cek Pesanan</h1>
                     <p class="dashboard-intro">Pantau pesanan terbaru dan status pembayarannya.</p>
                 </div>
