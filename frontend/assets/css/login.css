@@ -196,7 +196,19 @@ button { cursor: pointer; }
 /* =========================================
    7. RESPONSIF
    ========================================= */
+@media (max-width: 768px) {
+  .page-login { padding: 16px; }
+  .login-card { min-height: unset; padding: 20px; }
+  .brand { margin: 8px 0 32px; }
+  .brand__logo { width: 34px; height: 34px; }
+  .brand__name { font-size: 18px; }
+  .field__label, .input input, .btn-submit, .register { font-size: 13px; }
+  .btn-submit { height: 40px; }
+}
+
 @media (max-width: 520px) {
   .brand { flex-direction: column; text-align: center; gap: 8px; }
   .brand__tagline { font-size: 11px; }
+  .remember { font-size: 12px; }
+  .login-card { padding: 18px; }
 }

@@ -53,7 +53,18 @@
   .hero__title { font-size: 34px; }
   .featured { grid-template-columns: repeat(2, 1fr); }
   .steps { grid-template-columns: repeat(2, 1fr); }
+  .section__title { font-size: 22px; }
+  .hero__desc { font-size: 15px; }
+  .btn--lg { height: 40px; padding: 0 20px; font-size: 13px; }
 }
 @media (max-width: 640px) {
   .explore, .featured, .steps { grid-template-columns: 1fr; }
+  .hero { padding: 28px 0 40px; }
+  .hero__pill { font-size: 11px; }
+  .hero__title { font-size: 28px; margin-bottom: 16px; }
+  .hero__desc { font-size: 14px; }
+  .explore__row h3 { font-size: 15px; }
+  .featured__title { font-size: 15px; }
+  .step__head h3 { font-size: 13px; }
+  .step p { font-size: 11px; }
 }

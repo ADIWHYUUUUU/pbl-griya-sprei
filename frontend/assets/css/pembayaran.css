@@ -519,3 +519,23 @@ body.ada-modal {
 .status-tunggu {
     color: var(--oranye);
 }
+
+@media (max-width: 1024px) {
+    .isi { padding: 20px 18px 40px; }
+    .invoice-kepala { gap: 14px; }
+    .dua-kolom { grid-template-columns: 1fr; }
+    .toko h1 { font-size: 18px; }
+    .tombol { font-size: 11px; padding: 9px 14px; }
+}
+
+@media (max-width: 640px) {
+    .kartu { padding: 18px 16px; }
+    .invoice-kepala { display: block; }
+    .nomor-invoice { text-align: left; margin-top: 10px; }
+    .logo-toko { width: 38px; height: 38px; }
+    .toko h1 { font-size: 17px; }
+    .tabel-item { display: block; overflow-x: auto; white-space: nowrap; }
+    .tombol, .tombol-abu { width: 100%; }
+    .baris-bayar { flex-direction: column; align-items: flex-start; }
+    .baris-bayar .kanan { text-align: left; }
+}

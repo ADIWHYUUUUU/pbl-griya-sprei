@@ -62,3 +62,17 @@
 
 .login-link { margin-top: 22px; text-align: center; font-size: 13px; color: var(--muted); }
 .login-link a { color: var(--green-dark); font-weight: 600; text-decoration: underline; margin-left: 4px; }
+
+@media (max-width: 768px) {
+  .page-register { padding: 18px; }
+  .card { padding: 24px; }
+  .card__title { font-size: 22px; }
+  .card__subtitle, .field__label, .input input, .btn-submit, .terms, .login-link { font-size: 13px; }
+  .btn-submit { height: 40px; }
+}
+
+@media (max-width: 420px) {
+  .card { padding: 18px; }
+  .terms { font-size: 12px; }
+  .card__title { font-size: 20px; }
+}

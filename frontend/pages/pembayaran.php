@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../payment_upload.php';
 
 function e($teks) {
     return htmlspecialchars((string) $teks, ENT_QUOTES, 'UTF-8');
@@ -62,31 +63,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bank    = $_POST['bank'] ?? '';
     $noRek   = trim($_POST['no_rekening'] ?? '');
     $namaRek = trim($_POST['nama_rekening'] ?? '');
-    $file    = $_FILES['bukti'] ?? null;
-    $ekstensi = $file ? strtolower(pathinfo($file['name'], PATHINFO_EXTENSION)) : '';
+    $file = $_FILES['bukti'] ?? null;
 
     if (!isset($daftarBank[$bank])) {
         $pesanError = 'Pilih bank tujuan transfer.';
     } elseif ($noRek === '' || $namaRek === '') {
         $pesanError = 'Nomor rekening dan nama pemilik rekening pengirim wajib diisi.';
-    } elseif (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-        $pesanError = 'Unggah bukti transfer terlebih dahulu.';
-    } elseif (!in_array($ekstensi, ['jpg', 'jpeg', 'png', 'pdf']) || $file['size'] > 2 * 1024 * 1024) {
-        $pesanError = 'Bukti transfer harus JPG, PNG, atau PDF dengan ukuran maksimal 2 MB.';
     } else {
-        $_SESSION['pesanan'][$indeks]['riwayat_bayar'][] = [
-            'waktu'   => date('d M Y'),
-            'jumlah'  => $pesanan['tagihan'],
-            'file'    => basename($file['name']),
-            'status'  => 'Dicek Admin',
-            'bank'    => $daftarBank[$bank]['kode'],
-            'rekening_pengirim' => $noRek,
-            'nama_pengirim'     => $namaRek,
-        ];
-        $_SESSION['pesanan'][$indeks]['status'] = 'Menunggu Verifikasi';
+        $upload = simpan_bukti_pembayaran($file);
+        if (isset($upload['error'])) {
+            $pesanError = $upload['error'];
+        } else {
+            $_SESSION['pesanan'][$indeks]['riwayat_bayar'][] = [
+                'waktu'   => date('d M Y'),
+                'jumlah'  => $pesanan['tagihan'],
+                'file'    => $upload['file'],
+                'path'    => $upload['path'],
+                'mime'    => $upload['mime'],
+                'status'  => 'Menunggu Verifikasi',
+                'bank'    => $daftarBank[$bank]['kode'],
+                'rekening_pengirim' => $noRek,
+                'nama_pengirim'     => $namaRek,
+            ];
+            $_SESSION['pesanan'][$indeks]['status'] = 'Menunggu Verifikasi';
 
-        header('Location: pembayaran.php?kode=' . urlencode($kode) . '&berhasil=1');
-        exit;
+            header('Location: pembayaran.php?kode=' . urlencode($kode) . '&berhasil=1');
+            exit;
+        }
     }
 }
 

@@ -2,24 +2,8 @@
 
 session_start();
 
-// ---------- contoh data ----------
-$dataContoh = [
-    1 => ['nama' => 'Sprei katun jepang', 'gambar' => '../assets/img/sprei1.jpg', 'jenis' => 'standar',
-          'ukuran' => '200 × 160 × 30 cm', 'tambahan' => '2 sarung bantal + 1 sarung guling',
-          'catatan' => 'Karet keliling 4 sudut kencang, jahitan rapi untuk kasur busa', 'jumlah' => 1],
-    2 => ['nama' => 'Sprei Katun Modal Hilton', 'gambar' => '../assets/img/sprei2.jpg', 'jenis' => 'custom',
-          'ukuran' => '200 × 160 × 30 cm', 'tambahan' => '2 sarung bantal',
-          'catatan' => 'Sudut fitted elastic, penambahan tinggi +10 cm (ekstra)', 'jumlah' => 1],
-    3 => ['nama' => 'Bedcover Set Asterina', 'gambar' => '../assets/img/bedcover1.jpg', 'jenis' => 'standar',
-          'ukuran' => 'King 200 × 200 × 25 cm', 'tambahan' => '2 sarung bantal + 2 sarung guling',
-          'catatan' => 'Kombinasi Two-Tone, dacron 7 oz premium', 'jumlah' => 1],
-    4 => ['nama' => 'Sarung Bantal Polos', 'gambar' => '../assets/img/bantal1.jpg', 'jenis' => 'standar',
-          'ukuran' => '50 × 70 cm', 'tambahan' => '-',
-          'catatan' => 'Warna abu muda', 'jumlah' => 2],
-];
-
 if (!isset($_SESSION['keranjang']) || isset($_GET['reset'])) {
-    $_SESSION['keranjang'] = $dataContoh;
+    $_SESSION['keranjang'] = [];
     if (isset($_GET['reset'])) {
         header('Location: keranjang.php');
         exit;
@@ -41,6 +25,53 @@ if ($halaman < 1) $halaman = 1;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id   = isset($_POST['id']) ? (int) $_POST['id'] : 0;
     $aksi = isset($_POST['aksi']) ? $_POST['aksi'] : '';
+
+    if ($aksi === 'tambah_produk') {
+        $nama = trim($_POST['nama'] ?? '');
+        $jenis = ($_POST['jenis'] ?? '') === 'custom' ? 'custom' : 'standar';
+        $panjang = filter_var($_POST['panjang'] ?? null, FILTER_VALIDATE_INT);
+        $lebar = filter_var($_POST['lebar'] ?? null, FILTER_VALIDATE_INT);
+        $tinggi = filter_var($_POST['tinggi'] ?? null, FILTER_VALIDATE_INT);
+        $jumlah = filter_var($_POST['jumlah'] ?? null, FILTER_VALIDATE_INT);
+        $bantal = filter_var($_POST['bantal'] ?? null, FILTER_VALIDATE_INT);
+        $guling = filter_var($_POST['guling'] ?? null, FILTER_VALIDATE_INT);
+        $catatan = trim($_POST['catatan'] ?? '');
+        $warna = $_POST['warna'] ?? '';
+
+        if (
+            $nama === '' || strlen($nama) > 200 ||
+            $panjang === false || $panjang < 100 || $panjang > 300 ||
+            $lebar === false || $lebar < 80 || $lebar > 260 ||
+            $tinggi === false || $tinggi < 10 || $tinggi > 50 ||
+            $jumlah === false || $jumlah < 1 || $jumlah > 50 ||
+            $bantal === false || $bantal < 0 || $bantal > 20 ||
+            $guling === false || $guling < 0 || $guling > 20 ||
+            strlen($catatan) > 500
+        ) {
+            http_response_code(400);
+            exit('Data produk tidak valid. Kembali ke detail produk dan periksa isian Anda.');
+        }
+
+        $tambahan = [];
+        if ($bantal > 0) $tambahan[] = $bantal . ' sarung bantal';
+        if ($guling > 0) $tambahan[] = $guling . ' sarung guling';
+
+        $keys = array_map('intval', array_keys($_SESSION['keranjang']));
+        $idBaru = $keys ? max($keys) + 1 : 1;
+        $_SESSION['keranjang'][$idBaru] = [
+            'nama' => $nama,
+            'gambar' => '',
+            'warna' => preg_match('/^#[0-9a-fA-F]{6}$/', $warna) ? $warna : '#d9ccb4',
+            'jenis' => $jenis,
+            'ukuran' => "$panjang × $lebar × $tinggi cm",
+            'tambahan' => $tambahan ? implode(' + ', $tambahan) : '-',
+            'catatan' => $catatan ?: '-',
+            'jumlah' => $jumlah,
+        ];
+
+        header('Location: keranjang.php');
+        exit;
+    }
 
     if (isset($_SESSION['keranjang'][$id])) {
         if ($aksi === 'hapus') {
@@ -155,7 +186,12 @@ function e($teks) {
             <?php foreach ($produkTampil as $id => $produk) { ?>
             <div class="kartu produk">
 
-                <img src="<?= e($produk['gambar']) ?>" alt="<?= e($produk['nama']) ?>" class="foto-produk">
+                <?php if (!empty($produk['gambar'])) { ?>
+                    <img src="<?= e($produk['gambar']) ?>" alt="<?= e($produk['nama']) ?>" class="foto-produk">
+                <?php } else { ?>
+                    <div class="foto-produk" role="img" aria-label="<?= e($produk['nama']) ?>"
+                         style="background-color: <?= e($produk['warna'] ?? '#d9ccb4') ?>"></div>
+                <?php } ?>
 
                 <div class="detail">
                     <div class="judul-baris">

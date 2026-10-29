@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../payment_upload.php';
 
 function e($teks) {
     return htmlspecialchars((string) $teks, ENT_QUOTES, 'UTF-8');
@@ -102,21 +103,26 @@ if (!isset($_SESSION['pesanan_contoh_dimuat']) || isset($_GET['reset'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['aksi'] ?? '') === 'unggah_bukti') {
     $kode = $_POST['kode'] ?? '';
     $file = $_FILES['bukti'] ?? null;
-    $ekstensi = $file ? strtolower(pathinfo($file['name'], PATHINFO_EXTENSION)) : '';
 
-    if ($file && $file['error'] === UPLOAD_ERR_OK && in_array($ekstensi, ['jpg', 'jpeg', 'png', 'pdf']) && $file['size'] <= 2 * 1024 * 1024) {
-        foreach ($_SESSION['pesanan'] as $i => $p) {
-            if ($p['kode'] === $kode && in_array($p['status'], ['Menunggu Pembayaran', 'Bukti Pembayaran Ditolak'])) {
-                $_SESSION['pesanan'][$i]['riwayat_bayar'][] = [
-                    'waktu'  => date('d M Y'),
-                    'jumlah' => $p['tagihan'],
-                    'file'   => basename($file['name']),
-                    'status' => 'Dicek Admin',
-                ];
-                $_SESSION['pesanan'][$i]['status'] = 'Menunggu Verifikasi';
-                break;
-            }
+    foreach ($_SESSION['pesanan'] as $i => $p) {
+        if ($p['kode'] !== $kode || !in_array($p['status'], ['Menunggu Pembayaran', 'Bukti Pembayaran Ditolak'])) {
+            continue;
         }
+
+        $upload = simpan_bukti_pembayaran($file);
+        if (!isset($upload['error'])) {
+            $_SESSION['pesanan'][$i]['riwayat_bayar'][] = [
+                'waktu'  => date('d M Y'),
+                'jumlah' => $p['tagihan'],
+                'file'   => $upload['file'],
+                'path'   => $upload['path'],
+                'mime'   => $upload['mime'],
+                'status' => 'Menunggu Verifikasi',
+            ];
+            $_SESSION['pesanan'][$i]['status'] = 'Menunggu Verifikasi';
+            unset($_SESSION['pesanan'][$i]['catatan_admin']);
+        }
+        break;
     }
 
     header('Location: pesananSaya.php');

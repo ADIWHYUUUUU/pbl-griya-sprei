@@ -698,6 +698,50 @@ body.ada-modal {
     font-size: 11px;
 }
 
+@media (max-width: 980px) {
+    .isi { padding: 20px 18px 40px; }
+    .dua-kolom {
+        grid-template-columns: 1fr;
+        padding-left: 0;
+    }
+    .produk {
+        padding-left: 0;
+    }
+    .pilihan-kirim {
+        grid-template-columns: 1fr;
+    }
+    .tombol-besar { max-width: none; }
+}
+
+@media (max-width: 560px) {
+    .breadcrumb { font-size: 11px; }
+    .kartu { padding: 16px 14px; }
+    .kepala { gap: 8px; }
+    .kepala h2 { font-size: 14px; }
+    .produk {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .foto-produk {
+        width: 100%;
+        height: 140px;
+    }
+    .detail h3 { font-size: 14px; }
+    .tiga-kolom, .dua-penghitung {
+        grid-template-columns: 1fr;
+    }
+    .tombol, .tombol-garis, .tombol-abu {
+        width: 100%;
+        justify-content: center;
+        font-size: 12px;
+    }
+    .bagian-kirim {
+        align-items: stretch;
+    }
+    .modal { padding: 0; }
+    .modal-kepala, .modal-isi, .modal-kaki { padding-left: 16px; padding-right: 16px; }
+}
+
 .aksi-sukses {
     display: flex;
     justify-content: center;
