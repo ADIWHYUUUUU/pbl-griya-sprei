@@ -130,295 +130,290 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Griya Sprei</title>
+    <title>Dashboard - Griya Sprei</title>
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
 </head>
 <body class="admin-dashboard">
-    <div class="admin-layout">
-        <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
 
-        <main class="dashboard-main">
-            <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
-            <header class="dashboard-header">
-                <div>
-                    <p class="eyebrow">PANEL ADMIN</p>
-                    <h1>Dashboard</h1>
-                    <p class="dashboard-intro">Ringkasan aktivitas toko Griya Sprei.</p>
-                </div>
-            </header>
+<?php require __DIR__ . '/../layouts/sidebar.php'; ?>
 
-            <div id="flashArea" aria-live="polite"></div>
+<main>
+    <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
 
-            <section class="stats-grid" aria-label="Ringkasan toko">
-                <a class="stat-card" href="#daftarPesanan">
-                    <span class="stat-label">Pesanan Baru</span>
-                    <strong class="stat-value"><?= (int) $stats['pesanan_baru'] ?></strong>
-                    <span class="stat-subtext">Menunggu pembayaran</span>
-                </a>
-                <a class="stat-card" href="#verifikasi">
-                    <span class="stat-label">Verifikasi Transfer</span>
-                    <strong class="stat-value"><?= (int) $stats['menunggu_verifikasi'] ?></strong>
-                    <span class="stat-subtext">Menunggu verifikasi</span>
-                </a>
-                <button class="stat-card stat-card-button" type="button" data-modal="modalStok">
-                    <span class="stat-label">Stok Produk</span>
-                    <strong class="stat-value"><?= (int) $stats['total_stok'] ?></strong>
-                    <span class="stat-subtext">Total stok gudang</span>
-                </button>
-            </section>
+    <h1 class="header-title">Dashboard</h1>
 
-            <section class="panel chart-section" aria-labelledby="grafikTitle">
-                <div class="section-header">
-                    <h2 id="grafikTitle">Grafik penjualan</h2>
-                    <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
-                </div>
-                <div class="sales-metrics">
-                    <div class="metric-item">
-                        <small>Total penjualan (<?= $esc($namaBulan[$bulanLaporan - 1] . ' ' . $tahunLaporan) ?>)</small>
-                        <strong><?= $esc($formatRupiah($totalPenjualan)) ?></strong>
-                    </div>
-                    <div class="metric-item">
-                        <small>Transaksi selesai</small>
-                        <strong><?= $jumlahSelesai ?> pesanan</strong>
-                    </div>
-                    <div class="metric-item">
-                        <small>Rata-rata pesanan</small>
-                        <strong><?= $esc($formatRupiah($jumlahTerbayar ? $totalPenjualan / $jumlahTerbayar : 0)) ?></strong>
-                    </div>
-                </div>
-                <div class="bar-chart" role="img" aria-label="Grafik penjualan mingguan pada <?= $esc($namaBulan[$bulanLaporan - 1] . ' ' . $tahunLaporan) ?>">
-                    <?php foreach ($mingguan as $index => $minggu): ?>
-                        <div class="bar-group">
-                            <div class="bars">
-                                <span class="bar bar-a" title="<?= $esc($formatRupiah($minggu['total'])) ?>" style="height: <?= $minggu['total'] ? max(3, (int) round($minggu['total'] / $maksMingguan * 100)) : 0 ?>%"></span>
-                                <span class="bar bar-b" title="<?= (int) $minggu['transaksi'] ?> transaksi" style="height: <?= $minggu['transaksi'] ? max(3, (int) round($minggu['transaksi'] / max(1, ...array_column($mingguan, 'transaksi')) * 100)) : 0 ?>%"></span>
-                            </div>
-                            <span class="bar-label">Minggu <?= $index + 1 ?></span>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <div class="chart-legend">
-                    <span><i class="dot dot-a"></i>Penjualan</span>
-                    <span><i class="dot dot-b"></i>Transaksi</span>
-                </div>
-            </section>
+    <div id="flashArea"></div>
 
-            <section class="panel verification-box" id="verifikasi" aria-labelledby="verifikasiTitle">
-                <div class="section-header"><h2 id="verifikasiTitle">Membutuhkan verifikasi</h2></div>
-                <?php if (!$pesananVerifikasi): ?>
-                    <p class="empty-text">Tidak ada bukti transfer yang menunggu verifikasi.</p>
-                <?php else: ?>
-                    <?php foreach ($pesananVerifikasi as $pesanan): ?>
-                        <div class="verif-item">
-                            <div class="verif-info">
-                                <strong><?= $esc($pesanan['kode'] . ' · ' . $pesanan['nama_pelanggan']) ?></strong>
-                                <span><?= $esc($formatRupiah($pesanan['total'])) ?> · <?= $esc($formatTanggal($pesanan['tanggal_pesan'])) ?></span>
-                            </div>
-                            <button type="button" class="btn-text" <?= $detailAttributes($pesanan) ?>>Lihat pesanan</button>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </section>
+    <section class="stats-grid">
+        <div class="stat-card">
+            <div class="label">Pesanan Baru</div>
+            <div class="value" id="statBaru">0</div>
+            <div class="subtext">Menunggu diproses</div>
+        </div>
 
-            <section class="panel table-box" id="daftarPesanan" aria-labelledby="pesananTitle">
-                <div class="section-header">
-                    <h2 id="pesananTitle">Daftar pesanan terbaru</h2>
-                    <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Kode Pesanan</th>
-                                <th>Pelanggan &amp; Produk</th>
-                                <th>Tanggal</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php if (!$pesananTerbaru): ?>
-                            <tr><td colspan="6" class="empty-text">Belum ada pesanan.</td></tr>
-                        <?php else: ?>
-                            <?php foreach ($pesananTerbaru as $pesanan): ?>
-                                <tr>
-                                    <td><strong><?= $esc($pesanan['kode']) ?></strong></td>
-                                    <td><?= $esc($pesanan['nama_pelanggan']) ?><br><small class="muted"><?= $esc($pesanan['daftar_produk']) ?></small></td>
-                                    <td><?= $esc($formatTanggal($pesanan['tanggal_pesan'])) ?></td>
-                                    <td><?= $esc($formatRupiah($pesanan['total'])) ?></td>
-                                    <td><?= $statusBadge($pesanan['status_pesanan']) ?></td>
-                                    <td><button type="button" class="btn-text" <?= $detailAttributes($pesanan) ?>>Lihat detail</button></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    </div>
+        <a class="stat-card clickable" href="#verifikasi">
+            <div class="label">Verifikasi Transfer</div>
+            <div class="value" id="statVerifikasi">0</div>
+            <div class="subtext">Menunggu verifikasi</div>
+        </a>
 
-    <div class="modal-overlay" id="modalDetail" role="dialog" aria-modal="true" aria-labelledby="judulDetail" aria-hidden="true">
-        <section class="modal-container detail-order-modal">
+        <div class="stat-card clickable" data-modal="modalStok" role="button" tabindex="0">
+            <div class="label">Stok Sprei</div>
+            <div class="value" id="statStok">0</div>
+            <div class="subtext">Total stok gudang</div>
+        </div>
+    </section>
+
+    <section class="chart-section">
+        <div class="section-header">
+            <h3>Grafik penjualan</h3>
+            <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
+        </div>
+
+        <div class="sales-metrics">
+            <div class="metric-item">
+                <small id="mLabelTotal">Total penjualan</small>
+                <div class="m-val" id="mTotal"></div>
+            </div>
+            <div class="metric-item">
+                <small>Transaksi selesai</small>
+                <div class="m-val" id="mSelesai"></div>
+            </div>
+        </div>
+
+        <div class="bar-chart" id="barChart" role="img" aria-label="Grafik penjualan per minggu"></div>
+        <div class="chart-legend">
+            <span><i class="dot dot-a"></i>Penjualan</span>
+            <span><i class="dot dot-b"></i>Transaksi</span>
+        </div>
+    </section>
+
+    <section class="verification-box" id="verifikasi">
+        <div class="section-header">
+            <h3>Membutuhkan verifikasi</h3>
+        </div>
+        <div id="listVerifikasi"></div>
+    </section>
+
+    <section class="table-box" id="daftarPesanan">
+        <div class="section-header">
+            <h3>Daftar pesanan</h3>
+            <button type="button" class="btn-text btn-disabled" disabled>Lihat Pesanan</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kode Pesanan</th>
+                        <th>Pelanggan &amp; Produk</th>
+                        <th>Tanggal</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelPesanan"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- POPUP: DETAIL PESANAN -->
+<div class="modal-overlay" id="modalDetail" role="dialog" aria-modal="true" aria-labelledby="judulDetail" aria-hidden="true">
+    <section class="modal-container detail-order-modal">
+        <div class="modal-form">
             <header class="modal-header">
-                <div>
-                    <h2 id="judulDetail">Detail Pesanan</h2>
-                    <small class="muted" id="dKodeTanggal"></small>
+                <div class="detail-order-heading">
+                    <span class="detail-order-icon" aria-hidden="true">&#9638;</span>
+                    <div>
+                        <h3 id="judulDetail">Detail Pesanan Ringkas</h3>
+                        <small class="muted" id="dKodeTanggal"></small>
+                    </div>
                 </div>
                 <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
             </header>
+
             <div class="modal-body">
                 <div class="detail-order-grid">
-                    <section class="detail-order-card">
-                        <small class="card-label">Pelanggan</small>
-                        <strong id="dNama"></strong>
-                        <p id="dTelepon"></p>
-                        <p id="dAlamat"></p>
-                    </section>
-                    <section class="detail-order-card">
-                        <small class="card-label">Produk pesanan</small>
-                        <p id="dProduk"></p>
-                    </section>
-                    <section class="detail-order-card">
-                        <small class="card-label">Total tagihan</small>
-                        <strong class="price-text" id="dTotal"></strong>
-                        <p id="dPembayaran"></p>
-                    </section>
-                    <section class="detail-order-card">
-                        <small class="card-label">Status Pesanan</small>
-                        <p id="dStatus"></p>
-                        <small class="card-label">Catatan Admin</small>
-                        <p id="dCatatan"></p>
-                    </section>
+                    <div class="detail-order-column">
+                        <section class="detail-order-card">
+                            <small class="card-label">Pelanggan</small>
+                            <strong id="dNama"></strong>
+                            <p class="detail-contact"><span aria-hidden="true">&#9742;</span><span id="dTelepon"></span></p>
+                            <p class="detail-contact"><span aria-hidden="true">&#9679;</span><span id="dAlamat"></span></p>
+                        </section>
+
+                        <section class="detail-order-card detail-product-card">
+                            <small class="card-label">Produk sprei</small>
+                            <div id="dItems"></div>
+                            <p class="detail-customer-note" id="dCatatanPelanggan"></p>
+                        </section>
+                    </div>
+
+                    <div class="detail-order-column">
+                        <section class="detail-order-card detail-total-card">
+                            <small class="card-label">Total tagihan</small>
+                            <p class="price-text" id="dTotal"></p>
+                            <p class="detail-payment-status" id="dMetode"></p>
+                        </section>
+
+                        <section class="detail-order-card detail-edit-card">
+                            <div class="form-group">
+                                <label for="dStatus">Status Pesanan</label>
+                                <input class="form-control" type="text" id="dStatus" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dCatatanAdmin">Catatan untuk Admin</label>
+                                <input class="form-control" type="text" id="dCatatanAdmin" readonly>
+                            </div>
+                        </section>
+                    </div>
                 </div>
             </div>
-        </section>
-    </div>
 
-    <div class="modal-overlay" id="modalStok" role="dialog" aria-modal="true" aria-labelledby="judulStok" aria-hidden="true">
-        <section class="modal-container stock-list-modal">
+            <footer class="modal-footer detail-order-footer" aria-hidden="true"></footer>
+        </div>
+    </section>
+</div>
+
+<!-- POPUP: LIHAT STOK -->
+<div class="modal-overlay" id="modalStok" role="dialog" aria-modal="true" aria-labelledby="judulStok" aria-hidden="true">
+    <section class="modal-container stock-list-modal">
+        <header class="modal-header">
+            <h3 id="judulStok">LIHAT STOK</h3>
+            <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
+        </header>
+        <div class="modal-body">
+            <div id="daftarStok" class="stock-list"></div>
+            <button type="button" class="stock-add-link" data-modal="modalTambahStok">
+                <span aria-hidden="true">+</span> Tambah Stok Sprei
+            </button>
+        </div>
+    </section>
+</div>
+
+<!-- POPUP: TAMBAH / RESTOCK STOK -->
+<div class="modal-overlay" id="modalTambahStok" role="dialog" aria-modal="true" aria-labelledby="judulTambahStok" aria-hidden="true">
+    <section class="modal-container stock-form-modal">
+        <form class="modal-form" id="formStok" novalidate>
             <header class="modal-header">
-                <h2 id="judulStok">Stok Produk</h2>
+                <div class="stock-form-heading">
+                    <span class="stock-form-icon" aria-hidden="true">+</span>
+                    <h3 id="judulTambahStok">Tambah / Restock Stok Sprei</h3>
+                </div>
                 <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
             </header>
-            <div class="modal-body">
-                <div class="stock-list">
-                    <?php if (!$produk): ?>
-                        <p class="empty-text">Belum ada produk di katalog.</p>
-                    <?php else: ?>
-                        <?php foreach ($produk as $item): ?>
-                            <?php $stokItem = (int) $item['stok']; ?>
-                            <div class="stock-row">
-                                <div class="stock-row-heading">
-                                    <span class="stock-name"><?= $esc($item['nama_produk']) ?></span>
-                                    <strong class="stock-qty"><?= $stokItem ?> set</strong>
-                                </div>
-                                <span class="progress" aria-label="Stok <?= $stokItem ?> set">
-                                    <span class="progress-fill" style="width: <?= (int) round($stokItem / $maksStok * 100) ?>%"></span>
-                                </span>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-                <a class="stock-add-link" href="/?page=admin-products">Kelola stok melalui manajemen produk</a>
-            </div>
-        </section>
-    </div>
 
-    <div class="modal-overlay" id="modalLaporan" role="dialog" aria-modal="true" aria-labelledby="judulLaporan" aria-hidden="true">
-        <section class="modal-container modal-lg">
-            <header class="modal-header report-modal-header">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="selectProduk">PILIH VARIAN SPREI READY</label>
+                    <select class="form-control" id="selectProduk"></select>
+                </div>
+
+                <div class="stock-status-panel">
+                    <div>
+                        <small>Stok Saat Ini</small>
+                        <strong id="infoStok">-</strong>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputJumlah">JUMLAH TAMBAHAN STOK (SET)</label>
+                    <div class="stepper stock-stepper">
+                        <button type="button" class="step-btn" data-step="-1" aria-label="Kurangi">&minus;</button>
+                        <input class="form-control" type="number" id="inputJumlah" min="1" max="10000" value="1">
+                        <button type="button" class="step-btn" data-step="1" aria-label="Tambah">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group stock-source-group">
+                    <label for="selectSumber">SUMBER MASUK / KETERANGAN (OPSIONAL)</label>
+                    <select class="form-control" id="selectSumber"></select>
+                    <input class="form-control" type="text" id="inputKeterangan" maxlength="255" placeholder="Catatan tambahan (misal: Selesai jahit Mbak Siti).">
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close>Batal</button>
+                <button type="submit" class="btn btn-primary"><span aria-hidden="true">&#10003;</span> Simpan Tambah Stok</button>
+            </footer>
+        </form>
+    </section>
+</div>
+
+<!-- POPUP: LAPORAN BULANAN -->
+<div class="modal-overlay" id="modalLaporan" role="dialog" aria-modal="true" aria-labelledby="judulLaporan" aria-hidden="true">
+    <section class="modal-container modal-lg">
+        <header class="modal-header report-modal-header">
+            <div class="report-heading">
+                <span class="report-heading-icon" aria-hidden="true">&#128202;</span>
                 <div>
-                    <h2 id="judulLaporan">Laporan Penjualan Bulanan</h2>
-                    <small class="muted">Ringkasan transaksi berdasarkan data pesanan tersimpan.</small>
+                    <h3 id="judulLaporan">Laporan &amp; Ringkasan Penjualan Bulanan</h3>
+                    <small class="muted">Ikhtisar grafik performa penjualan dan rekapitulasi transaksi bulanan</small>
                 </div>
-                <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
-            </header>
-            <div class="modal-body">
-                <form class="report-filter" action="/?page=admin-dashboard#modalLaporan" method="get">
-                    <input type="hidden" name="halaman" value="1">
-                    <label for="lapBulan">Bulan</label>
-                    <select id="lapBulan" name="bulan">
-                        <?php foreach ($namaBulan as $index => $bulan): ?>
-                            <option value="<?= $index + 1 ?>" <?= $bulanLaporan === $index + 1 ? 'selected' : '' ?>><?= $esc($bulan) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="lapTahun">Tahun</label>
-                    <select id="lapTahun" name="tahun">
-                        <?php for ($tahun = $tahunSekarang - 5; $tahun <= $tahunSekarang + 1; $tahun++): ?>
-                            <option value="<?= $tahun ?>" <?= $tahunLaporan === $tahun ? 'selected' : '' ?>><?= $tahun ?></option>
-                        <?php endfor; ?>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Terapkan</button>
-                </form>
-
-                <div class="report-summary">
-                    <div class="report-summary-card">
-                        <small>Total penjualan</small>
-                        <strong class="summary-val"><?= $esc($formatRupiah($totalPenjualan)) ?></strong>
-                    </div>
-                    <div class="report-summary-card">
-                        <small>Pesanan selesai</small>
-                        <strong class="summary-val"><?= $jumlahSelesai ?> pesanan</strong>
-                    </div>
-                </div>
-                <section class="report-panel">
-                    <h3 class="report-title">Tren penjualan mingguan (<?= $esc($namaBulan[$bulanLaporan - 1] . ' ' . $tahunLaporan) ?>)</h3>
-                    <div class="trend-grid">
-                        <?php foreach ($mingguan as $index => $minggu): ?>
-                            <?php
-                            $hariAwal = $index * 7 + 1;
-                            $hariAkhir = min(($index + 1) * 7, $tanggalAkhirBulan);
-                            $tinggi = $minggu['total'] ? max(8, (int) round($minggu['total'] / $maksMingguan * 100)) : 0;
-                            ?>
-                            <div class="trend-item">
-                                <strong><?= $esc($formatRupiah($minggu['total'])) ?></strong>
-                                <div class="trend-bar-track"><span class="trend-bar" style="height: <?= $tinggi ?>%"></span></div>
-                                <span>Minggu <?= $index + 1 ?></span>
-                                <small><?= $hariAwal ?>–<?= $hariAkhir ?> <?= $esc(substr($namaBulan[$bulanLaporan - 1], 0, 3)) ?></small>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </section>
-                <section class="report-table-panel">
-                    <h3 class="report-title">Pesanan pada <?= $esc($namaBulan[$bulanLaporan - 1] . ' ' . $tahunLaporan) ?></h3>
-                    <div class="table-wrap">
-                        <table class="report-table">
-                            <thead><tr><th>Invoice / kode</th><th>Tanggal</th><th>Pelanggan &amp; produk</th><th>Total</th><th>Status</th></tr></thead>
-                            <tbody>
-                            <?php if (!$pesananLaporanHalaman): ?>
-                                <tr><td colspan="5" class="empty-text">Belum ada pesanan pada periode ini.</td></tr>
-                            <?php else: ?>
-                                <?php foreach ($pesananLaporanHalaman as $pesanan): ?>
-                                    <tr>
-                                        <td><?= $esc($pesanan['kode']) ?></td>
-                                        <td><?= $esc($formatTanggal($pesanan['tanggal_pesan'])) ?></td>
-                                        <td><?= $esc($pesanan['nama_pelanggan']) ?><br><small class="muted"><?= $esc($pesanan['daftar_produk']) ?></small></td>
-                                        <td><?= $esc($formatRupiah($pesanan['total'])) ?></td>
-                                        <td><?= $statusBadge($pesanan['status_pesanan']) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    <nav class="report-pagination" aria-label="Halaman laporan">
-                        <?php if ($halamanLaporan > 1): ?>
-                            <a href="/?page=admin-dashboard&amp;bulan=<?= $bulanLaporan ?>&amp;tahun=<?= $tahunLaporan ?>&amp;halaman=<?= $halamanLaporan - 1 ?>#modalLaporan" aria-label="Halaman sebelumnya">&lsaquo;</a>
-                        <?php else: ?><span aria-disabled="true">&lsaquo;</span><?php endif; ?>
-                        <strong aria-live="polite"><?= $halamanLaporan ?> / <?= $jumlahHalamanLaporan ?></strong>
-                        <?php if ($halamanLaporan < $jumlahHalamanLaporan): ?>
-                            <a href="/?page=admin-dashboard&amp;bulan=<?= $bulanLaporan ?>&amp;tahun=<?= $tahunLaporan ?>&amp;halaman=<?= $halamanLaporan + 1 ?>#modalLaporan" aria-label="Halaman berikutnya">&rsaquo;</a>
-                        <?php else: ?><span aria-disabled="true">&rsaquo;</span><?php endif; ?>
-                    </nav>
-                </section>
             </div>
-        </section>
-    </div>
+            <div class="report-controls">
+                <label class="sr-only" for="lapBulan">Pilih bulan laporan</label>
+                <select class="report-select" id="lapBulan"></select>
+                <label class="sr-only" for="lapTahun">Pilih tahun laporan</label>
+                <select class="report-select" id="lapTahun"></select>
+                <button type="button" class="btn btn-primary" id="terapkanLaporan">Terapkan</button>
+                <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
+            </div>
+        </header>
 
-    <script src="/assets/js/admin/sidebar.js"></script>
-    <script src="/assets/js/admin/dashboard.js"></script>
+        <div class="modal-body">
+            <div class="report-summary">
+                <div class="report-summary-card">
+                    <small>Total penjualan</small>
+                    <div class="summary-val" id="lapTotal"></div>
+                </div>
+                <div class="report-summary-card">
+                    <small>Transaksi selesai</small>
+                    <div class="summary-line">
+                        <div class="summary-val" id="lapSelesai"></div>
+                        <span class="period-badge">30 Hari</span>
+                    </div>
+                    <small class="summary-note" id="lapTerbayar"></small>
+                </div>
+            </div>
+
+            <section class="report-panel">
+                <h4 class="report-title" id="judulTren"></h4>
+                <div class="trend-grid" id="lapTren"></div>
+            </section>
+
+            <section class="report-table-panel">
+                <h4 class="report-title">Daftar pesanan &amp; transaksi terverifikasi (30 hari terakhir)</h4>
+                <div class="table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>No. invoice / kode</th>
+                                <th>Tanggal</th>
+                                <th>Pelanggan &amp; produk</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lapTabel"></tbody>
+                    </table>
+                </div>
+                <div class="report-pagination">
+                    <div class="pagination-controls" aria-label="Halaman laporan">
+                        <button type="button" id="lapSebelumnya" aria-label="Halaman sebelumnya">&lsaquo;</button>
+                        <span id="lapNomorHalaman" aria-live="polite"></span>
+                        <button type="button" id="lapBerikutnya" aria-label="Halaman berikutnya">&rsaquo;</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+</div>
+
+<script src="/assets/js/admin/sidebar.js"></script>
+<script src="/assets/js/admin/dashboard.js"></script>
 </body>
 </html>
