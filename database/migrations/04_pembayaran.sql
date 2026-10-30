@@ -1,3 +1,11 @@
+CREATE TYPE metode_pembayaran_enum AS ENUM (
+    'TRANSFER_BCA', 'TRANSFER_BRI', 'TRANSFER_BSI', 'TRANSFER_MANDIRI'
+);
+
+CREATE TYPE status_pembayaran_enum AS ENUM (
+    'MENUNGGU_VERIFIKASI', 'TERVERIFIKASI', 'DITOLAK'
+);
+
 CREATE TABLE pembayaran (
     id_pembayaran        SERIAL PRIMARY KEY,
     id_pesanan           INTEGER                 NOT NULL REFERENCES pesanan(id_pesanan) ON DELETE RESTRICT,
@@ -8,12 +16,4 @@ CREATE TABLE pembayaran (
     tanggal_upload       TIMESTAMP               NOT NULL DEFAULT now(),
     tanggal_verifikasi   TIMESTAMP               NOT NULL DEFAULT now(),
     catatan_admin        TEXT
-);
-
-CREATE TYPE metode_pembayaran_enum AS ENUM (
-    'TRANSFER_BCA', 'TRANSFER_BRI', 'TRANSFER_BSI', 'TRANSFER_MANDIRI'
-);
-
-CREATE TYPE status_pembayaran_enum AS ENUM (
-    'MENUNGGU_VERIFIKASI', 'TERVERIFIKASI', 'DITOLAK'
 );

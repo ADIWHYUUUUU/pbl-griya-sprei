@@ -254,6 +254,12 @@
   font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
 }
 
+.admin-orders .admin-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
 .admin-orders .sidebar {
   flex-basis: 195px;
   width: 195px;

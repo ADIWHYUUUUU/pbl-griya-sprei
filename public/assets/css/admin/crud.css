@@ -1,3 +1,9 @@
+.admin-products .admin-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
 .admin-products .product-header {
   display: flex;
   align-items: flex-end;

@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/CartModel.php';
-
 class OrderModel
 {
     private PDO $pdo;
@@ -87,17 +85,14 @@ class OrderModel
                 ]);
             }
 
-            $cartModel = new CartModel($this->pdo);
-            if ($cartModel->isStorageReady()) {
-                $cartStatement = $this->pdo->prepare(
-                    'DELETE FROM keranjang_pelanggan WHERE id_user = :id_user AND item_id = :item_id'
-                );
-                foreach ($order['cart_item_ids'] as $itemId) {
-                    $cartStatement->execute([
-                        ':id_user' => $order['id_user'],
-                        ':item_id' => $itemId,
-                    ]);
-                }
+            $cartStatement = $this->pdo->prepare(
+                'DELETE FROM keranjang_pelanggan WHERE id_user = :id_user AND item_id = :item_id'
+            );
+            foreach ($order['cart_item_ids'] as $itemId) {
+                $cartStatement->execute([
+                    ':id_user' => $order['id_user'],
+                    ':item_id' => $itemId,
+                ]);
             }
 
             $this->pdo->commit();

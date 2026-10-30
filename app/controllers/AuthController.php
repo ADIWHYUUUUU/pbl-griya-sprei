@@ -78,23 +78,21 @@ class AuthController
 
         global $pdo;
         $cartModel = new CartModel($pdo);
-        $cartStorageReady = $cartModel->isStorageReady();
         $cart = array_replace(
-            $cartStorageReady ? $cartModel->getCart((int) $user['id_user']) : [],
+            $cartModel->getCart((int) $user['id_user']),
             $sessionCart,
             $pendingCart
         );
-        if ($cartStorageReady) {
-            foreach ($cart as $itemId => $item) {
-                if (is_string($itemId) && is_array($item)) {
-                    $cartModel->saveItem((int) $user['id_user'], $itemId, $item);
-                }
+        foreach ($cart as $itemId => $item) {
+            if (is_string($itemId) && is_array($item)) {
+                $cartModel->saveItem((int) $user['id_user'], $itemId, $item);
             }
         }
 
         // Simpan session customer
         session_regenerate_id(true);
         $_SESSION = [];
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         $_SESSION['login'] = true;
         $_SESSION['id_user'] = $user['id_user'];
         $_SESSION['nama'] = $user['nama'];
@@ -150,6 +148,7 @@ class AuthController
 
         session_regenerate_id(true);
         $_SESSION = [];
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         $_SESSION['login'] = true;
         $_SESSION['nama'] = $isConfiguredAdmin ? 'Admin' : $user['nama'];
         $_SESSION['email'] = $email;
@@ -229,6 +228,7 @@ class AuthController
         if (!$hasAdminSession) {
             session_regenerate_id(true);
             $_SESSION = [];
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             $_SESSION['login'] = true;
             $_SESSION['id_user'] = $adminId;
             $_SESSION['nama'] = $nama;
@@ -378,7 +378,7 @@ class AuthController
         }
 
         if ($role === 'CUSTOMER') {
-            $anonymousSession = array_intersect_key($_SESSION, array_flip(['cart', 'pending_cart']));
+            $anonymousSession = array_intersect_key($_SESSION, ['pending_cart' => true]);
             session_regenerate_id(true);
             $_SESSION = $anonymousSession;
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

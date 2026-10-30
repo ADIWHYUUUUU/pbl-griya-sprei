@@ -1,3 +1,5 @@
+CREATE TYPE tipe_ukuran_enum AS ENUM ('STANDAR', 'CUSTOM');
+
 CREATE TABLE detail_pesanan (
     id_detail       SERIAL PRIMARY KEY,
     id_pesanan      INTEGER           NOT NULL REFERENCES pesanan(id_pesanan) ON DELETE CASCADE,
@@ -12,5 +14,3 @@ CREATE TABLE detail_pesanan (
     tambah_sargul   INTEGER           NOT NULL DEFAULT 0 CHECK (tambah_sargul >= 0),
     catatan_pesanan TEXT
 );
-
-CREATE TYPE tipe_ukuran_enum AS ENUM ('STANDAR', 'CUSTOM');

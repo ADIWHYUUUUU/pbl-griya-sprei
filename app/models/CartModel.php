@@ -18,6 +18,7 @@ class CartModel
 
     public function getCart(int $userId): array
     {
+        $this->assertStorageReady();
         $statement = $this->pdo->prepare(
             'SELECT item_id, item_data
             FROM keranjang_pelanggan
@@ -40,6 +41,7 @@ class CartModel
 
     public function saveItem(int $userId, string $itemId, array $item): void
     {
+        $this->assertStorageReady();
         $statement = $this->pdo->prepare(
             'INSERT INTO keranjang_pelanggan (id_user, item_id, item_data)
             VALUES (:id_user, :item_id, CAST(:item_data AS JSONB))
@@ -55,6 +57,7 @@ class CartModel
 
     public function removeItem(int $userId, string $itemId): void
     {
+        $this->assertStorageReady();
         $statement = $this->pdo->prepare(
             'DELETE FROM keranjang_pelanggan
             WHERE id_user = :id_user AND item_id = :item_id'
@@ -63,6 +66,15 @@ class CartModel
             ':id_user' => $userId,
             ':item_id' => $itemId,
         ]);
+    }
+
+    private function assertStorageReady(): void
+    {
+        if (!$this->isStorageReady()) {
+            throw new RuntimeException(
+                'Penyimpanan keranjang belum tersedia. Jalankan migrasi 06_keranjang_pelanggan.sql.'
+            );
+        }
     }
 
 }

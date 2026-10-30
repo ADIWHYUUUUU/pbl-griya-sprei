@@ -1,3 +1,7 @@
+CREATE TYPE kategori_produk_enum AS ENUM (
+    'SPREI', 'BED_COVER'
+);
+
 CREATE TABLE produk (
     id_produk       SERIAL PRIMARY KEY,
     nama_produk     VARCHAR(150)         NOT NULL,
@@ -10,8 +14,4 @@ CREATE TABLE produk (
     deskripsi       TEXT,
     gambar_produk   VARCHAR(255)         NOT NULL,
     created_at      TIMESTAMP            NOT NULL DEFAULT now()
-);
-
-CREATE TYPE kategori_produk_enum AS ENUM (
-    'SPREI', 'BED_COVER'
 );

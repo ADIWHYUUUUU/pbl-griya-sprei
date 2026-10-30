@@ -183,7 +183,10 @@ class OrderController
             array_map(static function (array $item): array {
                 return [
                     'id_produk' => $item['id_produk'],
-                    'tipe_ukuran' => strtoupper($item['mode']),
+                    'tipe_ukuran' => match ($item['mode']) {
+                        'standard' => 'STANDAR',
+                        'custom' => 'CUSTOM',
+                    },
                     'jumlah' => $item['jumlah'],
                     'harga_satuan' => $item['harga_satuan'],
                     'panjang' => $item['panjang'],
@@ -347,7 +350,7 @@ class OrderController
         }
 
         $cart[$itemId] = $item;
-        $cartPersisted = $this->persistCartItem($itemId, $item);
+        $this->persistCartItem($itemId, $item);
         $_SESSION['cart'] = $cart;
 
         $this->setCartMessage('Produk berhasil ditambahkan ke keranjang.', 'success');
@@ -455,14 +458,12 @@ class OrderController
         }
 
         $cart[$itemId]['qtySprei'] = $quantity;
-        $cartPersisted = $this->persistCartItem($itemId, $cart[$itemId]);
+        $this->persistCartItem($itemId, $cart[$itemId]);
         $_SESSION['cart'] = $cart;
         $this->setCartMessage(
-            !$cartPersisted
-                ? 'Keranjang diperbarui di sesi browser. Jalankan migrasi keranjang agar tersimpan permanen di akun.'
-                : (($_POST['edit_cart'] ?? '') === '1'
-                    ? 'Pesanan berhasil diperbarui.'
-                    : 'Jumlah pesanan berhasil diperbarui.'),
+            ($_POST['edit_cart'] ?? '') === '1'
+                ? 'Pesanan berhasil diperbarui.'
+                : 'Jumlah pesanan berhasil diperbarui.',
             'success'
         );
         $this->redirect('/?page=customer-cart');
@@ -489,9 +490,7 @@ class OrderController
 
         global $pdo;
         $cartModel = new CartModel($pdo);
-        if ($cartModel->isStorageReady()) {
-            $cartModel->removeItem((int) $_SESSION['id_user'], $itemId);
-        }
+        $cartModel->removeItem((int) $_SESSION['id_user'], $itemId);
         unset($_SESSION['cart'][$itemId]);
         $this->setCartMessage('Item berhasil dihapus dari keranjang.', 'success');
         $this->redirect('/?page=customer-cart');
@@ -507,7 +506,7 @@ class OrderController
         return $integer === false ? null : $integer;
     }
 
-    private function persistCartItem(string $itemId, array $item): bool
+    private function persistCartItem(string $itemId, array $item): void
     {
         global $pdo;
 
@@ -519,12 +518,7 @@ class OrderController
         }
 
         $cartModel = new CartModel($pdo);
-        if (!$cartModel->isStorageReady()) {
-            return false;
-        }
-
         $cartModel->saveItem($userId, $itemId, $item);
-        return true;
     }
 
     private function hasValidCsrfToken(): bool
