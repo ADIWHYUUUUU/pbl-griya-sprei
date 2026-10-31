@@ -9,6 +9,115 @@ class OrderModel
         $this->pdo = $pdo;
     }
 
+    public function getCustomerOrders(int $customerId): array
+    {
+        $statement = $this->pdo->prepare(
+            "SELECT
+                p.id_pesanan,
+                COALESCE(p.no_invoice, 'ORD-' || p.id_pesanan::text) AS kode,
+                p.tanggal_pesan,
+                p.tanggal_verifikasi_admin,
+                p.status_pesanan::text AS status_pesanan,
+                p.alamat_pengiriman,
+                p.catatan_alamat,
+                p.metode_pengiriman::text AS metode_pengiriman,
+                p.catatan_pengiriman,
+                p.nomor_resi,
+                p.ongkir,
+                p.diskon,
+                pembayaran_terbaru.status_pembayaran::text AS status_pembayaran,
+                pembayaran_terbaru.metode_pembayaran::text AS metode_pembayaran,
+                pembayaran_terbaru.nominal_transfer,
+                pembayaran_terbaru.tanggal_upload,
+                pembayaran_terbaru.catatan_admin,
+                d.id_detail,
+                d.tipe_ukuran::text AS tipe_ukuran,
+                d.jumlah,
+                d.panjang,
+                d.lebar,
+                d.tinggi,
+                d.tambah_sarban,
+                d.tambah_sargul,
+                d.catatan_pesanan,
+                COALESCE(d.harga_satuan, produk.harga_dasar) AS harga_satuan,
+                produk.nama_produk,
+                produk.gambar_produk
+            FROM pesanan p
+            LEFT JOIN detail_pesanan d ON d.id_pesanan = p.id_pesanan
+            LEFT JOIN produk ON produk.id_produk = d.id_produk
+            LEFT JOIN LATERAL (
+                SELECT
+                    status_pembayaran,
+                    metode_pembayaran,
+                    nominal_transfer,
+                    tanggal_upload,
+                    catatan_admin
+                FROM pembayaran
+                WHERE id_pesanan = p.id_pesanan
+                ORDER BY tanggal_upload DESC, id_pembayaran DESC
+                LIMIT 1
+            ) pembayaran_terbaru ON TRUE
+            WHERE p.id_user = :customer_id
+            ORDER BY p.tanggal_pesan DESC, p.id_pesanan DESC, d.id_detail"
+        );
+        $statement->execute([':customer_id' => $customerId]);
+
+        $orders = [];
+        foreach ($statement->fetchAll() as $row) {
+            $orderId = (int) $row['id_pesanan'];
+            if (!isset($orders[$orderId])) {
+                $orders[$orderId] = [
+                    'id_pesanan' => $orderId,
+                    'kode' => (string) $row['kode'],
+                    'tanggal_pesan' => $row['tanggal_pesan'],
+                    'tanggal_verifikasi_admin' => $row['tanggal_verifikasi_admin'],
+                    'status_pesanan' => (string) $row['status_pesanan'],
+                    'alamat_pengiriman' => (string) $row['alamat_pengiriman'],
+                    'catatan_alamat' => (string) ($row['catatan_alamat'] ?? ''),
+                    'metode_pengiriman' => (string) $row['metode_pengiriman'],
+                    'catatan_pengiriman' => (string) ($row['catatan_pengiriman'] ?? ''),
+                    'nomor_resi' => (string) ($row['nomor_resi'] ?? ''),
+                    'ongkir' => (float) $row['ongkir'],
+                    'diskon' => (float) $row['diskon'],
+                    'status_pembayaran' => (string) ($row['status_pembayaran'] ?? ''),
+                    'metode_pembayaran' => (string) ($row['metode_pembayaran'] ?? ''),
+                    'nominal_transfer' => $row['nominal_transfer'] === null
+                        ? null
+                        : (float) $row['nominal_transfer'],
+                    'tanggal_upload' => $row['tanggal_upload'],
+                    'catatan_admin' => (string) ($row['catatan_admin'] ?? ''),
+                    'produk' => [],
+                    'subtotal' => 0.0,
+                ];
+            }
+
+            if ($row['id_detail'] !== null) {
+                $quantity = (int) $row['jumlah'];
+                $price = (float) $row['harga_satuan'];
+                $orders[$orderId]['produk'][] = [
+                    'nama' => (string) $row['nama_produk'],
+                    'gambar' => (string) ($row['gambar_produk'] ?? ''),
+                    'tipe_ukuran' => (string) $row['tipe_ukuran'],
+                    'jumlah' => $quantity,
+                    'panjang' => (int) $row['panjang'],
+                    'lebar' => (int) $row['lebar'],
+                    'tinggi' => (int) $row['tinggi'],
+                    'tambah_sarban' => (int) $row['tambah_sarban'],
+                    'tambah_sargul' => (int) $row['tambah_sargul'],
+                    'catatan' => (string) ($row['catatan_pesanan'] ?? ''),
+                ];
+                $orders[$orderId]['subtotal'] += $price * $quantity;
+            }
+        }
+
+        foreach ($orders as &$order) {
+            $order['total'] = max(0, $order['subtotal'] + $order['ongkir'] - $order['diskon']);
+        }
+        unset($order);
+
+        return array_values($orders);
+    }
+
     public function createOrder(array $order, array $items): array
     {
         $this->pdo->beginTransaction();

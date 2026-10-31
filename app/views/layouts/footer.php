@@ -67,7 +67,7 @@ $isCustomerLoggedIn = ($_SESSION['login'] ?? false) === true
             <ul class="footer__list">
                 <li><a href="/?page=customer-catalog">Katalog</a></li>
                 <?php if ($isCustomerLoggedIn): ?>
-                    <li><span aria-disabled="true">Pesanan Saya</span></li>
+                    <li><a href="/?page=customer-orders">Pesanan Saya</a></li>
                 <?php endif; ?>
             </ul>
         </div>

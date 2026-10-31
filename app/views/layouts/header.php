@@ -32,7 +32,7 @@ $activeNavPage = match ($currentPage) {
     'index.php', 'customer-home' => 'home',
     'customer-catalog', 'customer-detail' => 'catalog',
     'customer-cart' => '',
-    'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
+    'customer-orders', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
     default => '',
 };
 
@@ -66,11 +66,11 @@ $activeNavPage = match ($currentPage) {
             Katalog
         </a>
         <?php if ($isLogin): ?>
-            <span
+            <a href="/?page=customer-orders"
                 class="nav__link<?= $activeNavPage === 'orders' ? ' nav__link--active' : ''; ?>"
-                aria-disabled="true">
+                <?= $activeNavPage === 'orders' ? 'aria-current="page"' : ''; ?>>
                 Pesanan Saya
-            </span>
+            </a>
         <?php endif; ?>
     </nav>
 
