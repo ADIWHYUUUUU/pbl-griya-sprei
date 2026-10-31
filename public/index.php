@@ -24,7 +24,8 @@ if ($action !== '') {
 	$isProductAction = in_array($action, $productActions, true);
 	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove', 'customer-checkout-start'], true);
 	$isOrderAction = $action === 'customer-order-create';
-	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction) {
+	$isAdminOrderAction = $action === 'admin-order-verify';
+	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -35,14 +36,17 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction) {
+	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
 	}
 
 	try {
-		if ($isCartAction || $isOrderAction) {
+		if ($isAdminOrderAction) {
+			require_once __DIR__ . '/../app/controllers/AdminOrderController.php';
+			(new AdminOrderController())->verify();
+		} elseif ($isCartAction || $isOrderAction) {
 			require_once __DIR__ . '/../app/controllers/OrderController.php';
 			$controller = new OrderController();
 			if ($isOrderAction) {
@@ -79,6 +83,13 @@ if ($action !== '') {
 		} elseif ($isOrderAction) {
 			$_SESSION['checkout_message'] = 'Pesanan gagal disimpan. Silakan coba lagi.';
 			header('Location: /?page=customer-checkout', true, 303);
+		} elseif ($isAdminOrderAction) {
+			$_SESSION['admin_order_message'] = [
+				'type' => 'error',
+				'text' => 'Verifikasi pesanan gagal disimpan. Silakan coba lagi.',
+			];
+			http_response_code(303);
+			header('Location: /?page=admin-orders', true, 303);
 		} elseif ($isProductAction) {
 			echo 'Produk gagal disimpan. Silakan coba lagi.';
 		} else {
@@ -99,6 +110,14 @@ if (
 	$_SESSION['cart_message'] = 'Silakan login dengan akun customer untuk mengakses Pesanan Saya.';
 	$_SESSION['cart_message_type'] = 'error';
 	header('Location: /?page=customer-login', true, 303);
+	exit;
+}
+
+if (
+	in_array($page, ['admin-orders', 'admin-order-verification'], true)
+	&& (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'ADMIN')
+) {
+	header('Location: /?page=admin-login', true, 303);
 	exit;
 }
 

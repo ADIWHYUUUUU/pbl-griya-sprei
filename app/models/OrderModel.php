@@ -23,6 +23,7 @@ class OrderModel
                 p.metode_pengiriman::text AS metode_pengiriman,
                 p.catatan_pengiriman,
                 p.nomor_resi,
+                p.tagihan_pokok,
                 p.ongkir,
                 p.diskon,
                 pembayaran_terbaru.status_pembayaran::text AS status_pembayaran,
@@ -77,6 +78,9 @@ class OrderModel
                     'metode_pengiriman' => (string) $row['metode_pengiriman'],
                     'catatan_pengiriman' => (string) ($row['catatan_pengiriman'] ?? ''),
                     'nomor_resi' => (string) ($row['nomor_resi'] ?? ''),
+                    'tagihan_pokok' => $row['tagihan_pokok'] === null
+                        ? null
+                        : (float) $row['tagihan_pokok'],
                     'ongkir' => (float) $row['ongkir'],
                     'diskon' => (float) $row['diskon'],
                     'status_pembayaran' => (string) ($row['status_pembayaran'] ?? ''),
@@ -111,11 +115,145 @@ class OrderModel
         }
 
         foreach ($orders as &$order) {
-            $order['total'] = max(0, $order['subtotal'] + $order['ongkir'] - $order['diskon']);
+            $principal = $order['tagihan_pokok'] ?? $order['subtotal'];
+            $order['total'] = max(0, $principal + $order['ongkir'] - $order['diskon']);
         }
         unset($order);
 
         return array_values($orders);
+    }
+
+    public function getOrderForVerification(int $orderId): ?array
+    {
+        $statement = $this->pdo->prepare(
+            "SELECT
+                p.id_pesanan,
+                COALESCE(p.no_invoice, 'ORD-' || p.id_pesanan::text) AS kode,
+                p.status_pesanan::text AS status_pesanan,
+                p.alamat_pengiriman,
+                p.catatan_alamat,
+                p.metode_pengiriman::text AS metode_pengiriman,
+                p.catatan_pengiriman,
+                p.tagihan_pokok,
+                p.ongkir,
+                p.diskon,
+                u.nama AS nama_pelanggan,
+                u.email AS email_pelanggan,
+                u.no_hp AS telepon_pelanggan,
+                d.id_detail,
+                d.tipe_ukuran::text AS tipe_ukuran,
+                d.jumlah,
+                d.panjang,
+                d.lebar,
+                d.tinggi,
+                d.tambah_sarban,
+                d.tambah_sargul,
+                d.catatan_pesanan,
+                COALESCE(d.harga_satuan, produk.harga_dasar) AS harga_satuan,
+                produk.nama_produk,
+                produk.gambar_produk
+            FROM pesanan p
+            JOIN \"user\" u ON u.id_user = p.id_user
+            LEFT JOIN detail_pesanan d ON d.id_pesanan = p.id_pesanan
+            LEFT JOIN produk ON produk.id_produk = d.id_produk
+            WHERE p.id_pesanan = :order_id
+            ORDER BY d.id_detail"
+        );
+        $statement->execute([':order_id' => $orderId]);
+        $rows = $statement->fetchAll();
+        if ($rows === []) {
+            return null;
+        }
+
+        $first = $rows[0];
+        $order = [
+            'id_pesanan' => (int) $first['id_pesanan'],
+            'kode' => (string) $first['kode'],
+            'status_pesanan' => (string) $first['status_pesanan'],
+            'alamat_pengiriman' => (string) $first['alamat_pengiriman'],
+            'catatan_alamat' => (string) ($first['catatan_alamat'] ?? ''),
+            'metode_pengiriman' => (string) $first['metode_pengiriman'],
+            'catatan_pengiriman' => (string) ($first['catatan_pengiriman'] ?? ''),
+            'tagihan_pokok' => $first['tagihan_pokok'] === null ? null : (float) $first['tagihan_pokok'],
+            'ongkir' => (float) $first['ongkir'],
+            'diskon' => (float) $first['diskon'],
+            'nama_pelanggan' => (string) $first['nama_pelanggan'],
+            'email_pelanggan' => (string) $first['email_pelanggan'],
+            'telepon_pelanggan' => (string) $first['telepon_pelanggan'],
+            'produk' => [],
+            'subtotal' => 0.0,
+        ];
+
+        foreach ($rows as $row) {
+            if ($row['id_detail'] === null) {
+                continue;
+            }
+
+            $quantity = (int) $row['jumlah'];
+            $price = (float) $row['harga_satuan'];
+            $order['produk'][] = [
+                'nama' => (string) $row['nama_produk'],
+                'gambar' => (string) ($row['gambar_produk'] ?? ''),
+                'tipe_ukuran' => (string) $row['tipe_ukuran'],
+                'jumlah' => $quantity,
+                'panjang' => (int) $row['panjang'],
+                'lebar' => (int) $row['lebar'],
+                'tinggi' => (int) $row['tinggi'],
+                'tambah_sarban' => (int) $row['tambah_sarban'],
+                'tambah_sargul' => (int) $row['tambah_sargul'],
+                'catatan' => (string) ($row['catatan_pesanan'] ?? ''),
+                'subtotal' => $price * $quantity,
+            ];
+            $order['subtotal'] += $price * $quantity;
+        }
+
+        return $order;
+    }
+
+    public function verifyOrder(int $orderId, int $principal, int $shipping, int $discount): bool
+    {
+        $this->pdo->beginTransaction();
+        try {
+            $lock = $this->pdo->prepare(
+                'SELECT status_pesanan::text FROM pesanan WHERE id_pesanan = :order_id FOR UPDATE'
+            );
+            $lock->execute([':order_id' => $orderId]);
+            if ($lock->fetchColumn() !== 'MENUNGGU_VERIFIKASI') {
+                $this->pdo->rollBack();
+                return false;
+            }
+
+            $hasItems = $this->pdo->prepare(
+                'SELECT EXISTS (SELECT 1 FROM detail_pesanan WHERE id_pesanan = :order_id)'
+            );
+            $hasItems->execute([':order_id' => $orderId]);
+            if (!$hasItems->fetchColumn()) {
+                throw new UnexpectedValueException('Pesanan tidak memiliki detail produk.');
+            }
+
+            $update = $this->pdo->prepare(
+                "UPDATE pesanan
+                SET tagihan_pokok = :tagihan_pokok,
+                    ongkir = :ongkir,
+                    diskon = :diskon,
+                    status_pesanan = 'MENUNGGU_PEMBAYARAN',
+                    tanggal_verifikasi_admin = CURRENT_TIMESTAMP
+                WHERE id_pesanan = :order_id"
+            );
+            $update->execute([
+                ':tagihan_pokok' => $principal,
+                ':ongkir' => $shipping,
+                ':diskon' => $discount,
+                ':order_id' => $orderId,
+            ]);
+            $this->pdo->commit();
+            return true;
+        } catch (Throwable $error) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $error;
+        }
     }
 
     public function createOrder(array $order, array $items): array

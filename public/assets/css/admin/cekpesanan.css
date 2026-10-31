@@ -594,6 +594,9 @@
 }
 
 .order-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 57px;
   min-height: 24px;
   padding: 4px 9px;
@@ -603,6 +606,27 @@
   color: #586655;
   font-size: 9px;
   cursor: pointer;
+  text-decoration: none;
+}
+
+.verification-flash {
+  margin-bottom: 16px;
+  padding: 12px 15px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.verification-flash--success {
+  border-color: #b6d2b7;
+  background: #edf6ed;
+  color: #315b34;
+}
+
+.verification-flash--error {
+  border-color: #e6b8b8;
+  background: #fff1f1;
+  color: #923838;
 }
 
 .order-action:hover {

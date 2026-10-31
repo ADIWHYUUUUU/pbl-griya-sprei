@@ -15,6 +15,8 @@ require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../models/DashboardModel.php';
 
 $orders = (new DashboardModel($pdo))->getRecentOrders(100);
+$flash = $_SESSION['admin_order_message'] ?? null;
+unset($_SESSION['admin_order_message']);
 $escape = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
@@ -108,6 +110,12 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
                     <h1>Cek Pesanan</h1>
                 </div>
             </header>
+
+            <?php if (is_array($flash) && isset($flash['text'])): ?>
+                <div class="verification-flash verification-flash--<?= $escape($flash['type'] ?? 'error') ?>" role="status">
+                    <?= $escape($flash['text']) ?>
+                </div>
+            <?php endif; ?>
 
             <section class="orders-content" aria-label="Daftar pesanan">
                 <div class="orders-toolbar">
@@ -205,9 +213,14 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="order-action<?= $aksiLabel === 'Verifikasi' ? ' order-action--verify' : '' ?>" type="button" data-toggle-details aria-expanded="false" aria-controls="order-detail-<?= (int) $order['id_pesanan'] ?>">
-                                            <?= $escape($aksiLabel) ?>
-                                        </button>
+                                        <?php if (($order['status_pesanan'] ?? '') === 'MENUNGGU_VERIFIKASI'): ?>
+                                            <a
+                                                class="order-action order-action--verify"
+                                                href="/?page=admin-order-verification&amp;id=<?= (int) $order['id_pesanan'] ?>"
+                                            >Verifikasi</a>
+                                        <?php else: ?>
+                                            <button class="order-action" type="button" data-toggle-details aria-expanded="false" aria-controls="order-detail-<?= (int) $order['id_pesanan'] ?>">Detail</button>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <tr class="order-details-row" id="order-detail-<?= (int) $order['id_pesanan'] ?>" data-order-details hidden>
