@@ -9,11 +9,12 @@ class OrderModel
         $this->pdo = $pdo;
     }
 
-    public function createOrder(array $order, array $items): int
+    public function createOrder(array $order, array $items): array
     {
         $this->pdo->beginTransaction();
 
         try {
+            $order['no_invoice'] = $this->createInvoice($items);
             $orderStatement = $this->pdo->prepare(
                 'INSERT INTO pesanan (
                     id_user,
@@ -96,12 +97,72 @@ class OrderModel
             }
 
             $this->pdo->commit();
-            return $orderId;
+            return [
+                'id_pesanan' => $orderId,
+                'no_invoice' => $order['no_invoice'],
+            ];
         } catch (Throwable $error) {
             if ($this->pdo->inTransaction()) {
                 $this->pdo->rollBack();
             }
             throw $error;
         }
+    }
+
+    private function createInvoice(array $items): string
+    {
+        $firstItem = $items[0] ?? null;
+        if (!is_array($firstItem)) {
+            throw new InvalidArgumentException('Pesanan harus memiliki setidaknya satu produk.');
+        }
+
+        $categoryCode = match ($firstItem['kategori_produk'] ?? '') {
+            'SPREI' => 'SP',
+            'BED_COVER' => 'BC',
+            default => throw new UnexpectedValueException('Kategori produk tidak valid untuk nomor invoice.'),
+        };
+        $productId = filter_var($firstItem['id_produk'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        if ($productId === false || $productId === null) {
+            throw new UnexpectedValueException('ID produk tidak valid untuk nomor invoice.');
+        }
+
+        $businessTimezone = new DateTimeZone('Asia/Jakarta');
+        $today = new DateTimeImmutable('now', $businessTimezone);
+        $invoiceDate = $today->format('Ymd');
+        $dayStart = $today->setTime(0, 0)->setTimezone(new DateTimeZone('UTC'));
+        $nextDay = $dayStart->modify('+1 day');
+        $lockStatement = $this->pdo->prepare('SELECT pg_advisory_xact_lock(hashtext(:lock_key))');
+        $lockStatement->execute([':lock_key' => 'invoice-' . $invoiceDate]);
+
+        $sequenceStatement = $this->pdo->prepare(
+            "SELECT GREATEST(
+                (
+                    SELECT COUNT(*)
+                    FROM pesanan
+                    WHERE tanggal_pesan >= :day_start AND tanggal_pesan < :next_day
+                ),
+                (
+                    SELECT COALESCE(MAX(substring(no_invoice FROM '([0-9]+)$')::integer), 0)
+                    FROM pesanan
+                    WHERE no_invoice LIKE :invoice_prefix
+                )
+            )"
+        );
+        $sequenceStatement->execute([
+            ':day_start' => $dayStart->format('Y-m-d H:i:s'),
+            ':next_day' => $nextDay->format('Y-m-d H:i:s'),
+            ':invoice_prefix' => 'INV-' . $invoiceDate . '-%',
+        ]);
+        $sequence = (int) $sequenceStatement->fetchColumn() + 1;
+
+        return sprintf(
+            'INV-%s-%s-%d-%04d',
+            $invoiceDate,
+            $categoryCode,
+            $productId,
+            $sequence
+        );
     }
 }

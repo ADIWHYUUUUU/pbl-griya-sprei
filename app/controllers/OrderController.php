@@ -117,6 +117,7 @@ class OrderController
             $items[] = [
                 'id_produk' => (int) $product['id_produk'],
                 'nama_produk' => (string) $product['nama_produk'],
+                'kategori_produk' => (string) $product['kategori_produk'],
                 'stok' => (int) $product['stok'],
                 'mode' => $mode,
                 'jumlah' => $quantity,
@@ -169,11 +170,9 @@ class OrderController
 
         global $pdo;
         require_once __DIR__ . '/../models/OrderModel.php';
-        $invoice = 'GS-' . date('ymd') . '-' . strtoupper(bin2hex(random_bytes(5)));
-        $orderId = (new OrderModel($pdo))->createOrder(
+        $createdOrder = (new OrderModel($pdo))->createOrder(
             [
                 'id_user' => (int) $_SESSION['id_user'],
-                'no_invoice' => $invoice,
                 'alamat_pengiriman' => $orderData['alamat'],
                 'catatan_alamat' => $orderData['catatan_alamat'],
                 'metode_pengiriman' => $shippingMethods[$shippingMethod],
@@ -183,6 +182,7 @@ class OrderController
             array_map(static function (array $item): array {
                 return [
                     'id_produk' => $item['id_produk'],
+                    'kategori_produk' => $item['kategori_produk'],
                     'tipe_ukuran' => match ($item['mode']) {
                         'standard' => 'STANDAR',
                         'custom' => 'CUSTOM',
@@ -198,6 +198,7 @@ class OrderController
                 ];
             }, $items)
         );
+        $orderId = $createdOrder['id_pesanan'];
 
         foreach (array_keys($cart) as $itemId) {
             unset($_SESSION['cart'][$itemId]);
@@ -208,7 +209,7 @@ class OrderController
         unset($_SESSION['checkout_item_ids'], $_SESSION['checkout_form'], $_SESSION['checkout_message']);
         $_SESSION['pesanan_terakhir'] = [
             'id' => $orderId,
-            'kode' => $invoice,
+            'kode' => $createdOrder['no_invoice'],
             'produk' => array_column($items, 'nama_produk'),
         ];
         $this->redirect('/?page=customer-checkout&berhasil=1');

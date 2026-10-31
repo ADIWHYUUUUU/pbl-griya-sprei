@@ -10,7 +10,7 @@ CREATE TYPE metode_pengiriman_enum AS ENUM (
 CREATE TABLE pesanan (
     id_pesanan               SERIAL PRIMARY KEY,
     id_user                  INTEGER             NOT NULL REFERENCES "user"(id_user) ON DELETE RESTRICT,
-    no_invoice               VARCHAR(30)         UNIQUE,
+    no_invoice               VARCHAR(40)         UNIQUE,
     tanggal_pesan            TIMESTAMP           NOT NULL DEFAULT now(),
     status_pesanan           status_pesanan_enum NOT NULL DEFAULT 'MENUNGGU_VERIFIKASI',
     tanggal_verifikasi_admin TIMESTAMP           NOT NULL DEFAULT now(),
