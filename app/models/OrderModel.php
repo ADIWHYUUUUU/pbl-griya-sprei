@@ -210,6 +210,54 @@ class OrderModel
         return $order;
     }
 
+    public function getAdminOrderDetail(int $orderId): ?array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT
+                p.id_pesanan,
+                p.no_invoice,
+                p.tanggal_pesan,
+                p.status_pesanan::text AS status_pesanan,
+                p.alamat_pengiriman,
+                p.catatan_alamat,
+                p.metode_pengiriman::text AS metode_pengiriman,
+                p.catatan_pengiriman,
+                u.nama AS nama_pelanggan,
+                u.no_hp AS telepon
+             FROM pesanan p
+             JOIN "user" u ON u.id_user = p.id_user
+             WHERE p.id_pesanan = :order_id'
+        );
+        $statement->execute([':order_id' => $orderId]);
+        $order = $statement->fetch();
+        if (!$order) {
+            return null;
+        }
+
+        $items = $this->pdo->prepare(
+            'SELECT
+                d.tipe_ukuran::text AS tipe_ukuran,
+                d.jumlah,
+                d.harga_satuan,
+                d.panjang,
+                d.lebar,
+                d.tinggi,
+                d.tambah_sarban,
+                d.tambah_sargul,
+                d.catatan_pesanan,
+                produk.nama_produk,
+                produk.gambar_produk
+             FROM detail_pesanan d
+             JOIN produk ON produk.id_produk = d.id_produk
+             WHERE d.id_pesanan = :order_id
+             ORDER BY d.id_detail'
+        );
+        $items->execute([':order_id' => $orderId]);
+        $order['items'] = $items->fetchAll();
+
+        return $order;
+    }
+
     public function verifyOrder(int $orderId, int $principal, int $shipping, int $discount): bool
     {
         $this->pdo->beginTransaction();

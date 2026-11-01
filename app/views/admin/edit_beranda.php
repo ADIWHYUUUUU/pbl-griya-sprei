@@ -8,6 +8,9 @@ if (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'ADM
     exit;
 }
 
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../models/ProductModel.php';
+
 $contentPath = __DIR__ . '/../../../storage/homepage.json';
 $uploadDirectory = __DIR__ . '/../../../public/uploads/beranda/';
 $uploadUrl = '/uploads/beranda/';
@@ -34,16 +37,18 @@ if (is_file($contentPath)) {
     }
 }
 
-$escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-$notice = '';
-$error = '';
-if (isset($_GET['saved'])) {
-    $notice = 'Perubahan beranda berhasil disimpan.';
+$products = (new ProductModel($pdo))->getAllProducts();
+$productsById = [];
+foreach ($products as $product) {
+    $productsById[(int) $product['id_produk']] = $product;
 }
+$escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$notice = isset($_GET['saved']) ? 'Perubahan beranda berhasil disimpan.' : '';
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = (string) ($_POST['csrf_token'] ?? '');
-    if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), $token)) {
+    if (!isset($_SESSION['csrf_token']) || !hash_equals((string) $_SESSION['csrf_token'], $token)) {
         $error = 'Sesi formulir tidak valid. Muat ulang halaman lalu coba lagi.';
     } else {
         $updated = [];
@@ -54,27 +59,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         try {
+            foreach (['hero_title' => 240, 'hero_description' => 600, 'sprei_title' => 80, 'sprei_description' => 180, 'bedcover_title' => 80, 'bedcover_description' => 180] as $key => $maxLength) {
+                if (mb_strlen($updated[$key]) > $maxLength) {
+                    throw new RuntimeException('Teks ' . $key . ' terlalu panjang.');
+                }
+            }
+            if ($updated['hero_title'] === '' || $updated['hero_description'] === '') {
+                throw new RuntimeException('Judul dan deskripsi hero wajib diisi.');
+            }
             if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0755, true) && !is_dir($uploadDirectory)) {
                 throw new RuntimeException('Folder upload tidak dapat dibuat.');
             }
 
             $saveUpload = static function (string $field, string $previous = '') use ($uploadDirectory, $uploadUrl): string {
-                if (!isset($_FILES[$field]) || $_FILES[$field]['error'] === UPLOAD_ERR_NO_FILE) {
+                if (!isset($_FILES[$field]) || (int) $_FILES[$field]['error'] === UPLOAD_ERR_NO_FILE) {
                     return $previous;
                 }
-                if ($_FILES[$field]['error'] !== UPLOAD_ERR_OK || $_FILES[$field]['size'] > 5 * 1024 * 1024) {
+                if ((int) $_FILES[$field]['error'] !== UPLOAD_ERR_OK || (int) $_FILES[$field]['size'] > 5 * 1024 * 1024) {
                     throw new RuntimeException('Gambar harus berukuran maksimal 5 MB.');
                 }
-
                 $mime = (new finfo(FILEINFO_MIME_TYPE))->file($_FILES[$field]['tmp_name']);
                 $extensions = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
-                if (!isset($extensions[$mime])) {
+                if (!is_string($mime) || !isset($extensions[$mime])) {
                     throw new RuntimeException('Format gambar yang didukung: JPG, PNG, atau WebP.');
                 }
-
-                $filename = bin2hex(random_bytes(12)) . '.' . $extensions[$mime];
+                $filename = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
                 if (!move_uploaded_file($_FILES[$field]['tmp_name'], $uploadDirectory . $filename)) {
                     throw new RuntimeException('Gambar gagal diunggah. Periksa izin folder uploads.');
+                }
+                if ($previous !== '' && str_starts_with($previous, $uploadUrl)) {
+                    $oldPath = __DIR__ . '/../../../public' . $previous;
+                    if (is_file($oldPath)) {
+                        unlink($oldPath);
+                    }
                 }
                 return $uploadUrl . $filename;
             };
@@ -83,42 +100,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $updated[$imageKey] = $saveUpload($imageKey, (string) ($content[$imageKey] ?? ''));
             }
 
-            $updated['featured'] = [];
-            foreach (($_POST['featured'] ?? []) as $index => $product) {
-                if (!is_array($product)) {
-                    continue;
-                }
-                $name = trim((string) ($product['name'] ?? ''));
-                $tag = trim((string) ($product['tag'] ?? ''));
-                $description = trim((string) ($product['description'] ?? ''));
-                $price = filter_var($product['price'] ?? null, FILTER_VALIDATE_INT);
-                if ($name === '' && $tag === '' && $description === '') {
-                    continue;
-                }
-                if ($name === '' || $tag === '' || $description === '' || $price === false || $price < 0) {
-                    throw new RuntimeException('Lengkapi nama, label, deskripsi, dan harga setiap produk pilihan.');
-                }
-
-                $imageField = 'featured_image_' . preg_replace('/[^0-9]/', '', (string) $index);
-                $updated['featured'][] = [
-                    'name' => $name,
-                    'tag' => $tag,
-                    'description' => $description,
-                    'price' => $price,
-                    'color' => preg_match('/^#[0-9a-f]{6}$/i', (string) ($product['color'] ?? '')) ? $product['color'] : '#cccccc',
-                    'image' => $saveUpload($imageField, (string) ($product['image'] ?? '')),
-                ];
+            $submittedSlots = $_POST['featured'] ?? [];
+            if (!is_array($submittedSlots) || count($submittedSlots) !== 4) {
+                throw new RuntimeException('Produk pilihan harus terdiri dari tepat 4 slot.');
             }
-
-            if (count($updated['featured']) > 12) {
-                throw new RuntimeException('Produk pilihan dibatasi maksimal 12 item.');
+            $selectedIds = [];
+            $updated['featured'] = [];
+            foreach (array_values($submittedSlots) as $slot) {
+                if (!is_array($slot)) {
+                    throw new RuntimeException('Format slot produk tidak valid.');
+                }
+                $rawId = trim((string) ($slot['id_produk'] ?? ''));
+                $id = $rawId === '' ? null : filter_var($rawId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($id !== null && $id === false) {
+                    throw new RuntimeException('Produk pilihan tidak valid.');
+                }
+                if ($id !== null && isset($selectedIds[(int) $id])) {
+                    throw new RuntimeException('Produk pilihan tidak boleh dipilih lebih dari sekali.');
+                }
+                if ($id !== null && !isset($productsById[(int) $id])) {
+                    throw new RuntimeException('Produk pilihan tidak ditemukan di katalog.');
+                }
+                if ($id !== null) {
+                    $selectedIds[(int) $id] = true;
+                }
+                $badge = trim((string) ($slot['badge'] ?? ''));
+                if (mb_strlen($badge) > 60) {
+                    throw new RuntimeException('Badge produk maksimal 60 karakter.');
+                }
+                $updated['featured'][] = [
+                    'id_produk' => $id === null ? null : (int) $id,
+                    'badge' => $badge,
+                    'tampil' => isset($slot['tampil']),
+                ];
             }
 
             $json = json_encode($updated, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($json === false || file_put_contents($contentPath, $json . PHP_EOL, LOCK_EX) === false) {
                 throw new RuntimeException('Konten gagal disimpan. Periksa izin folder storage.');
             }
-
             header('Location: /?page=admin-edit-home&saved=1');
             exit;
         } catch (Throwable $exception) {
@@ -131,170 +151,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+$legacyFeatured = is_array($content['featured'] ?? null) ? $content['featured'] : [];
+$slots = [];
+for ($index = 0; $index < 4; $index++) {
+    $savedSlot = $legacyFeatured[$index] ?? [];
+    $productId = isset($savedSlot['id_produk']) ? (int) $savedSlot['id_produk'] : null;
+    if (!$productId && isset($savedSlot['name'])) {
+        foreach ($products as $product) {
+            if ((string) $product['nama_produk'] === (string) $savedSlot['name']) {
+                $productId = (int) $product['id_produk'];
+                break;
+            }
+        }
+    }
+    $slots[] = [
+        'id_produk' => $productId ?: null,
+        'badge' => (string) ($savedSlot['badge'] ?? $savedSlot['tag'] ?? ''),
+        'tampil' => array_key_exists('tampil', $savedSlot) ? (bool) $savedSlot['tampil'] : !empty($savedSlot),
+    ];
+}
+$productCatalog = [];
+foreach ($products as $product) {
+    $productCatalog[(int) $product['id_produk']] = [
+        'name' => (string) $product['nama_produk'],
+        'price' => (float) $product['harga_dasar'],
+        'category' => (string) $product['kategori_produk'],
+        'image' => !empty($product['gambar_produk']) ? '/uploads/produk/' . rawurlencode(basename((string) $product['gambar_produk'])) : '',
+    ];
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Beranda - Griya Sprei</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/edit_beranda.css">
 </head>
-
-<body>
-    <header class="admin-header">
-        <a href="/?page=admin-dashboard" class="back-link" aria-label="Kembali ke dashboard">← Dashboard</a>
-        <div><span class="eyebrow">PENGELOLAAN TOKO</span>
-            <h1>Konten beranda</h1>
-        </div>
-        <a href="/?page=customer-home" target="_blank" rel="noopener" class="preview-link">Lihat beranda ↗</a>
-    </header>
-
-    <main class="editor-shell">
-        <?php if ($notice !== ''): ?><p class="alert alert--success" role="status"><?= $escape($notice); ?></p><?php endif; ?>
-        <?php if ($error !== ''): ?><p class="alert alert--error" role="alert"><?= $escape($error); ?></p><?php endif; ?>
+<body class="admin-home-editor">
+<div class="admin-layout">
+    <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
+    <main class="editor-main">
+        <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
+        <div class="editor-breadcrumb"><span>Admin</span><span aria-hidden="true">›</span><strong>Edit Beranda</strong></div>
+        <header class="editor-header"><h1>Edit Beranda</h1><a class="preview-link" href="/?page=customer-home" target="_blank" rel="noopener">&#9673; Pratinjau</a></header>
+        <?php if ($notice !== ''): ?><p class="alert alert--success" role="status"><?= $escape($notice) ?></p><?php endif; ?>
+        <?php if ($error !== ''): ?><p class="alert alert--error" role="alert"><?= $escape($error) ?></p><?php endif; ?>
 
         <form method="post" enctype="multipart/form-data" class="editor-form">
-            <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']); ?>">
-
+            <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']) ?>">
             <section class="editor-section">
-                <div class="section-heading">
-                    <div><span class="eyebrow">01 / PEMBUKA</span>
-                        <h2>Hero beranda</h2>
-                    </div>
-                </div>
+                <div class="section-heading"><span class="section-number">1</span><div><h2>Foto &amp; Tulisan Utama Depan Toko (Hero)</h2></div></div>
                 <div class="form-grid">
-                    <label class="field field--wide">Label kecil<input name="hero_pill" maxlength="120" value="<?= $escape($content['hero_pill']); ?>"></label>
-                    <label class="field field--wide">Judul utama<textarea name="hero_title" rows="2" maxlength="240" required><?= $escape($content['hero_title']); ?></textarea></label>
-                    <label class="field field--wide">Deskripsi<textarea name="hero_description" rows="3" maxlength="600" required><?= $escape($content['hero_description']); ?></textarea></label>
-                    <?php renderImageField('hero_image', 'Gambar utama', $content['hero_image'] ?? '', $escape); ?>
+                    <?php foreach (['hero_image' => 'Foto Banner Utama Kasur & Sprei', 'sprei_image' => 'Foto kategori Sprei', 'bedcover_image' => 'Foto kategori Bed Cover'] as $imageKey => $imageLabel): ?>
+                        <?php if ($imageKey === 'hero_image'): ?>
+                            <div class="image-field image-field--hero"><span class="field-label"><?= $escape($imageLabel) ?></span><img class="image-preview" src="<?= $escape($content[$imageKey]) ?>" alt="" data-empty="<?= $content[$imageKey] === '' ? 'true' : 'false' ?>"><span class="file-name"><?= $escape($content[$imageKey] !== '' ? basename($content[$imageKey]) : 'Belum ada foto') ?></span><button type="button" class="button button--small" data-open-upload="<?= $escape($imageKey) ?>">Ganti Foto</button><input type="file" name="<?= $escape($imageKey) ?>" accept="image/jpeg,image/png,image/webp" hidden></div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <label class="field field--wide">Label Badge di Atas Judul<input name="hero_pill" maxlength="120" value="<?= $escape($content['hero_pill']) ?>"></label>
+                    <label class="field field--wide">Tulisan Besar di Depan (Judul)<textarea name="hero_title" rows="2" maxlength="240" required><?= $escape($content['hero_title']) ?></textarea></label>
+                    <label class="field field--wide">Subjudul / Penjelasan Singkat<textarea name="hero_description" rows="3" maxlength="600" required><?= $escape($content['hero_description']) ?></textarea></label>
                 </div>
             </section>
 
             <section class="editor-section">
-                <div class="section-heading">
-                    <div><span class="eyebrow">02 / KATEGORI</span>
-                        <h2>Jelajahi katalog</h2>
-                    </div>
-                </div>
-                <div class="form-grid">
-                    <label class="field">Judul bagian<input name="explore_title" maxlength="100" value="<?= $escape($content['explore_title']); ?>"></label>
-                    <span></span>
-                    <label class="field">Nama kategori<input name="sprei_title" maxlength="80" value="<?= $escape($content['sprei_title']); ?>"></label>
-                    <label class="field">Nama kategori<input name="bedcover_title" maxlength="80" value="<?= $escape($content['bedcover_title']); ?>"></label>
-                    <label class="field">Deskripsi sprei<textarea name="sprei_description" rows="2" maxlength="180"><?= $escape($content['sprei_description']); ?></textarea></label>
-                    <label class="field">Deskripsi bed cover<textarea name="bedcover_description" rows="2" maxlength="180"><?= $escape($content['bedcover_description']); ?></textarea></label>
-                    <?php renderImageField('sprei_image', 'Gambar kategori sprei', $content['sprei_image'] ?? '', $escape); ?>
-                    <?php renderImageField('bedcover_image', 'Gambar kategori bed cover', $content['bedcover_image'] ?? '', $escape); ?>
-                </div>
-            </section>
-
-            <section class="editor-section">
-                <div class="section-heading section-heading--products">
-                    <div><span class="eyebrow">03 / PILIHAN TOKO</span>
-                        <h2>Produk pilihan</h2>
-                        <p class="section-note">Atur produk yang muncul di halaman beranda.</p>
-                    </div>
-                    <button type="button" class="button button--secondary" id="add-product">＋ Tambah produk</button>
-                </div>
-                <label class="field field--title">Judul bagian<input name="featured_title" maxlength="100" value="<?= $escape($content['featured_title']); ?>"></label>
-                <div id="featured-products" class="product-list">
-                    <?php foreach (($content['featured'] ?? []) as $index => $product): ?>
-                        <?php renderProductFields($index, $product, $escape); ?>
+                <div class="section-heading"><span class="section-number">2</span><div><h2>Kategori di Beranda (Jelajahi Katalog)</h2><p>Atur 2 kartu kategori yang tampil di bawah hero banner.</p></div><span class="section-chip">2 Kartu</span></div>
+                <input type="hidden" name="explore_title" value="<?= $escape($content['explore_title']) ?>">
+                <div class="category-grid">
+                    <?php foreach (['sprei' => 'Sprei', 'bedcover' => 'Bed Cover'] as $category => $label): ?>
+                        <article class="category-card">
+                            <div class="category-card__top"><span>KATEGORI <?= $category === 'sprei' ? '1' : '2' ?></span><span>● Tampil</span></div>
+                            <div class="category-image"><img class="image-preview" src="<?= $escape($content[$category . '_image']) ?>" alt="" data-empty="<?= $content[$category . '_image'] === '' ? 'true' : 'false' ?>"><button type="button" class="button button--small" data-open-upload="<?= $escape($category . '_image') ?>">Ubah Foto</button><input type="file" name="<?= $escape($category . '_image') ?>" accept="image/jpeg,image/png,image/webp" hidden></div>
+                            <label class="field">Nama Kategori<input name="<?= $escape($category . '_title') ?>" maxlength="80" value="<?= $escape($content[$category . '_title']) ?>"></label>
+                            <label class="field">Deskripsi<textarea name="<?= $escape($category . '_description') ?>" rows="2" maxlength="180"><?= $escape($content[$category . '_description']) ?></textarea></label>
+                        </article>
                     <?php endforeach; ?>
                 </div>
-                <template id="product-template">
-                    <?php renderProductFields('__INDEX__', [], $escape); ?>
-                </template>
             </section>
 
-            <div class="save-bar"><a href="/?page=admin-dashboard" class="cancel-link">Batal</a><button type="submit" class="button button--primary">Simpan perubahan</button></div>
+            <section class="editor-section">
+                <div class="section-heading"><span class="section-number">3</span><div><h2>Produk Pilihan &amp; Best Seller di Beranda</h2></div><span class="section-chip">4 Slot</span></div>
+                <label class="field field--wide">Judul Bagian<input name="featured_title" maxlength="100" value="<?= $escape($content['featured_title']) ?>"></label>
+                <div class="product-slots">
+                    <?php foreach ($slots as $index => $slot): ?>
+                        <article class="product-slot" data-slot>
+                            <div class="slot-heading"><strong>SLOT <?= $index + 1 ?><?= $index === 0 ? ' (UTAMA)' : '' ?></strong><label class="toggle-label"><input type="checkbox" name="featured[<?= $index ?>][tampil]"<?= $slot['tampil'] ? ' checked' : '' ?>> Tampil</label></div>
+                            <label class="field">Pilih Produk dari Katalog<select name="featured[<?= $index ?>][id_produk]" data-product-select><option value="">Pilih produk</option><?php foreach ($products as $product): ?><option value="<?= (int) $product['id_produk'] ?>"<?= (int) $slot['id_produk'] === (int) $product['id_produk'] ? ' selected' : '' ?>><?= $escape($product['nama_produk'] . ' - Rp ' . number_format((float) $product['harga_dasar'], 0, ',', '.')) ?></option><?php endforeach; ?></select></label>
+                            <label class="field">Badge Khusus / Label Promo<input name="featured[<?= $index ?>][badge]" maxlength="60" value="<?= $escape($slot['badge']) ?>"></label>
+                            <div class="product-preview" data-product-preview></div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+            <div class="save-bar"><a href="/?page=admin-dashboard" class="cancel-link">&larr; Kembali ke Dashboard</a><button type="submit" class="button button--primary">&#10003; Simpan Perubahan Beranda</button></div>
         </form>
     </main>
-    <script>
-        const productList = document.getElementById('featured-products');
-        const productTemplate = document.getElementById('product-template');
-        let nextProductIndex = <?= count($content['featured'] ?? []); ?>;
-        document.getElementById('add-product').addEventListener('click', () => {
-            if (productList.children.length >= 12) return;
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = productTemplate.innerHTML.replaceAll('__INDEX__', String(nextProductIndex++));
-            productList.append(wrapper.firstElementChild);
-        });
-        productList.addEventListener('click', (event) => {
-            if (event.target.matches('[data-remove-product]')) event.target.closest('.product-card').remove();
-        });
-        document.querySelector('.editor-form').addEventListener('change', (event) => {
-            const input = event.target;
-            if (!input.matches('input[type="file"]') || !input.files?.[0]) return;
+</div>
 
-            const file = input.files[0];
-            const imageField = input.closest('.image-field');
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!allowedTypes.includes(file.type) || file.size > 5 * 1024 * 1024) {
-                alert('Pilih gambar JPG, PNG, atau WebP dengan ukuran maksimal 5 MB.');
-                input.value = '';
-                return;
-            }
-
-            let preview = imageField.querySelector('.image-preview');
-            if (!preview) {
-                preview = document.createElement('img');
-                preview.className = 'image-preview';
-                preview.alt = 'Pratinjau gambar';
-                imageField.insertBefore(preview, imageField.querySelector('small'));
-            }
-
-            if (preview.dataset.previewUrl) URL.revokeObjectURL(preview.dataset.previewUrl);
-            preview.dataset.previewUrl = URL.createObjectURL(file);
-            preview.src = preview.dataset.previewUrl;
-        });
-    </script>
+<div class="upload-modal" id="uploadModal" hidden>
+    <div class="upload-modal__backdrop" data-close-upload></div>
+    <section class="upload-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="uploadTitle">
+        <button type="button" class="upload-modal__close" data-close-upload aria-label="Tutup">&times;</button>
+        <h2 id="uploadTitle">Area Unggah Berkas Foto</h2>
+        <div class="drop-zone" id="dropZone" tabindex="0"><div class="camera-icon">&#128247;</div><strong>Tarik &amp; letakkan foto di sini, atau klik tombol di bawah</strong><small>Mendukung format JPG, PNG, atau WebP (Maksimal ukuran file 5 MB)</small><button type="button" class="button button--secondary" id="choosePhoto">&#128444; Pilih File Foto dari Perangkat</button><p class="upload-file-name" id="uploadFileName"></p></div>
+        <input type="file" id="uploadPicker" accept="image/jpeg,image/png,image/webp" hidden>
+        <img class="upload-preview" id="uploadPreview" alt="Pratinjau foto" hidden>
+        <button type="button" class="button button--primary" id="usePhoto" disabled>Gunakan Foto</button>
+    </section>
+</div>
+<script>
+window.homepageProducts = <?= json_encode($productCatalog, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?: '{}'; ?>;
+</script>
+<script src="/assets/js/admin/sidebar.js"></script>
+<script src="/assets/js/admin/edit_beranda.js"></script>
 </body>
-
 </html>
-
-<?php
-function renderImageField(string $name, string $label, string $image, callable $escape): void
-{
-?>
-    <div class="image-field">
-        <span class="field-label"><?= $escape($label); ?></span>
-        <label class="upload-control"><span>Pilih gambar</span><input type="file" name="<?= $escape($name); ?>" accept="image/jpeg,image/png,image/webp"></label>
-        <?php if ($image !== ''): ?><img class="image-preview" src="<?= $escape($image); ?>" alt="Gambar saat ini"><?php endif; ?>
-        <small>JPG, PNG, WebP · Maksimal 5 MB</small>
-    </div>
-<?php
-}
-
-function renderProductFields($index, array $product, callable $escape): void
-{
-    $prefix = 'featured[' . $index . ']';
-    $imageIndex = $index === '__INDEX__' ? '__INDEX__' : preg_replace('/[^0-9]/', '', (string) $index);
-?>
-    <article class="product-card">
-        <div class="product-card__heading">
-            <h3>Produk pilihan</h3><button type="button" class="remove-button" data-remove-product aria-label="Hapus produk">Hapus</button>
-        </div>
-        <div class="form-grid">
-            <label class="field">Nama produk<input name="<?= $escape($prefix); ?>[name]" maxlength="120" required value="<?= $escape($product['name'] ?? ''); ?>"></label>
-            <label class="field">Label<input name="<?= $escape($prefix); ?>[tag]" maxlength="60" required value="<?= $escape($product['tag'] ?? ''); ?>"></label>
-            <label class="field field--wide">Deskripsi<textarea name="<?= $escape($prefix); ?>[description]" rows="2" maxlength="220" required><?= $escape($product['description'] ?? ''); ?></textarea></label>
-            <label class="field">Harga (Rp)<input type="number" name="<?= $escape($prefix); ?>[price]" min="0" step="1000" required value="<?= $escape($product['price'] ?? ''); ?>"></label>
-            <label class="field">Warna placeholder<input type="color" name="<?= $escape($prefix); ?>[color]" value="<?= $escape($product['color'] ?? '#9bb87a'); ?>"></label>
-            <div class="image-field field--wide">
-                <span class="field-label">Foto produk</span>
-                <label class="upload-control"><span>Pilih gambar</span><input type="file" name="featured_image_<?= $escape($imageIndex); ?>" accept="image/jpeg,image/png,image/webp"></label>
-                <input type="hidden" name="<?= $escape($prefix); ?>[image]" value="<?= $escape($product['image'] ?? ''); ?>">
-                <?php if (!empty($product['image'])): ?><img class="image-preview" src="<?= $escape($product['image']); ?>" alt="Foto produk saat ini"><?php endif; ?>
-                <small>JPG, PNG, WebP · Maksimal 5 MB</small>
-            </div>
-        </div>
-    </article>
-<?php
-}
-?>

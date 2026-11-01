@@ -177,7 +177,7 @@ $total = max(0, $principal + $order['ongkir'] - $order['diskon']);
                     </div>
 
                     <?php if ($canVerify): ?>
-                        <form method="post" action="/?action=admin-order-verify" class="verification-form">
+                        <form method="post" action="/?action=admin-order-verify-save" class="verification-form">
                             <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']) ?>">
                             <input type="hidden" name="id_pesanan" value="<?= (int) $order['id_pesanan'] ?>">
 

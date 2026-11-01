@@ -36,7 +36,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 10h6M9 14h6M9 18h3"/></svg>
                 <span>Cek Pesanan</span>
             </a>
-            <a class="nav-item" href="/?page=admin-dashboard#verifikasi">
+            <a class="nav-item <?= in_array($halamanAktif, ['admin-payments', 'admin-payment-verify'], true) ? 'active' : '' ?>" href="/?page=admin-payments" <?= in_array($halamanAktif, ['admin-payments', 'admin-payment-verify'], true) ? 'aria-current="page"' : '' ?>>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg>
                 <span>Cek Pembayaran</span>
             </a>

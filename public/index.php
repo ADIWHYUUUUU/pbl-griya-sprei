@@ -24,8 +24,12 @@ if ($action !== '') {
 	$isProductAction = in_array($action, $productActions, true);
 	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove', 'customer-checkout-start'], true);
 	$isOrderAction = $action === 'customer-order-create';
-	$isAdminOrderAction = $action === 'admin-order-verify';
-	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction) {
+	$isPaymentAction = $action === 'customer-payment-submit';
+	$adminOrderActions = ['admin-order-verify-save'];
+	$isAdminOrderAction = in_array($action, $adminOrderActions, true);
+	$adminPaymentActions = ['admin-payment-verify-save'];
+	$isAdminPaymentAction = in_array($action, $adminPaymentActions, true);
+	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isPaymentAction && !$isAdminPaymentAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -36,16 +40,22 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction) {
+	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isPaymentAction && !$isAdminPaymentAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
 	}
 
 	try {
-		if ($isAdminOrderAction) {
+		if ($isAdminPaymentAction) {
+			require_once __DIR__ . '/../app/controllers/AdminPaymentController.php';
+			(new AdminPaymentController())->verifySave();
+		} elseif ($isPaymentAction) {
+			require_once __DIR__ . '/../app/controllers/PaymentController.php';
+			(new PaymentController())->submit();
+		} elseif ($isAdminOrderAction) {
 			require_once __DIR__ . '/../app/controllers/AdminOrderController.php';
-			(new AdminOrderController())->verify();
+			(new AdminOrderController())->verifySave();
 		} elseif ($isCartAction || $isOrderAction) {
 			require_once __DIR__ . '/../app/controllers/OrderController.php';
 			$controller = new OrderController();
@@ -83,15 +93,33 @@ if ($action !== '') {
 		} elseif ($isOrderAction) {
 			$_SESSION['checkout_message'] = 'Pesanan gagal disimpan. Silakan coba lagi.';
 			header('Location: /?page=customer-checkout', true, 303);
-		} elseif ($isAdminOrderAction) {
+		} elseif ($isProductAction) {
+			echo 'Produk gagal disimpan. Silakan coba lagi.';
+		} elseif ($isPaymentAction) {
+			$_SESSION['payment_message'] = 'Pembayaran gagal diproses. Silakan coba lagi.';
+			$_SESSION['payment_message_type'] = 'error';
+			$_SESSION['payment_form'] = $_POST;
+			$query = ['page' => 'customer-payment'];
+			if (isset($_POST['id_pesanan']) && is_string($_POST['id_pesanan'])) {
+				$query['id'] = $_POST['id_pesanan'];
+			}
+			header('Location: /?' . http_build_query($query), true, 303);
+		} elseif ($action === 'admin-order-verify-save') {
 			$_SESSION['admin_order_message'] = [
 				'type' => 'error',
 				'text' => 'Verifikasi pesanan gagal disimpan. Silakan coba lagi.',
 			];
-			http_response_code(303);
-			header('Location: /?page=admin-orders', true, 303);
-		} elseif ($isProductAction) {
-			echo 'Produk gagal disimpan. Silakan coba lagi.';
+			$query = ['page' => 'admin-order-verification'];
+			if (isset($_POST['id_pesanan']) && is_string($_POST['id_pesanan'])) {
+				$query['id'] = $_POST['id_pesanan'];
+			} else {
+				$query['page'] = 'admin-orders';
+			}
+			header('Location: /?' . http_build_query($query), true, 303);
+		} elseif ($isAdminPaymentAction) {
+			$_SESSION['admin_payment_message'] = 'Pembayaran gagal diproses. Silakan coba lagi.';
+			$_SESSION['admin_payment_message_type'] = 'error';
+			header('Location: /?page=admin-payments', true, 303);
 		} else {
 			echo json_encode(['success' => false, 'message' => 'Permintaan gagal diproses. Silakan coba lagi.']);
 		}
@@ -113,14 +141,6 @@ if (
 	exit;
 }
 
-if (
-	in_array($page, ['admin-orders', 'admin-order-verification'], true)
-	&& (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'ADMIN')
-) {
-	header('Location: /?page=admin-login', true, 303);
-	exit;
-}
-
 if (!isset($pages[$page])) {
 	http_response_code(404);
 	echo 'Halaman tidak ditemukan.';
@@ -128,7 +148,7 @@ if (!isset($pages[$page])) {
 }
 
 if (
-	in_array($page, ['customer-cart', 'customer-checkout'], true)
+	in_array($page, ['customer-cart', 'customer-checkout', 'customer-payment'], true)
 	&& (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'CUSTOMER')
 ) {
 	$_SESSION['cart_message'] = 'Silakan login dengan akun customer terlebih dahulu untuk melanjutkan pesanan.';

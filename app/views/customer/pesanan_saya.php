@@ -277,7 +277,17 @@ unset($order);
                     <?php endif; ?>
 
                     <div class="pesanan-aksi">
-                        <button type="button" class="tombol tombol-garis" data-buka-detail="<?= e($order['kode']) ?>">Lihat Detail</button>
+                        <div class="kiri">
+                            <?php if (
+                                $order['status_pesanan'] === 'MENUNGGU_PEMBAYARAN'
+                                && !in_array($order['status_pembayaran'], ['MENUNGGU_VERIFIKASI', 'TERVERIFIKASI'], true)
+                            ): ?>
+                                <a class="tombol" href="/?page=customer-payment&amp;id=<?= (int) $order['id_pesanan'] ?>">
+                                    <?= $order['status_pembayaran'] === 'DITOLAK' ? 'Unggah Ulang Bukti Pembayaran' : 'Bayar Sekarang' ?>
+                                </a>
+                            <?php endif; ?>
+                            <button type="button" class="tombol tombol-garis" data-buka-detail="<?= e($order['kode']) ?>">Lihat Detail</button>
+                        </div>
                     </div>
                 </article>
             <?php endforeach; ?>

@@ -5,6 +5,20 @@ require_once __DIR__ . '/../models/OrderModel.php';
 
 class AdminOrderController
 {
+    public function detail(?int $orderId): ?array
+    {
+        if ($orderId === null || $orderId < 1) {
+            return null;
+        }
+
+        return (new OrderModel($GLOBALS['pdo']))->getAdminOrderDetail($orderId);
+    }
+
+    public function verifySave(): void
+    {
+        $this->verify();
+    }
+
     public function verify(): void
     {
         if (session_status() === PHP_SESSION_NONE) {

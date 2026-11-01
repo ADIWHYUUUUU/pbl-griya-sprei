@@ -220,6 +220,7 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
                                             >Verifikasi</a>
                                         <?php else: ?>
                                             <button class="order-action" type="button" data-toggle-details aria-expanded="false" aria-controls="order-detail-<?= (int) $order['id_pesanan'] ?>">Detail</button>
+                                            <a class="order-action order-action--verify" href="/?page=admin-order-detail&amp;id=<?= (int) $order['id_pesanan'] ?>">Rincian</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
