@@ -63,7 +63,7 @@ $statusLabels = [
     <title>Verifikasi Pembayaran - Griya Sprei</title>
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
-    <link rel="stylesheet" href="/assets/css/admin/pembayaran.css">
+    <link rel="stylesheet" href="/assets/css/admin/cek_pembayaran.css">
 </head>
 <body class="admin-dashboard admin-payment-page">
 <div class="admin-layout">
@@ -142,7 +142,7 @@ $statusLabels = [
                         </div>
                         <div class="reject-dialog" id="rejectDialog" hidden>
                             <label for="adminNote">Alasan penolakan</label>
-                            <textarea id="adminNote" name="catatan_admin" rows="3" maxlength="1000" required></textarea>
+                            <textarea id="adminNote" name="catatan_admin" rows="3" maxlength="1000"></textarea>
                             <div><button type="button" id="cancelRejectButton">Batal</button><button type="button" id="confirmRejectButton">Tolak Bukti</button></div>
                         </div>
                     </form>
@@ -155,6 +155,6 @@ $statusLabels = [
     </main>
 </div>
 <script src="/assets/js/admin/sidebar.js"></script>
-<script src="/assets/js/admin/pembayaran.js"></script>
+<script src="/assets/js/admin/cek_pembayaran.js"></script>
 </body>
 </html>

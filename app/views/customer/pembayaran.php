@@ -41,7 +41,7 @@ foreach ($order['items'] as $item) {
 $principal = (float) ($order['tagihan_pokok'] ?: $subtotal);
 $total = $principal + (float) $order['ongkir'] - (float) $order['diskon'];
 $payment = $order['payment'];
-$canPay = in_array($order['status_pesanan'], ['MENUNGGU_PEMBAYARAN', 'DIPROSES', 'DIKIRIM', 'SELESAI'], true);
+$canPay = $order['status_pesanan'] === 'MENUNGGU_PEMBAYARAN';
 $paymentActive = $payment && $payment['status_pembayaran'] !== 'DITOLAK';
 $selectedMethod = (string) ($form['metode_pembayaran'] ?? '');
 $amountValue = (string) ($form['nominal_transfer'] ?? '');
@@ -76,7 +76,11 @@ $amountValue = (string) ($form['nominal_transfer'] ?? '');
         </section>
 
         <?php if (!$canPay): ?>
-            <div class="payment-notice">Nominal final masih menunggu konfirmasi admin. Form pembayaran akan terbuka setelah pesanan minimal berstatus Menunggu Pembayaran.</div>
+            <div class="payment-notice">
+                <?= $order['status_pesanan'] === 'MENUNGGU_VERIFIKASI'
+                    ? 'Nominal final masih menunggu konfirmasi admin. Form pembayaran akan terbuka setelah pesanan berstatus Menunggu Pembayaran.'
+                    : 'Pesanan ini belum dapat menerima pembayaran.' ?>
+            </div>
         <?php elseif ($paymentActive): ?>
             <div class="payment-notice">Bukti pembayaran Anda sedang diproses admin.</div>
         <?php else: ?>

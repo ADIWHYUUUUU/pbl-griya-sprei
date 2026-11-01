@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!rejectButton || !dialog || !decision || !note) return;
 
   rejectButton.addEventListener("click", function () {
+    note.required = true;
     dialog.hidden = false;
     note.focus();
   });
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cancelRejectButton.addEventListener("click", function () {
       dialog.hidden = true;
       note.value = "";
+      note.required = false;
     });
   }
 

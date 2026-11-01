@@ -55,7 +55,7 @@ unset($_SESSION['admin_payment_message'], $_SESSION['admin_payment_message_type'
     <title>Cek Pembayaran - Griya Sprei</title>
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
-    <link rel="stylesheet" href="/assets/css/admin/pembayaran.css">
+    <link rel="stylesheet" href="/assets/css/admin/cek_pembayaran.css">
 </head>
 <body class="admin-dashboard admin-payment-page">
 <div class="admin-layout">

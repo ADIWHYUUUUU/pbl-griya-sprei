@@ -12,7 +12,7 @@ return [
 	'customer-register' => __DIR__ . '/../app/views/customer/register.php',
 	'admin-login' => __DIR__ . '/../app/views/admin/login.php',
 	'admin-dashboard' => __DIR__ . '/../app/views/admin/dashboard.php',
-	'admin-orders' => __DIR__ . '/../app/views/admin/cekpesanan.php',
+	'admin-orders' => __DIR__ . '/../app/views/admin/cek_pesanan.php',
 	'admin-order-detail' => __DIR__ . '/../app/views/admin/rincian_pesanan.php',
 	'admin-order-verification' => __DIR__ . '/../app/views/admin/verifikasi_pesanan.php',
 	'admin-payments' => __DIR__ . '/../app/views/admin/cek_pembayaran.php',

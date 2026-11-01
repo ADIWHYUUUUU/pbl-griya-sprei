@@ -248,6 +248,6 @@ $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), t
     </div>
 
     <script src="/assets/js/admin/sidebar.js"></script>
-    <script src="/assets/js/admin/cekpesanan.js"></script>
+    <script src="/assets/js/admin/cek_pesanan.js"></script>
 </body>
 </html>
