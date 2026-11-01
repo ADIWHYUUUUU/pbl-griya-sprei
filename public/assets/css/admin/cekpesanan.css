@@ -260,79 +260,6 @@
   min-height: 100vh;
 }
 
-.admin-orders .sidebar {
-  flex-basis: 195px;
-  width: 195px;
-}
-
-.admin-orders .sidebar-brand {
-  min-height: 60px;
-  gap: 9px;
-  padding: 10px 15px;
-}
-
-.admin-orders .brand-icon {
-  flex-basis: 30px;
-  width: 30px;
-  height: 30px;
-}
-
-.admin-orders .brand-text h2 {
-  font-size: 13px;
-}
-
-.admin-orders .brand-text p {
-  font-size: 10px;
-}
-
-.admin-orders .sidebar-nav {
-  gap: 2px;
-  padding: 12px 9px;
-}
-
-.admin-orders .nav-item {
-  min-height: 31px;
-  gap: 9px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-}
-
-.admin-orders .nav-item svg,
-.admin-orders .logout-link svg {
-  flex-basis: 14px;
-  width: 14px;
-  height: 14px;
-}
-
-.admin-orders .sidebar-nav .nav-item[href*="admin-orders"] { order: 3; }
-.admin-orders .sidebar-nav .nav-item[href*="admin-dashboard"] { order: 1; }
-.admin-orders .sidebar-nav .nav-item[href*="admin-products"] { order: 2; }
-.admin-orders .sidebar-nav .nav-item[href*="admin-edit-home"] { order: 5; }
-.admin-orders .sidebar-nav .nav-item[href*="admin-register"] { display: none; }
-.admin-orders .sidebar-nav .nav-item[href*="#verifikasi"] { order: 4; }
-
-.admin-orders .sidebar-footer {
-  gap: 12px;
-  padding: 14px 18px 16px;
-}
-
-.admin-orders .user-profile,
-.admin-orders .logout-link {
-  gap: 9px;
-  font-size: 11px;
-}
-
-.admin-orders .user-avatar {
-  flex-basis: 28px;
-  width: 28px;
-  height: 28px;
-}
-
-.admin-orders .user-profile div span {
-  font-size: 10px;
-}
-
 .admin-orders .dashboard-main.orders-main {
   width: auto;
   max-width: none;
@@ -679,11 +606,6 @@
 }
 
 @media (max-width: 768px) {
-  .admin-orders .sidebar {
-    flex-basis: 256px;
-    width: min(256px, 85vw);
-  }
-
   .admin-orders .dashboard-main.orders-main {
     padding-right: 16px;
     padding-left: 16px;
@@ -722,65 +644,6 @@
 .admin-orders {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
-
-.admin-orders .sidebar {
-  flex-basis: 256px;
-  width: 256px;
-}
-
-.admin-orders .sidebar-brand {
-  min-height: 80px;
-  gap: 12px;
-  padding: 16px 20px;
-}
-
-.admin-orders .brand-icon {
-  flex-basis: 40px;
-  width: 40px;
-  height: 40px;
-}
-
-.admin-orders .brand-text h2 { font-size: 16px; }
-.admin-orders .brand-text p { font-size: 12px; }
-
-.admin-orders .sidebar-nav {
-  gap: 4px;
-  padding: 12px;
-}
-
-.admin-orders .nav-item {
-  min-height: 40px;
-  gap: 14px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-.admin-orders .nav-item svg,
-.admin-orders .logout-link svg {
-  flex-basis: 18px;
-  width: 18px;
-  height: 18px;
-}
-
-.admin-orders .sidebar-footer {
-  gap: 16px;
-  padding: 20px 24px 24px;
-}
-
-.admin-orders .user-profile,
-.admin-orders .logout-link {
-  gap: 12px;
-  font-size: 14px;
-}
-
-.admin-orders .user-avatar {
-  flex-basis: 36px;
-  width: 36px;
-  height: 36px;
-}
-
-.admin-orders .user-profile div span { font-size: 12px; }
 
 .admin-orders .dashboard-main.orders-main {
   width: min(100%, 1440px);
@@ -889,11 +752,6 @@
 .order-details p { font-size: 12px; }
 
 @media (max-width: 768px) {
-  .admin-orders .sidebar {
-    flex-basis: 256px;
-    width: min(256px, 85vw);
-  }
-
   .admin-orders .dashboard-main.orders-main {
     width: 100%;
     padding: 24px 16px;
