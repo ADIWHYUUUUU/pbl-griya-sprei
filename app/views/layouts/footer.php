@@ -33,11 +33,11 @@ $isCustomerLoggedIn = ($_SESSION['login'] ?? false) === true
             <h3 class="footer__title">Kontak Kami</h3>
             <ul class="footer__list">
                 <li>
-                    <a class="footer__link" href="https://wa.me/+6285814626335" target="_blank" rel="noopener">
+                    <a class="footer__link" href="https://wa.me/+62111122223333" target="_blank" rel="noopener">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />
                         </svg>
-                        +62 858-1462-6335
+                        +62 1111-2222-3333
                     </a>
                 </li>
                 <li>
