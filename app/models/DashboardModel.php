@@ -16,15 +16,8 @@ class DashboardModel
                 (SELECT COUNT(*) FROM pesanan WHERE status_pesanan::text = 'MENUNGGU_PEMBAYARAN') AS pesanan_baru,
                 (
                     SELECT COUNT(*)
-                    FROM pesanan p
-                    JOIN LATERAL (
-                        SELECT status_pembayaran
-                        FROM pembayaran
-                        WHERE id_pesanan = p.id_pesanan
-                        ORDER BY tanggal_upload DESC, id_pembayaran DESC
-                        LIMIT 1
-                    ) pembayaran_terbaru ON TRUE
-                    WHERE pembayaran_terbaru.status_pembayaran::text = 'MENUNGGU_VERIFIKASI'
+                    FROM pembayaran
+                    WHERE status_pembayaran::text = 'MENUNGGU_VERIFIKASI'
                 ) AS menunggu_verifikasi,
                 (SELECT COALESCE(SUM(stok), 0) FROM produk) AS total_stok"
         );
@@ -37,13 +30,28 @@ class DashboardModel
         return $this->fetchOrders('', [], $limit);
     }
 
-    public function getWaitingVerificationOrders(int $limit = 5): array
+    public function getWaitingVerificationPayments(int $limit = 5): array
     {
-        return $this->fetchOrders(
-            "pembayaran_terbaru.status_pembayaran::text = 'MENUNGGU_VERIFIKASI'",
-            [],
-            $limit
+        $statement = $this->pdo->prepare(
+            "SELECT
+                pembayaran.id_pembayaran,
+                pembayaran.id_pesanan,
+                pembayaran.metode_pembayaran::text AS metode_pembayaran,
+                pembayaran.nominal_transfer,
+                pembayaran.tanggal_upload,
+                COALESCE(pesanan.no_invoice, 'ORD-' || pesanan.id_pesanan::text) AS kode,
+                pengguna.nama AS nama_pelanggan
+             FROM pembayaran
+             JOIN pesanan ON pesanan.id_pesanan = pembayaran.id_pesanan
+             JOIN \"user\" pengguna ON pengguna.id_user = pesanan.id_user
+             WHERE pembayaran.status_pembayaran::text = 'MENUNGGU_VERIFIKASI'
+             ORDER BY pembayaran.tanggal_upload DESC, pembayaran.id_pembayaran DESC
+             LIMIT :limit"
         );
+        $statement->bindValue(':limit', max(1, min(100, $limit)), PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll();
     }
 
     public function getOrdersForMonth(int $month, int $year): array

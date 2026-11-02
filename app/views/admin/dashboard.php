@@ -46,7 +46,7 @@ if ($tahunLaporan < $tahunSekarang - 5 || $tahunLaporan > $tahunSekarang + 1) {
 $dashboard = new DashboardModel($pdo);
 $stats = $dashboard->getStats();
 $pesananTerbaru = $dashboard->getRecentOrders();
-$pesananVerifikasi = $dashboard->getWaitingVerificationOrders();
+$pembayaranVerifikasi = $dashboard->getWaitingVerificationPayments();
 $pesananLaporan = $dashboard->getOrdersForMonth($bulanLaporan, $tahunLaporan);
 $produk = (new ProductController())->getAllProducts();
 
@@ -74,9 +74,11 @@ foreach ($pesananLaporan as $pesanan) {
 }
 
 $maksMingguan = max(1, ...array_column($mingguan, 'total'));
+$maksTransaksiMingguan = max(1, ...array_column($mingguan, 'transaksi'));
 $maksStok = max(1, ...array_map(static function ($item) {
     return (int) $item['stok'];
 }, $produk ?: [['stok' => 0]]));
+$skalaStok = max(50, $maksStok);
 $jumlahHalamanLaporan = max(1, (int) ceil(count($pesananLaporan) / 7));
 $halamanDiminta = $bacaAngkaQuery($_GET['halaman'] ?? 1, 1);
 $halamanLaporan = max(1, min($jumlahHalamanLaporan, $halamanDiminta));
@@ -95,7 +97,15 @@ $formatRupiah = static function ($amount): string {
     return 'Rp ' . number_format((float) $amount, 0, ',', '.');
 };
 $formatTanggal = static function ($date): string {
-    return date('d/m/Y', strtotime($date));
+    $bulanSingkat = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+        'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+    ];
+    $timestamp = strtotime($date);
+
+    return date('d', $timestamp)
+        . ' ' . $bulanSingkat[(int) date('n', $timestamp) - 1]
+        . ' ' . date('Y', $timestamp);
 };
 $esc = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -148,20 +158,23 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
     <section class="stats-grid">
         <div class="stat-card">
             <div class="label">Pesanan Baru</div>
-            <div class="value" id="statBaru">0</div>
-            <div class="subtext">Menunggu diproses</div>
+            <div class="value" id="statBaru"><?= $esc($stats['pesanan_baru'] ?? 0) ?></div>
+            <div class="subtext">Pesanan Baru</div>
         </div>
 
         <a class="stat-card clickable" href="#verifikasi">
             <div class="label">Verifikasi Transfer</div>
-            <div class="value" id="statVerifikasi">0</div>
-            <div class="subtext">Menunggu verifikasi</div>
+            <div class="value" id="statVerifikasi"><?= $esc($stats['menunggu_verifikasi'] ?? 0) ?></div>
+            <div class="subtext">Menunggu Konfirmasi</div>
         </a>
 
-        <div class="stat-card clickable" data-modal="modalStok" role="button" tabindex="0">
-            <div class="label">Stok Sprei</div>
-            <div class="value" id="statStok">0</div>
-            <div class="subtext">Total stok gudang</div>
+        <div class="stat-card stat-card-stock">
+            <div class="stat-card-heading">
+                <div class="label">Stok Sprei</div>
+                <button type="button" class="btn-text" data-modal="modalStok">Lihat Stok</button>
+            </div>
+            <div class="value" id="statStok"><?= $esc($stats['total_stok'] ?? 0) ?></div>
+            <div class="subtext">Total Stok Tersedia</div>
         </div>
     </section>
 
@@ -173,16 +186,34 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
 
         <div class="sales-metrics">
             <div class="metric-item">
-                <small id="mLabelTotal">Total penjualan</small>
-                <div class="m-val" id="mTotal"></div>
+                <small id="mLabelTotal">Total Penjualan</small>
+                <div class="m-val" id="mTotal"><?= $esc($formatRupiah($totalPenjualan)) ?></div>
             </div>
             <div class="metric-item">
-                <small>Transaksi selesai</small>
-                <div class="m-val" id="mSelesai"></div>
+                <small>Total Pesanan Selesai</small>
+                <div class="m-val" id="mSelesai"><?= $esc($jumlahSelesai) ?> pesanan</div>
             </div>
         </div>
 
-        <div class="bar-chart" id="barChart" role="img" aria-label="Grafik penjualan per minggu"></div>
+        <div class="bar-chart" id="barChart" role="img" aria-label="Grafik penjualan per minggu">
+            <?php foreach ($mingguan as $index => $minggu): ?>
+                <?php
+                $tinggiPenjualan = $minggu['total'] > 0
+                    ? max(4, (int) round($minggu['total'] / $maksMingguan * 100))
+                    : 0;
+                $tinggiTransaksi = $minggu['transaksi'] > 0
+                    ? max(4, (int) round($minggu['transaksi'] / $maksTransaksiMingguan * 100))
+                    : 0;
+                ?>
+                <div class="bar-group">
+                    <div class="bars">
+                        <span class="bar bar-a" style="height: <?= $tinggiPenjualan ?>%" title="<?= $esc($formatRupiah($minggu['total'])) ?>"></span>
+                        <span class="bar bar-b" style="height: <?= $tinggiTransaksi ?>%" title="<?= $esc($minggu['transaksi']) ?> transaksi"></span>
+                    </div>
+                    <span class="bar-label">Minggu <?= $index + 1 ?></span>
+                </div>
+            <?php endforeach; ?>
+        </div>
         <div class="chart-legend">
             <span><i class="dot dot-a"></i>Penjualan</span>
             <span><i class="dot dot-b"></i>Transaksi</span>
@@ -193,13 +224,29 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
         <div class="section-header">
             <h3>Membutuhkan verifikasi</h3>
         </div>
-        <div id="listVerifikasi"></div>
+        <div id="listVerifikasi">
+            <?php if ($pembayaranVerifikasi === []): ?>
+                <p class="empty-text">Tidak ada pembayaran yang menunggu verifikasi.</p>
+            <?php else: ?>
+                <?php foreach (array_slice($pembayaranVerifikasi, 0, 2) as $pembayaran): ?>
+                    <div class="verif-item">
+                        <span class="verification-check" aria-hidden="true">&#10003;</span>
+                        <div class="verif-info">
+                            <strong><?= $esc($pembayaran['nama_pelanggan']) ?> / <?= $esc($pembayaran['kode']) ?></strong>
+                            <span>Transfer pembayaran perlu diperiksa.</span>
+                            <small><?= $esc($formatTanggal($pembayaran['tanggal_upload'])) ?></small>
+                        </div>
+                        <a class="btn-outline" href="/?page=admin-payment-verify&amp;id=<?= (int) $pembayaran['id_pembayaran'] ?>">Cek Pembayaran</a>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
     </section>
 
     <section class="table-box" id="daftarPesanan">
         <div class="section-header">
             <h3>Daftar pesanan</h3>
-            <button type="button" class="btn-text btn-disabled" disabled>Lihat Pesanan</button>
+            <a class="btn-text" href="/?page=admin-orders">Lihat Pesanan</a>
         </div>
         <div class="table-wrap">
             <table>
@@ -213,7 +260,30 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                         <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="tabelPesanan"></tbody>
+                <tbody id="tabelPesanan">
+                    <?php if ($pesananTerbaru === []): ?>
+                        <tr><td class="empty-cell" colspan="6">Belum ada pesanan.</td></tr>
+                    <?php else: ?>
+                        <?php foreach (array_slice($pesananTerbaru, 0, 4) as $pesanan): ?>
+                            <tr>
+                                <td>
+                                    <strong><?= $esc($pesanan['kode']) ?></strong>
+                                    <small>Pesanan online</small>
+                                </td>
+                                <td>
+                                    <strong><?= $esc($pesanan['nama_pelanggan']) ?></strong>
+                                    <small><?= $esc($pesanan['daftar_produk']) ?></small>
+                                </td>
+                                <td><?= $esc($formatTanggal($pesanan['tanggal_pesan'])) ?></td>
+                                <td class="order-total"><?= $esc($formatRupiah($pesanan['total'])) ?></td>
+                                <td><?= $statusBadge($pesanan['status_pesanan']) ?></td>
+                                <td>
+                                    <button type="button" class="btn-outline" <?= $detailAttributes($pesanan) ?>>Lihat detail</button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
             </table>
         </div>
     </section>
@@ -286,7 +356,24 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
             <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
         </header>
         <div class="modal-body">
-            <div id="daftarStok" class="stock-list"></div>
+            <div id="daftarStok" class="stock-list">
+                <?php if ($produk === []): ?>
+                    <p class="empty-text">Belum ada produk dengan stok.</p>
+                <?php else: ?>
+                    <?php foreach ($produk as $item): ?>
+                        <?php $stokProduk = max(0, (int) $item['stok']); ?>
+                        <div class="stock-row">
+                            <div class="stock-row-heading">
+                                <span class="stock-name"><?= $esc($item['nama_produk']) ?></span>
+                                <strong class="stock-qty"><?= $esc($stokProduk) ?> set</strong>
+                            </div>
+                            <span class="progress" aria-label="Stok <?= $esc($stokProduk) ?> set">
+                                <span class="progress-fill" style="width: <?= min(100, (int) round($stokProduk / $skalaStok * 100)) ?>%"></span>
+                            </span>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
             <button type="button" class="stock-add-link" data-modal="modalTambahStok">
                 <span aria-hidden="true">+</span> Tambah Stok Sprei
             </button>
@@ -354,39 +441,66 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                     <small class="muted">Ikhtisar grafik performa penjualan dan rekapitulasi transaksi bulanan</small>
                 </div>
             </div>
-            <div class="report-controls">
+            <form class="report-controls" action="/#modalLaporan" method="get">
+                <input type="hidden" name="page" value="admin-dashboard">
                 <label class="sr-only" for="lapBulan">Pilih bulan laporan</label>
-                <select class="report-select" id="lapBulan"></select>
+                <select class="report-select" id="lapBulan" name="bulan">
+                    <?php foreach ($namaBulan as $index => $nama): ?>
+                        <option value="<?= $index + 1 ?>" <?= $bulanLaporan === $index + 1 ? 'selected' : '' ?>><?= $esc($nama) ?></option>
+                    <?php endforeach; ?>
+                </select>
                 <label class="sr-only" for="lapTahun">Pilih tahun laporan</label>
-                <select class="report-select" id="lapTahun"></select>
-                <button type="button" class="btn btn-primary" id="terapkanLaporan">Terapkan</button>
+                <select class="report-select" id="lapTahun" name="tahun">
+                    <?php for ($tahun = $tahunSekarang - 5; $tahun <= $tahunSekarang + 1; $tahun++): ?>
+                        <option value="<?= $tahun ?>" <?= $tahunLaporan === $tahun ? 'selected' : '' ?>><?= $tahun ?></option>
+                    <?php endfor; ?>
+                </select>
+                <button type="submit" class="btn btn-primary" id="terapkanLaporan">Terapkan</button>
                 <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
-            </div>
+            </form>
         </header>
 
         <div class="modal-body">
             <div class="report-summary">
                 <div class="report-summary-card">
                     <small>Total penjualan</small>
-                    <div class="summary-val" id="lapTotal"></div>
+                    <div class="summary-val" id="lapTotal"><?= $esc($formatRupiah($totalPenjualan)) ?></div>
                 </div>
                 <div class="report-summary-card">
                     <small>Transaksi selesai</small>
                     <div class="summary-line">
-                        <div class="summary-val" id="lapSelesai"></div>
+                        <div class="summary-val" id="lapSelesai"><?= $esc($jumlahSelesai) ?> pesanan</div>
                         <span class="period-badge">30 Hari</span>
                     </div>
-                    <small class="summary-note" id="lapTerbayar"></small>
+                    <small class="summary-note" id="lapTerbayar"><?= $esc($jumlahTerbayar) ?> transaksi berbayar</small>
                 </div>
             </div>
 
             <section class="report-panel">
-                <h4 class="report-title" id="judulTren"></h4>
-                <div class="trend-grid" id="lapTren"></div>
+                <h4 class="report-title" id="judulTren">Grafik tren penjualan mingguan (<?= $esc($namaBulan[$bulanLaporan - 1]) ?> <?= $tahunLaporan ?>)</h4>
+                <div class="trend-grid" id="lapTren">
+                    <?php foreach ($mingguan as $index => $minggu): ?>
+                        <?php
+                        $hariMulai = $index * 7 + 1;
+                        $hariSelesai = min(($index + 1) * 7, $tanggalAkhirBulan);
+                        $tinggiTren = $minggu['total'] > 0
+                            ? max(8, (int) round($minggu['total'] / $maksMingguan * 100))
+                            : 0;
+                        ?>
+                        <div class="trend-item">
+                            <strong><?= $esc($formatRupiah($minggu['total'])) ?></strong>
+                            <div class="trend-bar-track">
+                                <span class="trend-bar" style="height: <?= $tinggiTren ?>%"></span>
+                            </div>
+                            <span>Minggu <?= $index + 1 ?></span>
+                            <small>(<?= $hariMulai ?>–<?= $hariSelesai ?> <?= $esc(substr($namaBulan[$bulanLaporan - 1], 0, 3)) ?>)</small>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </section>
 
             <section class="report-table-panel">
-                <h4 class="report-title">Daftar pesanan &amp; transaksi terverifikasi (30 hari terakhir)</h4>
+                <h4 class="report-title">Daftar pesanan &amp; transaksi bulanan (<?= $esc($namaBulan[$bulanLaporan - 1]) ?> <?= $tahunLaporan ?>)</h4>
                 <div class="table-wrap">
                     <table class="report-table">
                         <thead>
@@ -398,14 +512,39 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="lapTabel"></tbody>
+                        <tbody id="lapTabel">
+                            <?php if ($pesananLaporanHalaman === []): ?>
+                                <tr><td class="empty-cell" colspan="5">Tidak ada pesanan pada bulan ini.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($pesananLaporanHalaman as $pesanan): ?>
+                                    <tr>
+                                        <td><strong><?= $esc($pesanan['kode']) ?></strong></td>
+                                        <td><?= $esc($formatTanggal($pesanan['tanggal_pesan'])) ?></td>
+                                        <td>
+                                            <strong><?= $esc($pesanan['nama_pelanggan']) ?></strong>
+                                            <small><?= $esc($pesanan['daftar_produk']) ?></small>
+                                        </td>
+                                        <td><?= $esc($formatRupiah($pesanan['total'])) ?></td>
+                                        <td><?= $statusBadge($pesanan['status_pesanan']) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
                     </table>
                 </div>
                 <div class="report-pagination">
                     <div class="pagination-controls" aria-label="Halaman laporan">
-                        <button type="button" id="lapSebelumnya" aria-label="Halaman sebelumnya">&lsaquo;</button>
-                        <span id="lapNomorHalaman" aria-live="polite"></span>
-                        <button type="button" id="lapBerikutnya" aria-label="Halaman berikutnya">&rsaquo;</button>
+                        <?php
+                        $linkLaporan = static function (int $page) use ($bulanLaporan, $tahunLaporan): string {
+                            return '/?page=admin-dashboard&bulan=' . $bulanLaporan
+                                . '&tahun=' . $tahunLaporan . '&halaman=' . $page . '#modalLaporan';
+                        };
+                        ?>
+                        <a href="<?= $esc($linkLaporan(max(1, $halamanLaporan - 1))) ?>" aria-label="Halaman sebelumnya" <?= $halamanLaporan <= 1 ? 'aria-disabled="true" tabindex="-1"' : '' ?>>&lsaquo;</a>
+                        <?php for ($page = 1; $page <= $jumlahHalamanLaporan; $page++): ?>
+                            <a href="<?= $esc($linkLaporan($page)) ?>" <?= $page === $halamanLaporan ? 'class="current" aria-current="page"' : '' ?>><?= $page ?></a>
+                        <?php endfor; ?>
+                        <a href="<?= $esc($linkLaporan(min($jumlahHalamanLaporan, $halamanLaporan + 1))) ?>" aria-label="Halaman berikutnya" <?= $halamanLaporan >= $jumlahHalamanLaporan ? 'aria-disabled="true" tabindex="-1"' : '' ?>>&rsaquo;</a>
                     </div>
                 </div>
             </section>

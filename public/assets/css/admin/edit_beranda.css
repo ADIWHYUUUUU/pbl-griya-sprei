@@ -17,11 +17,24 @@ body {
   background: var(--paper);
   font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
 }
+body.admin-home-editor {
+  --garis: var(--line);
+  --putih: var(--white);
+  --teks: var(--ink);
+}
 button,
 input,
 textarea,
 select {
   font: inherit;
+}
+body.admin-home-editor .sidebar,
+body.admin-home-editor .sidebar * {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+body.admin-home-editor .sidebar-brand h2,
+body.admin-home-editor .sidebar-brand p {
+  margin: 0;
 }
 .admin-home-editor .admin-layout {
   display: flex;

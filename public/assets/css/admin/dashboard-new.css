@@ -1323,4 +1323,801 @@ textarea.form-control {
     }
 }
 
+/* Compact dashboard layout */
+body.admin-dashboard {
+    --hijau-tua: #405540;
+    --hijau-sedang: #405540;
+    --hijau-muda: #c9d6c9;
+    --latar: #f7f6f3;
+    --teks: #344054;
+    --teks-abu: #647084;
+    --garis: #e1e4e9;
+    background: var(--latar);
+    font-family: Arial, Helvetica, sans-serif;
+}
 
+body.admin-dashboard .sidebar {
+    flex-basis: clamp(154px, 20vw, 256px);
+    width: clamp(154px, 20vw, 256px);
+}
+
+body.admin-dashboard .sidebar-brand {
+    min-height: 48px;
+    gap: 8px;
+    padding: 8px 12px;
+}
+
+body.admin-dashboard .brand-icon {
+    flex-basis: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+body.admin-dashboard .brand-text h2 {
+    font-size: 10px;
+}
+
+body.admin-dashboard .brand-text p {
+    font-size: 8px;
+}
+
+body.admin-dashboard .sidebar-nav {
+    gap: 2px;
+    padding: 8px;
+}
+
+body.admin-dashboard .nav-item {
+    gap: 8px;
+    min-height: 25px;
+    padding: 5px 7px;
+    border-radius: 6px;
+    font-size: 9px;
+}
+
+body.admin-dashboard .nav-item svg,
+body.admin-dashboard .logout-link svg {
+    flex-basis: 13px;
+    width: 13px;
+    height: 13px;
+}
+
+body.admin-dashboard .sidebar-footer {
+    gap: 10px;
+    padding: 12px 14px;
+}
+
+body.admin-dashboard .user-profile {
+    gap: 7px;
+    font-size: 9px;
+}
+
+body.admin-dashboard .user-avatar {
+    flex-basis: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+body.admin-dashboard .user-avatar svg {
+    width: 14px;
+    height: 14px;
+}
+
+body.admin-dashboard .user-profile div span,
+body.admin-dashboard .logout-link {
+    font-size: 8px;
+}
+
+body.admin-dashboard .logout-link {
+    gap: 8px;
+}
+
+body.admin-dashboard main {
+    height: 100vh;
+    padding: 20px;
+}
+
+body.admin-dashboard .header-title {
+    margin-bottom: 14px;
+    color: #344054;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+body.admin-dashboard .stats-grid {
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+body.admin-dashboard .stat-card {
+    min-width: 0;
+    min-height: 92px;
+    padding: 11px;
+    border-color: var(--garis);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(30, 41, 59, 0.04);
+}
+
+body.admin-dashboard .stat-card .label {
+    color: #475467;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+body.admin-dashboard .stat-card .value {
+    margin: 6px 0 7px;
+    color: #344054;
+    font-size: 20px;
+}
+
+body.admin-dashboard .stat-card .subtext {
+    padding-top: 6px;
+    border-top: 1px solid var(--garis);
+    color: var(--teks-abu);
+    font-size: 8px;
+}
+
+body.admin-dashboard .stat-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+body.admin-dashboard .stat-card-heading .btn-text {
+    font-size: 8px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+body.admin-dashboard .chart-section,
+body.admin-dashboard .verification-box,
+body.admin-dashboard .table-box {
+    margin-bottom: 14px;
+    padding: 12px;
+    border-color: var(--garis);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(30, 41, 59, 0.035);
+}
+
+body.admin-dashboard .section-header {
+    min-height: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--garis);
+}
+
+body.admin-dashboard .section-header h3 {
+    color: #344054;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+body.admin-dashboard .section-header .btn-text {
+    padding: 4px 8px;
+    border: 1px solid var(--garis);
+    border-radius: 5px;
+    background: #fff;
+    color: #344054;
+    font-size: 8px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+body.admin-dashboard .sales-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+body.admin-dashboard .metric-item {
+    min-width: 0;
+    padding: 8px;
+    border: 1px solid var(--garis);
+    border-radius: 6px;
+    background: var(--latar);
+}
+
+body.admin-dashboard .metric-item small {
+    margin-bottom: 4px;
+    font-size: 8px;
+}
+
+body.admin-dashboard .metric-item .m-val {
+    overflow: hidden;
+    color: #344054;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.admin-dashboard .bar-chart {
+    height: 128px;
+    gap: 12px;
+    border-color: #edf0f3;
+}
+
+body.admin-dashboard .bars {
+    height: 100px;
+    max-width: 40px;
+    gap: 4px;
+}
+
+body.admin-dashboard .bar {
+    min-height: 0;
+    border-radius: 3px 3px 0 0;
+}
+
+body.admin-dashboard .bar-a,
+body.admin-dashboard .dot-a {
+    background-color: #405540;
+}
+
+body.admin-dashboard .bar-b,
+body.admin-dashboard .dot-b {
+    background-color: #c9d6c9;
+}
+
+body.admin-dashboard .bar-label {
+    margin-top: 5px;
+    color: var(--teks-abu);
+    font-size: 8px;
+}
+
+body.admin-dashboard .chart-legend {
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 8px;
+}
+
+body.admin-dashboard .dot {
+    width: 7px;
+    height: 7px;
+    margin-right: 4px;
+    border-radius: 1px;
+}
+
+body.admin-dashboard .verif-item {
+    gap: 8px;
+    min-height: 46px;
+    padding: 7px 0;
+}
+
+body.admin-dashboard .verif-item + .verif-item {
+    border-top: 1px solid var(--garis);
+}
+
+body.admin-dashboard .verification-check {
+    display: grid;
+    flex: 0 0 17px;
+    place-items: center;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #e5ece5;
+    color: #405540;
+    font-size: 9px;
+}
+
+body.admin-dashboard .verif-info {
+    flex: 1;
+    min-width: 0;
+}
+
+body.admin-dashboard .verif-info strong,
+body.admin-dashboard .verif-info span,
+body.admin-dashboard .verif-info small {
+    display: block;
+    overflow: hidden;
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.admin-dashboard .verif-info strong {
+    margin-bottom: 2px;
+    color: #344054;
+}
+
+body.admin-dashboard .verif-info small {
+    margin-top: 2px;
+    color: var(--teks-abu);
+}
+
+body.admin-dashboard .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 20px;
+    padding: 4px 7px;
+    border: 1px solid var(--garis);
+    border-radius: 5px;
+    background: #fff;
+    color: #344054;
+    font-size: 8px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+body.admin-dashboard .btn-outline:hover {
+    border-color: #aab8aa;
+    background: #f9faf9;
+}
+
+body.admin-dashboard .table-box {
+    overflow: hidden;
+    padding: 0;
+}
+
+body.admin-dashboard .table-box > .section-header {
+    margin: 0;
+    padding: 10px 12px;
+}
+
+body.admin-dashboard .table-wrap {
+    overflow-x: auto;
+}
+
+body.admin-dashboard table {
+    min-width: 550px;
+    font-size: 8px;
+}
+
+body.admin-dashboard th {
+    padding: 8px 7px;
+    background: #f7f6f3;
+    color: #475467;
+    font-size: 7px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+body.admin-dashboard td {
+    padding: 7px;
+    color: #344054;
+    font-size: 8px;
+    vertical-align: middle;
+}
+
+body.admin-dashboard td strong,
+body.admin-dashboard td small {
+    display: block;
+}
+
+body.admin-dashboard td strong {
+    font-weight: 600;
+}
+
+body.admin-dashboard td small {
+    max-width: 150px;
+    margin-top: 2px;
+    overflow: hidden;
+    color: var(--teks-abu);
+    font-size: 7px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.admin-dashboard td:first-child,
+body.admin-dashboard .order-total {
+    white-space: nowrap;
+}
+
+body.admin-dashboard .badge {
+    padding: 3px 6px;
+    font-size: 7px;
+}
+
+body.admin-dashboard .empty-cell {
+    padding: 16px;
+    color: var(--teks-abu);
+    text-align: center;
+}
+
+body.admin-dashboard .empty-text {
+    padding: 5px 0;
+    font-size: 9px;
+}
+
+@media (min-width: 701px) and (max-width: 768px) {
+    body.admin-dashboard .sidebar {
+        position: sticky;
+        align-self: flex-start;
+        flex: 0 0 20%;
+        width: 20%;
+        height: 100vh;
+        transform: none;
+    }
+
+    body.admin-dashboard .sidebar-backdrop,
+    body.admin-dashboard .sidebar-close,
+    body.admin-dashboard main .burger-btn {
+        display: none;
+    }
+
+    body.admin-dashboard main {
+        width: 80%;
+        height: 100vh;
+        padding: 20px;
+    }
+
+    body.admin-dashboard .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    body.admin-dashboard .sales-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    body.admin-dashboard main {
+        padding: 18px;
+    }
+
+    body.admin-dashboard .sales-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+body.admin-dashboard .stock-list-modal {
+    width: min(100%, 320px);
+    max-height: calc(100vh - 32px);
+    border-radius: 12px;
+}
+
+body.admin-dashboard .stock-list-modal .modal-header {
+    min-height: 50px;
+    padding: 14px 20px 10px;
+}
+
+body.admin-dashboard .stock-list-modal .modal-header h3 {
+    color: #344054;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+body.admin-dashboard .stock-list-modal .close-btn {
+    color: #475467;
+    font-size: 22px;
+}
+
+body.admin-dashboard .stock-list-modal .modal-body {
+    padding: 8px 20px 20px;
+}
+
+body.admin-dashboard .stock-list-modal .stock-list {
+    border: 0;
+}
+
+body.admin-dashboard .stock-list-modal .stock-row {
+    padding: 10px 0 12px;
+}
+
+body.admin-dashboard .stock-list-modal .stock-row-heading {
+    margin-bottom: 5px;
+}
+
+body.admin-dashboard .stock-list-modal .stock-name,
+body.admin-dashboard .stock-list-modal .stock-qty {
+    color: #344054;
+    font-size: 12px;
+}
+
+body.admin-dashboard .stock-list-modal .stock-name {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.admin-dashboard .stock-list-modal .stock-qty {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+body.admin-dashboard .stock-list-modal .progress {
+    height: 7px;
+    border: 1px solid #e1e4e9;
+    border-radius: 999px;
+    background: #f4f5f6;
+}
+
+body.admin-dashboard .stock-list-modal .progress-fill {
+    min-width: 0;
+    border-radius: inherit;
+    background: #405540;
+}
+
+body.admin-dashboard .stock-list-modal .stock-row:nth-child(2) .progress-fill {
+    background: #647765;
+}
+
+body.admin-dashboard .stock-list-modal .stock-row:nth-child(3) .progress-fill {
+    background: #788e79;
+}
+
+body.admin-dashboard .stock-list-modal .stock-add-link {
+    min-height: 36px;
+    margin-top: 12px;
+    border-color: var(--garis);
+    border-radius: 8px;
+    background: #f7f6f3;
+    color: #344054;
+    font-size: 11px;
+}
+
+body.admin-dashboard .stock-list-modal .stock-add-link span {
+    font-size: 15px;
+}
+
+body.admin-dashboard #modalLaporan .modal-container {
+    width: min(960px, 100%);
+    max-height: calc(100vh - 32px);
+    border-radius: 12px;
+}
+
+body.admin-dashboard #modalLaporan .report-modal-header {
+    min-height: 60px;
+    padding: 10px 18px;
+    background: #f7f6f3;
+}
+
+body.admin-dashboard #modalLaporan .report-heading {
+    min-width: 0;
+    gap: 10px;
+}
+
+body.admin-dashboard #modalLaporan .report-heading-icon {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+body.admin-dashboard #modalLaporan .report-heading h3 {
+    color: #344054;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+body.admin-dashboard #modalLaporan .report-heading .muted {
+    max-width: 360px;
+    margin-top: 3px;
+    font-size: 8px;
+}
+
+body.admin-dashboard #modalLaporan .report-controls {
+    flex: 0 0 auto;
+    gap: 6px;
+    margin: 0;
+}
+
+body.admin-dashboard #modalLaporan .report-select {
+    min-width: 78px;
+    padding: 6px 7px;
+    border-color: var(--garis);
+    border-radius: 5px;
+    color: #344054;
+    font-size: 9px;
+}
+
+body.admin-dashboard #modalLaporan .report-controls .btn {
+    padding: 7px 10px;
+    border-radius: 5px;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .report-controls .close-btn {
+    margin-left: 2px;
+    font-size: 19px;
+}
+
+body.admin-dashboard #modalLaporan .modal-body {
+    padding: 16px 18px 20px;
+}
+
+body.admin-dashboard #modalLaporan .report-summary {
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+body.admin-dashboard #modalLaporan .report-summary-card {
+    min-height: 92px;
+    padding: 12px;
+    border-color: var(--garis);
+    border-radius: 9px;
+    background: #f7f6f3;
+}
+
+body.admin-dashboard #modalLaporan .report-summary-card > small {
+    color: #596579;
+    font-size: 8px;
+}
+
+body.admin-dashboard #modalLaporan .summary-val {
+    margin-top: 10px;
+    color: #344054;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+body.admin-dashboard #modalLaporan .summary-line {
+    gap: 12px;
+}
+
+body.admin-dashboard #modalLaporan .summary-line .summary-val {
+    margin-top: 6px;
+}
+
+body.admin-dashboard #modalLaporan .period-badge {
+    padding: 3px 6px;
+    border-color: #d7dfd5;
+    color: #405540;
+    font-size: 8px;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .summary-note {
+    margin-top: 7px;
+    padding-top: 7px;
+    border-top: 1px solid var(--garis);
+    font-size: 8px;
+}
+
+body.admin-dashboard #modalLaporan .report-panel,
+body.admin-dashboard #modalLaporan .report-table-panel {
+    margin-bottom: 10px;
+    border-color: var(--garis);
+    border-radius: 9px;
+}
+
+body.admin-dashboard #modalLaporan .report-title {
+    padding: 10px 12px;
+    color: #475467;
+    font-size: 8px;
+}
+
+body.admin-dashboard #modalLaporan .report-panel .report-title::before {
+    width: 7px;
+    height: 7px;
+}
+
+body.admin-dashboard #modalLaporan .trend-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    padding: 10px;
+    background: #f7f6f3;
+}
+
+body.admin-dashboard #modalLaporan .trend-item {
+    gap: 5px;
+    min-height: 100px;
+    padding: 8px 6px 7px;
+    border-color: var(--garis);
+    border-radius: 7px;
+    font-size: 8px;
+}
+
+body.admin-dashboard #modalLaporan .trend-item strong {
+    color: #475467;
+    font-size: 8px;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .trend-bar-track {
+    height: 44px;
+}
+
+body.admin-dashboard #modalLaporan .trend-bar {
+    width: 30px;
+    max-width: 55%;
+    min-height: 0;
+    border-radius: 4px;
+    background: #405540;
+}
+
+body.admin-dashboard #modalLaporan .trend-item > span {
+    color: #475467;
+    font-weight: 600;
+}
+
+body.admin-dashboard #modalLaporan .trend-item small {
+    font-size: 7px;
+}
+
+body.admin-dashboard #modalLaporan .report-table-panel {
+    margin-bottom: 0;
+}
+
+body.admin-dashboard #modalLaporan .report-table {
+    min-width: 620px;
+    font-size: 9px;
+}
+
+body.admin-dashboard #modalLaporan .report-table th {
+    padding: 8px 10px;
+    background: #f7f6f3;
+    font-size: 7px;
+}
+
+body.admin-dashboard #modalLaporan .report-table td {
+    padding: 8px 10px;
+    font-size: 8px;
+    vertical-align: middle;
+}
+
+body.admin-dashboard #modalLaporan .report-table td:nth-child(3) {
+    min-width: 180px;
+}
+
+body.admin-dashboard #modalLaporan .report-table td:nth-child(4) {
+    font-size: 8px;
+}
+
+body.admin-dashboard #modalLaporan .report-table td small {
+    max-width: 260px;
+    font-size: 7px;
+}
+
+body.admin-dashboard #modalLaporan .report-pagination {
+    padding: 10px;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls {
+    gap: 5px;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls a {
+    display: grid;
+    place-items: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 6px;
+    border: 1px solid var(--garis);
+    border-radius: 6px;
+    background: #fff;
+    color: #344054;
+    font-size: 9px;
+    text-decoration: none;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls a.current {
+    border-color: #405540;
+    background: #405540;
+    color: #fff;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls a[aria-disabled="true"] {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+@media (max-width: 700px) {
+    body.admin-dashboard #modalLaporan .report-modal-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-controls {
+        width: 100%;
+    }
+
+    body.admin-dashboard #modalLaporan .report-select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    body.admin-dashboard #modalLaporan .report-controls .close-btn {
+        margin-left: auto;
+    }
+
+    body.admin-dashboard #modalLaporan .trend-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

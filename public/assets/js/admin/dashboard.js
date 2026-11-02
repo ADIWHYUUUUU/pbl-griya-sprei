@@ -50,13 +50,13 @@
         document.getElementById('dNama').textContent = data.nama || '-';
         document.getElementById('dTelepon').textContent = data.telepon || '-';
         document.getElementById('dAlamat').textContent = data.alamat || '-';
-        document.getElementById('dProduk').textContent = data.produk || '-';
+        document.getElementById('dItems').textContent = data.produk || '-';
         document.getElementById('dTotal').textContent = data.total || '-';
-        document.getElementById('dPembayaran').textContent =
+        document.getElementById('dMetode').textContent =
             (data.pembayaran || 'Belum ada pembayaran') +
             (data.metode && data.metode !== 'Belum tersedia' ? ' · ' + data.metode : '');
-        document.getElementById('dStatus').textContent = data.status || '-';
-        document.getElementById('dCatatan').textContent = data.catatan || 'Tidak ada catatan.';
+        document.getElementById('dStatus').value = data.status || '-';
+        document.getElementById('dCatatanAdmin').value = data.catatan || 'Tidak ada catatan.';
     }
 
     document.addEventListener('click', function (event) {
