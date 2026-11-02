@@ -40,6 +40,10 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg>
                 <span>Cek Pembayaran</span>
             </a>
+            <a class="nav-item <?= in_array($halamanAktif, ['admin-resi-list', 'admin-resi-input'], true) ? 'active' : '' ?>" href="/?page=admin-resi-list" <?= in_array($halamanAktif, ['admin-resi-list', 'admin-resi-input'], true) ? 'aria-current="page"' : '' ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14v11H5zM9 5h6v3H9zM8 12h8M8 16h5"/></svg>
+                <span>Nomor Resi</span>
+            </a>
         </nav>
     </div>
 
