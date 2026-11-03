@@ -45,7 +45,7 @@ body.resi-page {
 .page-breadcrumb {
     margin-bottom: 14px;
     color: var(--teks-abu);
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.5;
 }
 
@@ -82,7 +82,7 @@ body.resi-page {
     border-bottom: 1px solid var(--garis);
     background: var(--bg-soft);
     color: var(--teks-abu);
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -95,7 +95,7 @@ body.resi-page {
     background: var(--putih);
     vertical-align: middle;
     color: var(--teks);
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .order-table-wrap tbody tr:last-child td {
@@ -112,34 +112,34 @@ body.resi-page {
     display: block;
     margin-bottom: 4px;
     color: var(--hijau-tua);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
 }
 
 .date,
 .muted {
     color: var(--teks-abu);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .customer-name {
     display: block;
     margin-bottom: 5px;
     color: var(--teks);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
 }
 
 .shipping-name {
     margin-top: 6px;
     color: var(--teks-abu);
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.5;
 }
 
 .spec {
     color: var(--teks);
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.6;
 }
 
@@ -153,7 +153,7 @@ body.resi-page {
     border-radius: 999px;
     background: #edf3ee;
     color: var(--hijau-tua);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
 }
 
@@ -167,7 +167,7 @@ body.resi-page {
     border-radius: 8px;
     background: var(--hijau-tua);
     color: var(--putih);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     text-decoration: none;
     transition: all 0.2s ease;
@@ -201,7 +201,7 @@ body.resi-page {
 
 .footer-note {
     color: var(--teks-abu);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .pager {
@@ -223,7 +223,7 @@ body.resi-page {
     border-radius: 8px;
     background: #f4f5f4;
     color: var(--teks);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     text-decoration: none;
 }
@@ -245,7 +245,7 @@ body.resi-page {
     padding: 12px 14px;
     border: 1px solid transparent;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .flash-message.success {

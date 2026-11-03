@@ -49,7 +49,7 @@ body.resi-input-page {
 .page-breadcrumb {
     margin-bottom: 12px;
     color: var(--teks-abu);
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.5;
 }
 
@@ -173,7 +173,7 @@ body.resi-input-page {
     border-radius: 999px;
     background: #edf3ee;
     color: var(--hijau-tua);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
 }

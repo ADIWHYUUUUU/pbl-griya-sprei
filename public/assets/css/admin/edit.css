@@ -27,7 +27,7 @@
   border-radius: 8px;
   background: var(--putih);
   color: #405540;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   transition: background-color 0.18s ease, border-color 0.18s ease;
 }
@@ -58,7 +58,7 @@
   display: block;
   margin-bottom: 8px;
   color: #667a64;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -73,7 +73,7 @@
 .admin-edit-product .edit-card-heading p {
   margin: 7px 0 0;
   color: var(--teks-abu);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-edit-product .edit-form-body {
@@ -91,7 +91,7 @@
   gap: 10px;
   margin: 0 0 20px;
   color: #344936;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -119,7 +119,7 @@
   display: block;
   margin-bottom: 8px;
   color: #3d493d;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -138,7 +138,7 @@
   background: #fff;
   color: var(--teks);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -197,7 +197,7 @@
   border-left: 1px solid #edf0eb;
   background: #f7f8f6;
   color: #6b756a;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .admin-edit-product .edit-price-stock {
@@ -218,7 +218,7 @@
   border-radius: 20px;
   background: #f4f7f2;
   color: #405540;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.18s ease, border-color 0.18s ease;
@@ -250,7 +250,7 @@
   border-radius: 8px;
   background: #f0f3ee;
   color: #6b756a;
-  font-size: 11px;
+  font-size: 13px;
   text-align: center;
 }
 
@@ -271,12 +271,12 @@
 .admin-edit-product .edit-photo-info strong {
   overflow-wrap: anywhere;
   color: #344936;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-edit-product .edit-photo-info small {
   color: var(--teks-abu);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -288,7 +288,7 @@
   border-radius: 7px;
   background: #edf3eb;
   color: #354f38;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -316,7 +316,7 @@
 .admin-edit-product #editDescriptionCount {
   margin-bottom: 12px;
   color: var(--teks-abu);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .admin-edit-product .edit-textarea {
@@ -346,7 +346,7 @@
   border-radius: 8px;
   background: #354f38;
   color: #fff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.18s ease, border-color 0.18s ease;

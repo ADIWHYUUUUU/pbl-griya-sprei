@@ -40,7 +40,7 @@
   padding: 8px 11px;
   border-radius: 7px;
   color: var(--teks-abu);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
@@ -60,7 +60,7 @@
   padding: 0 5px;
   border-radius: 999px;
   background: rgba(82, 121, 111, 0.12);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .order-search {
@@ -78,7 +78,7 @@
   border-radius: 7px 0 0 7px;
   color: var(--teks);
   font: inherit;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .order-search button {
@@ -87,7 +87,7 @@
   border-radius: 0 7px 7px 0;
   background: var(--hijau-tua);
   color: var(--putih);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -96,7 +96,7 @@
   margin: 0;
   padding: 14px 20px 10px;
   color: var(--teks-abu);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .orders-table-scroll {
@@ -115,7 +115,7 @@
   padding: 12px 16px;
   background: #f7f8f6;
   color: var(--teks-abu);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -125,7 +125,7 @@
   padding: 15px 16px;
   border-top: 1px solid var(--garis);
   color: var(--teks);
-  font-size: 12px;
+  font-size: 14px;
   vertical-align: middle;
 }
 
@@ -136,12 +136,12 @@
 
 .orders-table td > strong {
   margin-bottom: 5px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .orders-table td > small {
   color: var(--teks-abu);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .orders-table .order-invoice {
@@ -165,7 +165,7 @@
   max-width: 180px;
   padding: 6px 9px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -275,7 +275,7 @@
   padding: 0 24px;
   border-bottom: 1px solid #e4e9e3;
   color: #788276;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .orders-breadcrumb strong {
@@ -310,7 +310,7 @@
   border-radius: 6px;
   background: #fff;
   color: #657160;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -343,7 +343,7 @@
   border: 1px solid #e0e6df;
   border-radius: 7px;
   background: #fff;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .order-search button {
@@ -401,7 +401,7 @@
   padding: 9px 14px;
   background: #f0f3ef;
   color: #687365;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.02em;
   line-height: 1.25;
 }
@@ -409,7 +409,7 @@
 .orders-table td {
   padding: 12px 10px;
   border-top: 1px solid #edf0ec;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.45;
   vertical-align: middle;
 }
@@ -425,13 +425,13 @@
 
 .orders-table td > strong {
   margin-bottom: 2px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .orders-table td > small {
   color: #71806f;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .orders-table .order-invoice {
@@ -446,7 +446,7 @@
   border: 1px solid #cbd9c8;
   border-radius: 4px;
   color: #536650;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.3;
 }
 
@@ -473,7 +473,7 @@
 .orders-table .order-products {
   max-width: none;
   color: #334139;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.45;
   white-space: pre-line;
 }
@@ -483,7 +483,7 @@
 }
 
 .orders-table .order-total strong {
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .orders-table .order-total small {
@@ -498,7 +498,7 @@
   padding: 4px 9px;
   background: #f0f3ef;
   color: #556450;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -531,7 +531,7 @@
   border-radius: 5px;
   background: #fff;
   color: #586655;
-  font-size: 9px;
+  font-size: 12px;
   cursor: pointer;
   text-decoration: none;
 }
@@ -541,7 +541,7 @@
   padding: 12px 15px;
   border: 1px solid;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .verification-flash--success {
@@ -591,13 +591,13 @@
 
 .order-details small {
   color: #798575;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .order-details p {
   margin: 4px 0 0;
   color: #344139;
-  font-size: 10px;
+  font-size: 13px;
   overflow-wrap: anywhere;
 }
 
@@ -655,7 +655,7 @@
   height: 48px;
   margin: -28px calc(-1 * clamp(22px, 4vw, 56px)) 26px;
   padding: 0 clamp(22px, 4vw, 56px);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .admin-orders .orders-header {
@@ -676,7 +676,7 @@
   min-height: 38px;
   gap: 8px;
   padding: 8px 11px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .order-tab span {
@@ -686,7 +686,7 @@
   padding: 0 5px;
   border-radius: 999px;
   background: rgba(82, 121, 111, 0.12);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .order-tab.is-active span,
@@ -701,7 +701,7 @@
 
 .order-search input {
   padding: 10px 12px 10px 34px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .order-search button { left: 10px; }
@@ -714,7 +714,7 @@
 .orders-table th {
   height: auto;
   padding: 15px 16px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   line-height: 1.3;
 }
@@ -722,34 +722,34 @@
 .orders-table td {
   height: auto !important;
   padding: 15px 16px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
-.orders-table td > strong { font-size: 13px; }
-.orders-table td > small { font-size: 12px; }
+.orders-table td > strong { font-size: 14px; }
+.orders-table td > small { font-size: 14px; }
 .order-invoice { white-space: normal !important; }
-.order-size-label { font-size: 11px; }
+.order-size-label { font-size: 13px; }
 .order-phone svg { flex-basis: 14px; width: 14px; height: 14px; }
-.orders-table .order-products { font-size: 12px; }
-.orders-table .order-total strong { font-size: 13px; }
-.orders-table .order-total small { font-size: 11px; }
+.orders-table .order-products { font-size: 14px; }
+.orders-table .order-total strong { font-size: 14px; }
+.orders-table .order-total small { font-size: 13px; }
 
 .order-status {
   max-width: 200px;
   padding: 6px 9px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .order-action {
   min-width: 64px;
   min-height: 32px;
   padding: 6px 11px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
-.order-details small { font-size: 11px; }
-.order-details p { font-size: 12px; }
+.order-details small { font-size: 13px; }
+.order-details p { font-size: 14px; }
 
 @media (max-width: 768px) {
   .admin-orders .dashboard-main.orders-main {

@@ -27,7 +27,7 @@
   padding: 0 32px;
   border-bottom: 1px solid var(--order-border);
   color: var(--order-muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .order-breadcrumb a {
@@ -46,7 +46,7 @@
   display: inline-block;
   margin-bottom: 12px;
   color: var(--hijau-tua);
-  font-size: 12px;
+  font-size: 14px;
   text-decoration: none;
 }
 
@@ -63,7 +63,7 @@
 
 .order-title-row small {
   color: var(--order-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .order-badge,
@@ -74,7 +74,7 @@
   border-radius: 999px;
   background: #f0f4ef;
   color: #526351;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .order-badge--waiting {
@@ -114,7 +114,7 @@
   padding-bottom: 14px;
   border-bottom: 1px solid var(--order-border);
   color: #2d3b31;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .detail-list,
@@ -130,7 +130,7 @@
   gap: 14px;
   padding: 13px 0;
   border-bottom: 1px solid #edf1ec;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .detail-list dt,
@@ -171,11 +171,11 @@
 }
 .item-heading h3 {
   color: #354237;
-  font-size: 14px;
+  font-size: 15px;
 }
 .item-heading span {
   color: var(--order-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .item-specs {
   display: grid;
@@ -186,7 +186,7 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .item-specs dt {
   color: var(--order-muted);
@@ -202,7 +202,7 @@
   border-radius: 6px;
   background: #f8faf7;
   color: #657160;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.5;
 }
 .customer-note p {
@@ -220,13 +220,13 @@
 .invoice-chip {
   margin-left: 0;
   padding: 3px 9px;
-  font-size: 10px;
+  font-size: 13px;
 }
 .order-alert {
   margin-top: 18px;
   padding: 10px 14px;
   border-radius: 7px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .order-alert--success {
   background: #e6f3e8;
@@ -241,21 +241,21 @@
 }
 .subheading {
   color: #526351;
-  font-size: 12px;
+  font-size: 14px;
 }
 .summary-item {
   display: grid;
   gap: 5px;
   padding: 14px 0;
   border-bottom: 1px solid #edf1ec;
-  font-size: 12px;
+  font-size: 14px;
 }
 .summary-item strong {
   color: #354237;
 }
 .summary-item span {
   color: var(--order-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .summary-item p {
   margin-top: 4px;
@@ -263,7 +263,7 @@
   border-radius: 5px;
   background: #f8faf7;
   color: #657160;
-  font-size: 11px;
+  font-size: 13px;
 }
 .form-field {
   margin-top: 16px;
@@ -272,7 +272,7 @@
   display: block;
   margin-bottom: 6px;
   color: #526351;
-  font-size: 12px;
+  font-size: 14px;
 }
 .form-field input {
   width: 100%;
@@ -281,7 +281,7 @@
   border-radius: 6px;
   color: var(--teks);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
 }
 .total-box {
   display: flex;
@@ -293,7 +293,7 @@
   border-radius: 7px;
   background: #f0f5ef;
   color: #526351;
-  font-size: 12px;
+  font-size: 14px;
 }
 .total-box strong {
   color: var(--hijau-tua);
@@ -305,7 +305,7 @@
   border-radius: 6px;
   background: #fff8e6;
   color: #80621d;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.5;
 }
 .payment-status {
@@ -315,7 +315,7 @@
 .payment-status legend {
   margin-bottom: 8px;
   color: #526351;
-  font-size: 12px;
+  font-size: 14px;
 }
 .radio-buttons {
   display: flex;
@@ -335,7 +335,7 @@
   border-radius: 6px;
   color: #657160;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 .radio-buttons input:checked + span {
@@ -357,7 +357,7 @@
   border: 1px solid transparent;
   border-radius: 6px;
   font: inherit;
-  font-size: 12px;
+  font-size: 14px;
   text-decoration: none;
   cursor: pointer;
 }

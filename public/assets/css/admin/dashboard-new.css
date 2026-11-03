@@ -44,7 +44,7 @@ a {
 
 .muted {
     color: var(--teks-abu);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
 }
 
@@ -52,12 +52,12 @@ a {
     display: block;
     margin-top: 5px;
     color: var(--teks-abu);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .empty-text {
     color: var(--teks-abu);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 
@@ -87,7 +87,7 @@ main {
     padding: 12px 16px;
     border: 1px solid;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .flash-sukses {
@@ -127,7 +127,7 @@ main {
 }
 .stat-card .label,
 .stat-card .subtext {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--teks-abu);
 }
 
@@ -166,7 +166,7 @@ main {
 }
 
 .section-header h3 {
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .sales-metrics {
@@ -179,12 +179,12 @@ main {
 .metric-item small {
     display: block;
     margin-bottom: 4px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--teks-abu);
 }
 
 .metric-item .m-val {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
 }
 
@@ -202,11 +202,11 @@ main {
 
 .verif-info strong {
     display: block;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .verif-info span {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--teks-abu);
 }
 
@@ -214,7 +214,7 @@ main {
     display: inline-block;
     padding: 3px 10px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -230,7 +230,7 @@ main {
     border: 0;
     background: transparent;
     color: var(--hijau-sedang);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -273,7 +273,7 @@ main {
 
 .bar-label {
     margin-top: 8px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--teks-abu);
 }
 
@@ -282,7 +282,7 @@ main {
     justify-content: flex-end;
     gap: 16px;
     margin-top: 12px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--teks-abu);
 }
 
@@ -305,7 +305,7 @@ main {
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 th,
@@ -377,7 +377,7 @@ th {
 }
 
 .modal-header h3 {
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .modal-footer {
@@ -403,7 +403,7 @@ th {
     padding: 9px 14px;
     border: 0;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -431,7 +431,7 @@ th {
     border: 1px solid var(--garis);
     border-radius: 8px;
     background-color: var(--latar);
-    font-size: 13px;
+    font-size: 14px;
 }
 .detail-grid .detail-card {
     margin-bottom: 0;
@@ -444,7 +444,7 @@ th {
 .card-label {
     display: block;
     margin-bottom: 6px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--teks-abu);
 }
 
@@ -479,7 +479,7 @@ th {
 .detail-order-heading .muted {
     display: block;
     margin-top: 3px;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .detail-order-icon {
@@ -517,19 +517,19 @@ th {
     padding: 16px;
     border-radius: 8px;
     background: #f0f3f0;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .detail-order-card .card-label {
     margin-bottom: 8px;
     color: var(--hijau-tua);
-    font-size: 11px;
+    font-size: 13px;
     text-transform: uppercase;
 }
 
 .detail-order-card > strong {
     display: block;
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .detail-contact {
@@ -538,7 +538,7 @@ th {
     gap: 6px;
     margin-top: 4px;
     color: var(--teks-abu);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .detail-contact span:first-child {
@@ -562,14 +562,14 @@ th {
 }
 
 .detail-product-info strong {
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .detail-product-info small,
 .detail-product-total,
 .detail-customer-note {
     color: var(--teks-abu);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .detail-product-total {
@@ -595,7 +595,7 @@ th {
 .detail-payment-status {
     margin-top: 6px;
     color: var(--teks-abu);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .detail-edit-card .form-group {
@@ -609,7 +609,7 @@ th {
 .detail-edit-card .form-group label {
     margin-bottom: 6px;
     color: var(--teks);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .detail-edit-card .form-control {
@@ -619,7 +619,7 @@ th {
     border-radius: 8px;
     background: var(--putih);
     color: var(--teks);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .detail-order-footer {
@@ -650,7 +650,7 @@ th {
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--teks-abu);
 }
 
@@ -672,7 +672,7 @@ th {
     border: 1px solid var(--garis);
     border-radius: 6px;
     background-color: var(--putih);
-    font-size: 13px;
+    font-size: 14px;
     color: var(--teks);
 }
 
@@ -708,7 +708,7 @@ textarea.form-control {
 }
 
 .stock-name {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .stock-name small {
@@ -716,7 +716,7 @@ textarea.form-control {
 }
 
 .stock-qty {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
 }
 
@@ -752,7 +752,7 @@ textarea.form-control {
 }
 
 .stock-list-modal .modal-header h3 {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .stock-list-modal .modal-body {
@@ -787,7 +787,7 @@ textarea.form-control {
 
 .stock-list .stock-name,
 .stock-list .stock-qty {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .stock-list .stock-qty {
@@ -822,7 +822,7 @@ textarea.form-control {
     border-radius: 8px;
     background: var(--latar);
     color: var(--teks);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .stock-add-link:hover {
@@ -853,7 +853,7 @@ textarea.form-control {
 .stock-form-modal .form-group label {
     margin-bottom: 7px;
     color: var(--teks);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.02em;
 }
@@ -865,7 +865,7 @@ textarea.form-control {
 }
 
 .stock-form-heading h3 {
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .stock-form-icon {
@@ -901,16 +901,16 @@ textarea.form-control {
 
 .stock-status-panel small {
     color: var(--teks-abu);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .stock-status-panel strong {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .stock-stepper .step-btn {
     flex-basis: 40px;
-    font-size: 16px;
+    font-size: 17px;
 }
 
 .stock-stepper .form-control {
@@ -956,7 +956,7 @@ textarea.form-control {
 
 .report-summary small {
     color: var(--teks-abu);
-    font-size: 11px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -984,7 +984,7 @@ textarea.form-control {
     border: 1px solid var(--garis);
     border-radius: 4px;
     color: var(--hijau-tua);
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .report-title {
@@ -992,7 +992,7 @@ textarea.form-control {
     padding: 12px 14px;
     border-bottom: 1px solid var(--garis);
     color: var(--teks);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
 }
@@ -1035,13 +1035,13 @@ textarea.form-control {
     border: 1px solid var(--garis);
     border-radius: 9px;
     background: var(--putih);
-    font-size: 11px;
+    font-size: 13px;
     text-align: center;
 }
 
 .trend-item strong {
     color: var(--teks);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .trend-bar-track {
@@ -1061,7 +1061,7 @@ textarea.form-control {
 
 .trend-item small {
     color: var(--teks-abu);
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .report-table-panel {
@@ -1069,13 +1069,13 @@ textarea.form-control {
 }
 
 .report-table {
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .report-table th {
     padding: 10px 12px;
     background: var(--latar);
-    font-size: 10px;
+    font-size: 13px;
     text-transform: uppercase;
 }
 
@@ -1113,7 +1113,7 @@ textarea.form-control {
     border: 1px solid var(--garis);
     border-radius: 6px;
     background: var(--putih);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .pagination-controls button:disabled {
@@ -1152,7 +1152,7 @@ textarea.form-control {
 .report-heading .muted {
     display: block;
     margin-top: 3px;
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .report-controls {
@@ -1165,12 +1165,12 @@ textarea.form-control {
     border: 1px solid var(--garis);
     border-radius: 6px;
     background: var(--putih);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .report-controls .btn {
     padding: 8px 12px;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .report-controls .close-btn {
@@ -1344,7 +1344,7 @@ body.admin-dashboard main {
 body.admin-dashboard .header-title {
     margin-bottom: 14px;
     color: #344054;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
 }
 
@@ -1364,7 +1364,7 @@ body.admin-dashboard .stat-card {
 
 body.admin-dashboard .stat-card .label {
     color: #475467;
-    font-size: 8px;
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
 }
@@ -1379,7 +1379,7 @@ body.admin-dashboard .stat-card .subtext {
     padding-top: 6px;
     border-top: 1px solid var(--garis);
     color: var(--teks-abu);
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard .stat-card-heading {
@@ -1390,7 +1390,7 @@ body.admin-dashboard .stat-card-heading {
 }
 
 body.admin-dashboard .stat-card-heading .btn-text {
-    font-size: 8px;
+    font-size: 12px;
     font-weight: 400;
     white-space: nowrap;
 }
@@ -1414,7 +1414,7 @@ body.admin-dashboard .section-header {
 
 body.admin-dashboard .section-header h3 {
     color: #344054;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
 }
 
@@ -1424,7 +1424,7 @@ body.admin-dashboard .section-header .btn-text {
     border-radius: 5px;
     background: #fff;
     color: #344054;
-    font-size: 8px;
+    font-size: 12px;
     font-weight: 400;
     white-space: nowrap;
 }
@@ -1445,13 +1445,13 @@ body.admin-dashboard .metric-item {
 
 body.admin-dashboard .metric-item small {
     margin-bottom: 4px;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard .metric-item .m-val {
     overflow: hidden;
     color: #344054;
-    font-size: 12px;
+    font-size: 14px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -1486,13 +1486,13 @@ body.admin-dashboard .dot-b {
 body.admin-dashboard .bar-label {
     margin-top: 5px;
     color: var(--teks-abu);
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard .chart-legend {
     gap: 10px;
     margin-top: 8px;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard .dot {
@@ -1521,7 +1521,7 @@ body.admin-dashboard .verification-check {
     border-radius: 50%;
     background: #e5ece5;
     color: #405540;
-    font-size: 9px;
+    font-size: 12px;
 }
 
 body.admin-dashboard .verif-info {
@@ -1534,7 +1534,7 @@ body.admin-dashboard .verif-info span,
 body.admin-dashboard .verif-info small {
     display: block;
     overflow: hidden;
-    font-size: 8px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -1559,7 +1559,7 @@ body.admin-dashboard .btn-outline {
     border-radius: 5px;
     background: #fff;
     color: #344054;
-    font-size: 8px;
+    font-size: 12px;
     white-space: nowrap;
     cursor: pointer;
 }
@@ -1585,14 +1585,14 @@ body.admin-dashboard .table-wrap {
 
 body.admin-dashboard table {
     min-width: 550px;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard th {
     padding: 8px 7px;
     background: #f7f6f3;
     color: #475467;
-    font-size: 7px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
 }
@@ -1600,7 +1600,7 @@ body.admin-dashboard th {
 body.admin-dashboard td {
     padding: 7px;
     color: #344054;
-    font-size: 8px;
+    font-size: 12px;
     vertical-align: middle;
 }
 
@@ -1618,7 +1618,7 @@ body.admin-dashboard td small {
     margin-top: 2px;
     overflow: hidden;
     color: var(--teks-abu);
-    font-size: 7px;
+    font-size: 11px;
     line-height: 1.3;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1631,7 +1631,7 @@ body.admin-dashboard .order-total {
 
 body.admin-dashboard .badge {
     padding: 3px 6px;
-    font-size: 7px;
+    font-size: 11px;
 }
 
 body.admin-dashboard .empty-cell {
@@ -1642,7 +1642,7 @@ body.admin-dashboard .empty-cell {
 
 body.admin-dashboard .empty-text {
     padding: 5px 0;
-    font-size: 9px;
+    font-size: 12px;
 }
 
 @media (min-width: 701px) and (max-width: 768px) {
@@ -1685,7 +1685,7 @@ body.admin-dashboard .stock-list-modal .modal-header {
 
 body.admin-dashboard .stock-list-modal .modal-header h3 {
     color: #344054;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
 }
 
@@ -1713,7 +1713,7 @@ body.admin-dashboard .stock-list-modal .stock-row-heading {
 body.admin-dashboard .stock-list-modal .stock-name,
 body.admin-dashboard .stock-list-modal .stock-qty {
     color: #344054;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 body.admin-dashboard .stock-list-modal .stock-name {
@@ -1756,11 +1756,11 @@ body.admin-dashboard .stock-list-modal .stock-add-link {
     border-radius: 8px;
     background: #f7f6f3;
     color: #344054;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 body.admin-dashboard .stock-list-modal .stock-add-link span {
-    font-size: 15px;
+    font-size: 16px;
 }
 
 body.admin-dashboard #modalLaporan .modal-container {
@@ -1785,19 +1785,19 @@ body.admin-dashboard #modalLaporan .report-heading-icon {
     height: 32px;
     flex-basis: 32px;
     border-radius: 7px;
-    font-size: 16px;
+    font-size: 17px;
 }
 
 body.admin-dashboard #modalLaporan .report-heading h3 {
     color: #344054;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
 }
 
 body.admin-dashboard #modalLaporan .report-heading .muted {
     max-width: 360px;
     margin-top: 3px;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .report-controls {
@@ -1812,13 +1812,13 @@ body.admin-dashboard #modalLaporan .report-select {
     border-color: var(--garis);
     border-radius: 5px;
     color: #344054;
-    font-size: 9px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .report-controls .btn {
     padding: 7px 10px;
     border-radius: 5px;
-    font-size: 9px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -1846,13 +1846,13 @@ body.admin-dashboard #modalLaporan .report-summary-card {
 
 body.admin-dashboard #modalLaporan .report-summary-card > small {
     color: #596579;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .summary-val {
     margin-top: 10px;
     color: #344054;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
 }
 
@@ -1868,7 +1868,7 @@ body.admin-dashboard #modalLaporan .period-badge {
     padding: 3px 6px;
     border-color: #d7dfd5;
     color: #405540;
-    font-size: 8px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -1876,7 +1876,7 @@ body.admin-dashboard #modalLaporan .summary-note {
     margin-top: 7px;
     padding-top: 7px;
     border-top: 1px solid var(--garis);
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .report-panel,
@@ -1889,7 +1889,7 @@ body.admin-dashboard #modalLaporan .report-table-panel {
 body.admin-dashboard #modalLaporan .report-title {
     padding: 10px 12px;
     color: #475467;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .report-panel .report-title::before {
@@ -1910,12 +1910,12 @@ body.admin-dashboard #modalLaporan .trend-item {
     padding: 8px 6px 7px;
     border-color: var(--garis);
     border-radius: 7px;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .trend-item strong {
     color: #475467;
-    font-size: 8px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -1937,7 +1937,7 @@ body.admin-dashboard #modalLaporan .trend-item > span {
 }
 
 body.admin-dashboard #modalLaporan .trend-item small {
-    font-size: 7px;
+    font-size: 11px;
 }
 
 body.admin-dashboard #modalLaporan .report-table-panel {
@@ -1946,18 +1946,18 @@ body.admin-dashboard #modalLaporan .report-table-panel {
 
 body.admin-dashboard #modalLaporan .report-table {
     min-width: 620px;
-    font-size: 9px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .report-table th {
     padding: 8px 10px;
     background: #f7f6f3;
-    font-size: 7px;
+    font-size: 11px;
 }
 
 body.admin-dashboard #modalLaporan .report-table td {
     padding: 8px 10px;
-    font-size: 8px;
+    font-size: 12px;
     vertical-align: middle;
 }
 
@@ -1966,12 +1966,12 @@ body.admin-dashboard #modalLaporan .report-table td:nth-child(3) {
 }
 
 body.admin-dashboard #modalLaporan .report-table td:nth-child(4) {
-    font-size: 8px;
+    font-size: 12px;
 }
 
 body.admin-dashboard #modalLaporan .report-table td small {
     max-width: 260px;
-    font-size: 7px;
+    font-size: 11px;
 }
 
 body.admin-dashboard #modalLaporan .report-pagination {
@@ -1992,7 +1992,7 @@ body.admin-dashboard #modalLaporan .pagination-controls a {
     border-radius: 6px;
     background: #fff;
     color: #344054;
-    font-size: 9px;
+    font-size: 12px;
     text-decoration: none;
 }
 
