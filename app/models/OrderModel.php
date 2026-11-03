@@ -222,6 +222,7 @@ class OrderModel
                 p.catatan_alamat,
                 p.metode_pengiriman::text AS metode_pengiriman,
                 p.catatan_pengiriman,
+                p.nomor_resi,
                 u.nama AS nama_pelanggan,
                 u.no_hp AS telepon
              FROM pesanan p
@@ -256,6 +257,25 @@ class OrderModel
         $order['items'] = $items->fetchAll();
 
         return $order;
+    }
+
+    public function saveShipmentDetails(int $orderId, string $tracking, string $shippingNote): bool
+    {
+        $statement = $this->pdo->prepare(
+            "UPDATE pesanan
+             SET nomor_resi = :nomor_resi,
+                 catatan_pengiriman = :catatan_pengiriman,
+                 status_pesanan = 'DIKIRIM'
+             WHERE id_pesanan = :order_id
+               AND status_pesanan::text IN ('DIPROSES', 'DIKIRIM')"
+        );
+        $statement->execute([
+            ':nomor_resi' => $tracking,
+            ':catatan_pengiriman' => $shippingNote,
+            ':order_id' => $orderId,
+        ]);
+
+        return $statement->rowCount() === 1;
     }
 
     public function verifyOrder(int $orderId, int $principal, int $shipping, int $discount): bool

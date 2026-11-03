@@ -11,70 +11,9 @@ if (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'ADM
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../models/DashboardModel.php';
 
-$orders = (new DashboardModel($pdo))->getRecentOrders(50);
-if ($orders === []) {
-    $orders = [
-        [
-            'id_pesanan' => 1,
-            'kode' => 'INV/202601014/SP/001',
-            'tanggal_pesan' => '2026-10-14 09:15:00',
-            'nama_pelanggan' => 'Ratna Dewi Astuti',
-            'telepon' => '0812-3341-9982',
-            'alamat_pengiriman' => 'Lowokwaru, Kota Malang',
-            'metode_pengiriman' => 'EKSPEDISI_JNE',
-            'daftar_spesifikasi' => "Sprei Katun Asterina Sage\nUkuran 200 x 160 x 30 cm • 1 Set (2)",
-            'nomor_resi' => '',
-            'status_pesanan' => 'DIPROSES',
-        ],
-        [
-            'id_pesanan' => 2,
-            'kode' => 'INV/202601014/SP/004',
-            'tanggal_pesan' => '2026-10-14 10:40:00',
-            'nama_pelanggan' => 'Hendro Prasetyo',
-            'telepon' => '0822-4560-1123',
-            'alamat_pengiriman' => 'Klojen, Kota Malang',
-            'metode_pengiriman' => 'INSTANT_GOJEK',
-            'daftar_spesifikasi' => "Bed Cover Set Earth Tone...\nUkuran 200 x 200 x 35 cm • Bedcover\n+ Sprei Fitted",
-            'nomor_resi' => '',
-            'status_pesanan' => 'DIPROSES',
-        ],
-        [
-            'id_pesanan' => 3,
-            'kode' => 'INV/202601015/SP/002',
-            'tanggal_pesan' => '2026-10-15 08:30:00',
-            'nama_pelanggan' => 'dr. Annisa Rahmawati',
-            'telepon' => '0856-7781-2290',
-            'alamat_pengiriman' => 'Sukun, Kota Malang',
-            'metode_pengiriman' => 'EKSPEDISI_JNE',
-            'daftar_spesifikasi' => "Sprei Katun Motif Mawar...\nUkuran 200 x 200 x 30 cm • Sprei Rumbai Cantik",
-            'nomor_resi' => '',
-            'status_pesanan' => 'DIPROSES',
-        ],
-        [
-            'id_pesanan' => 4,
-            'kode' => 'INV/202601015/SP/005',
-            'tanggal_pesan' => '2026-10-15 11:20:00',
-            'nama_pelanggan' => 'Bu Hajjah Mardiyah',
-            'telepon' => '0813-8822-4411',
-            'alamat_pengiriman' => 'Kedungkandang, Malang',
-            'metode_pengiriman' => 'EKSPEDISI_JNT',
-            'daftar_spesifikasi' => "Sprei Tencel Organic...\nUkuran 180 x 200 x 40 cm • Extra Pillow Case",
-            'nomor_resi' => '',
-            'status_pesanan' => 'DIPROSES',
-        ],
-        [
-            'id_pesanan' => 5,
-            'kode' => 'INV/202601013/SP/003',
-            'tanggal_pesan' => '2026-10-13 14:10:00',
-            'nama_pelanggan' => 'Maya Salsabila',
-            'telepon' => '0878-1122-9099',
-            'alamat_pengiriman' => 'Blimbing, Kota Malang',
-            'metode_pengiriman' => 'EKSPEDISI_JNE',
-            'daftar_spesifikasi' => "Sprei Katun Motif Katak...\nUkuran 120 x 200 x 25 cm • Single Bed Kids",
-            'nomor_resi' => 'JNE1234567890',
-            'status_pesanan' => 'DIKIRIM',
-        ],
-    ];
+$orders = (new DashboardModel($pdo))->getOrdersForShipping(100);
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 $flash = $_SESSION['admin_order_message'] ?? null;
@@ -134,12 +73,12 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
     <link rel="stylesheet" href="/assets/css/admin/nomor_resi.css">
 </head>
-<body>
+<body class="resi-page">
     <div class="admin-layout">
         <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
         <main class="dashboard-main">
-            <div class="page-breadcrumb">Admin <span aria-hidden="true">›</span> <strong>Input Nomor Resi</strong></div>
-            <h1 class="page-title">Daftar Input Nomor Resi</h1>
+            <div class="page-breadcrumb">Admin <span aria-hidden="true">›</span> <strong>Nomor Resi Pengiriman</strong></div>
+            <h1 class="page-title">Daftar Nomor Resi Pengiriman</h1>
 
             <?php if (is_array($flash) && isset($flash['text'])): ?>
                 <div class="flash-message <?= $escape($flash['type'] ?? 'error') ?>" role="status">
@@ -159,15 +98,17 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if ($orders === []): ?>
+                            <tr>
+                                <td colspan="5" class="empty-state">Belum ada pesanan yang siap dikirim atau memiliki nomor resi.</td>
+                            </tr>
+                        <?php endif; ?>
                         <?php foreach ($orders as $order):
                             $tracking = trim((string) ($order['nomor_resi'] ?? ''));
                             $orderId = (int) ($order['id_pesanan'] ?? 0);
                             $courierKey = (string) ($order['metode_pengiriman'] ?? '');
                             $courierLabel = $couriers[$courierKey] ?? $courierKey ?: 'Ekspedisi';
-                            $specLines = $normalizeSpecLines(
-                                $order['daftar_spesifikasi'] ?? '',
-                            "Bedcover Hotel Series Ivory\nStandar: 200 × 180 × 30 cm"
-                            );
+                            $specLines = $normalizeSpecLines($order['daftar_spesifikasi'] ?? '');
                             $specDisplay = implode('<br>', array_map(static fn ($line) => htmlspecialchars((string) $line, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), array_slice($specLines, 0, 2)));
                             $detailData = [
                                 'invoice' => (string) ($order['kode'] ?? 'INV/000000'),
@@ -178,6 +119,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                 'phone' => (string) ($order['telepon'] ?? '-'),
                                 'address' => (string) ($order['alamat_pengiriman'] ?? 'Alamat belum tersedia'),
                                 'product' => implode("\n", $specLines),
+                                'note' => trim((string) ($order['catatan_pengiriman'] ?? '')),
                                 'orderId' => $orderId,
                             ];
                         ?>
@@ -200,6 +142,9 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                 <td>
                                     <?php if ($tracking !== ''): ?>
                                         <button type="button" class="action-btn secondary resi-detail-trigger" data-detail='<?= json_encode($detailData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>'>Lihat Resi</button>
+                                        <?php if (in_array($order['status_pesanan'] ?? '', ['DIPROSES', 'DIKIRIM'], true)): ?>
+                                            <a href="/?page=admin-resi-input&amp;id=<?= $orderId ?>" class="action-btn">Ubah Resi</a>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <a href="/?page=admin-resi-input&id=<?= (int) $orderId ?>" class="action-btn">Input Resi</a>
                                     <?php endif; ?>
@@ -211,14 +156,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
             </section>
 
             <div class="order-footer">
-                <div class="footer-note">Menampilkan 1 - 5 dari 5 pesanan</div>
-                <div class="pager" aria-label="Pagination">
-                    <a href="#" class="page-number ghost" aria-label="Sebelumnya">&#8249;</a>
-                    <a href="#" class="page-number active">1</a>
-                    <a href="#" class="page-number">2</a>
-                    <a href="#" class="page-number">3</a>
-                    <a href="#" class="page-number ghost" aria-label="Berikutnya">&#8250;</a>
-                </div>
+                <div class="footer-note">Menampilkan <?= count($orders) ?> pesanan yang siap dikirim atau telah dikirim.</div>
             </div>
         </main>
     </div>
@@ -232,12 +170,12 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
             </div>
 
             <div class="resi-modal-body">
-                <div class="resi-modal-subtitle" id="resiModalSubtitle">No. Pesanan: INV/202602014/SP/001 • J&amp;T Express</div>
+                <div class="resi-modal-subtitle" id="resiModalSubtitle">Detail nomor resi dan pengiriman</div>
 
                 <div class="resi-box">
                     <div class="resi-box-main">
                         <div class="resi-box-label">NOMOR RESI PENGIRIMAN</div>
-                        <div class="resi-box-number" id="resiNumberValue">JNT98234190823</div>
+                        <div class="resi-box-number" id="resiNumberValue">-</div>
                     </div>
                     <button type="button" class="resi-copy-btn" id="copyResiBtn">Salin Resi</button>
                 </div>
@@ -245,27 +183,26 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                 <div class="resi-info-row">
                     <div class="resi-info-label">KURIR &amp; LAYANAN</div>
                     <div class="resi-info-value" id="resiCourierValue">J&amp;T Express</div>
-                    <div class="resi-info-subvalue" id="resiCourierService">Layanan Reguler (EZ)</div>
+                    <div class="resi-info-subvalue" id="resiCourierService">Layanan pengiriman</div>
                 </div>
 
                 <div class="resi-two-col">
                     <div class="resi-card">
                         <div class="resi-card-title">PENERIMA</div>
-                        <div class="resi-card-name" id="resiCustomerName">Ratna Dewi Astuti</div>
-                        <div class="resi-card-phone" id="resiCustomerPhone">0812-3341-9982</div>
-                        <div class="resi-card-address" id="resiCustomerAddress">Jl. Dinoyo Permata Timur No. 14, RT 02 / RW 04,
-                            Dinoyo, Lowokwaru, Kota Malang 65144</div>
+                        <div class="resi-card-name" id="resiCustomerName">-</div>
+                        <div class="resi-card-phone" id="resiCustomerPhone">-</div>
+                        <div class="resi-card-address" id="resiCustomerAddress">-</div>
                     </div>
 
                     <div class="resi-card">
                         <div class="resi-card-title">RINCIAN BARANG</div>
                         <div class="resi-card-product">
                             <div class="resi-product-copy">
-                                <div class="resi-product-name" id="resiProductName">Sprei Katun Asterina Sage</div>
-                                <div class="resi-product-meta" id="resiProductMeta">200 × 160 × 30 cm (Queen)</div>
+                                <div class="resi-product-name" id="resiProductName">-</div>
+                                <div class="resi-product-meta" id="resiProductMeta">-</div>
                             </div>
                         </div>
-                        <div class="resi-product-note" id="resiProductNote">"Titipkan ke sekuriti jika rumah kosong."</div>
+                        <div class="resi-product-note" id="resiProductNote">Tidak ada catatan pengiriman.</div>
                     </div>
                 </div>
 

@@ -27,9 +27,10 @@ if ($action !== '') {
 	$isPaymentAction = $action === 'customer-payment-submit';
 	$adminOrderActions = ['admin-order-verify-save'];
 	$isAdminOrderAction = in_array($action, $adminOrderActions, true);
+	$isAdminResiAction = $action === 'admin-order-resi-save';
 	$adminPaymentActions = ['admin-payment-verify-save'];
 	$isAdminPaymentAction = in_array($action, $adminPaymentActions, true);
-	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isPaymentAction && !$isAdminPaymentAction) {
+	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -40,7 +41,7 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isPaymentAction && !$isAdminPaymentAction) {
+	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
@@ -53,6 +54,9 @@ if ($action !== '') {
 		} elseif ($isPaymentAction) {
 			require_once __DIR__ . '/../app/controllers/PaymentController.php';
 			(new PaymentController())->submit();
+		} elseif ($isAdminResiAction) {
+			require_once __DIR__ . '/../app/controllers/AdminOrderController.php';
+			(new AdminOrderController())->saveResi();
 		} elseif ($isAdminOrderAction) {
 			require_once __DIR__ . '/../app/controllers/AdminOrderController.php';
 			(new AdminOrderController())->verifySave();
@@ -114,6 +118,16 @@ if ($action !== '') {
 				$query['id'] = $_POST['id_pesanan'];
 			} else {
 				$query['page'] = 'admin-orders';
+			}
+			header('Location: /?' . http_build_query($query), true, 303);
+		} elseif ($isAdminResiAction) {
+			$_SESSION['admin_order_message'] = [
+				'type' => 'error',
+				'text' => 'Nomor resi gagal disimpan. Silakan coba lagi.',
+			];
+			$query = ['page' => 'admin-resi-list'];
+			if (isset($_POST['id_pesanan']) && is_string($_POST['id_pesanan'])) {
+				$query = ['page' => 'admin-resi-input', 'id' => $_POST['id_pesanan']];
 			}
 			header('Location: /?' . http_build_query($query), true, 303);
 		} elseif ($isAdminPaymentAction) {

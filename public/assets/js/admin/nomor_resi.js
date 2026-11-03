@@ -41,19 +41,19 @@ document.addEventListener('DOMContentLoaded', function () {
         resiNumberValue.textContent = detail.resi;
         resiModalSubtitle.textContent = 'No. Pesanan: ' + detail.invoice + ' • ' + detail.courier;
         resiCourierValue.textContent = detail.courier;
-        resiCourierService.textContent = 'Layanan Reguler (EZ)';
+        resiCourierService.textContent = detail.courierKey === 'INSTANT_GOJEK' ? 'Pengiriman instan' : 'Layanan ekspedisi';
         resiCustomerName.textContent = detail.customer || 'Pelanggan';
         resiCustomerPhone.textContent = detail.phone || '-';
         resiCustomerAddress.textContent = detail.address || 'Alamat belum tersedia';
 
-        const productText = detail.product || 'Bedcover Premium Rose Garden\nStandar: 200 × 180 × 30 cm';
+        const productText = detail.product || 'Rincian produk tidak tersedia';
         const lines = String(productText).split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
-        const mainProduct = lines[0] || 'Bedcover Premium Rose Garden';
-        const productMeta = lines.slice(1).join(' • ') || 'Standar: 200 × 180 × 30 cm';
+        const mainProduct = lines[0] || 'Produk tidak tersedia';
+        const productMeta = lines.slice(1).join(' • ') || '-';
 
         resiProductName.textContent = mainProduct;
         resiProductMeta.textContent = productMeta;
-        resiProductNote.textContent = '"Titipkan ke sekuriti jika rumah kosong."';
+        resiProductNote.textContent = detail.note || 'Tidak ada catatan pengiriman.';
 
         setModalState(true);
     };

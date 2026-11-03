@@ -19,6 +19,77 @@ class AdminOrderController
         $this->verify();
     }
 
+    public function saveResi(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'ADMIN') {
+            http_response_code(403);
+            exit('Akses ditolak.');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            header('Allow: POST');
+            exit('Metode request tidak diizinkan.');
+        }
+
+        $orderId = $this->readInteger($_POST['id_pesanan'] ?? null);
+        $redirect = $orderId !== null && $orderId > 0
+            ? '/?page=admin-resi-input&id=' . $orderId
+            : '/?page=admin-resi-list';
+        $token = $_POST['csrf_token'] ?? '';
+        if (
+            !is_string($token)
+            || !isset($_SESSION['csrf_token'])
+            || !hash_equals((string) $_SESSION['csrf_token'], $token)
+        ) {
+            $_SESSION['admin_order_message'] = [
+                'type' => 'error',
+                'text' => 'Token keamanan tidak valid. Muat ulang halaman dan coba lagi.',
+            ];
+            header('Location: ' . $redirect, true, 303);
+            exit;
+        }
+
+        $tracking = $_POST['nomor_resi'] ?? null;
+        $shippingNote = $_POST['catatan_pengiriman'] ?? '';
+        if (
+            $orderId === null
+            || $orderId < 1
+            || ($_POST['konfirmasi'] ?? null) !== '1'
+            || !is_string($tracking)
+            || trim($tracking) === ''
+            || preg_match('/^[^\x00-\x1F\x7F]{1,50}$/u', trim($tracking)) !== 1
+            || !is_string($shippingNote)
+        ) {
+            $_SESSION['admin_order_message'] = [
+                'type' => 'error',
+                'text' => 'Konfirmasi pengiriman diperlukan. Periksa nomor resi (maksimal 50 karakter) dan data pengiriman.',
+            ];
+            header('Location: ' . $redirect, true, 303);
+            exit;
+        }
+
+        $updated = (new OrderModel($GLOBALS['pdo']))->saveShipmentDetails(
+            $orderId,
+            trim($tracking),
+            trim($shippingNote)
+        );
+        $_SESSION['admin_order_message'] = $updated
+            ? ['type' => 'success', 'text' => 'Nomor resi berhasil disimpan dan status pesanan diperbarui menjadi dikirim.']
+            : ['type' => 'error', 'text' => 'Pesanan tidak ditemukan atau belum siap untuk dikirim.'];
+
+        header(
+            'Location: ' . ($updated ? '/?page=admin-resi-list' : $redirect),
+            true,
+            303
+        );
+        exit;
+    }
+
     public function verify(): void
     {
         if (session_status() === PHP_SESSION_NONE) {

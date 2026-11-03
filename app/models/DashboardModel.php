@@ -30,6 +30,16 @@ class DashboardModel
         return $this->fetchOrders('', [], $limit);
     }
 
+    public function getOrdersForShipping(int $limit = 100): array
+    {
+        return $this->fetchOrders(
+            "(p.status_pesanan::text IN ('DIPROSES', 'DIKIRIM') OR
+              (p.status_pesanan::text = 'SELESAI' AND p.nomor_resi IS NOT NULL))",
+            [],
+            $limit
+        );
+    }
+
     public function getWaitingVerificationPayments(int $limit = 5): array
     {
         $statement = $this->pdo->prepare(

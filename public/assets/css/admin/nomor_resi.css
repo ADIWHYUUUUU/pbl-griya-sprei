@@ -18,15 +18,26 @@ body {
     color: var(--teks);
 }
 
+body.resi-page {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+}
+
 .admin-layout {
     display: flex;
     min-height: 100vh;
+    width: 100%;
     background: var(--latar);
 }
 
 .dashboard-main {
     flex: 1;
     min-width: 0;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
     padding: 22px 28px 30px;
     background: var(--latar);
 }
@@ -89,6 +100,12 @@ body {
 
 .order-table-wrap tbody tr:last-child td {
     border-bottom: none;
+}
+
+.empty-state {
+    padding: 28px 16px !important;
+    color: var(--teks-abu) !important;
+    text-align: center;
 }
 
 .invoice {
@@ -183,7 +200,8 @@ body {
 }
 
 .footer-note {
-    display: none;
+    color: var(--teks-abu);
+    font-size: 12px;
 }
 
 .pager {
