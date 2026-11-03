@@ -88,17 +88,17 @@ class ProductController
 
         $panjang = filter_var(
             $_POST['panjang_standar'] ?? null,
-            FILTER_VALIDATE_FLOAT
+            FILTER_VALIDATE_INT
         );
 
         $lebar = filter_var(
             $_POST['lebar_standar'] ?? null,
-            FILTER_VALIDATE_FLOAT
+            FILTER_VALIDATE_INT
         );
 
         $tinggi = filter_var(
             $_POST['tinggi_standar'] ?? null,
-            FILTER_VALIDATE_FLOAT
+            FILTER_VALIDATE_INT
         );
 
         $harga = filter_var(
@@ -117,10 +117,10 @@ class ProductController
             strlen($nama) > 150 ||
             !in_array($kategori, ['SPREI', 'BED_COVER'], true) ||
             $deskripsi === '' ||
-            $panjang === false || !is_finite($panjang) || $panjang <= 0 ||
-            $lebar === false || !is_finite($lebar) || $lebar <= 0 ||
-            $tinggi === false || !is_finite($tinggi) || $tinggi <= 0 ||
-            $harga === false || !is_finite($harga) || $harga < 0 ||
+            $panjang === false || $panjang <= 0 ||
+            $lebar === false || $lebar <= 0 ||
+            $tinggi === false || $tinggi <= 0 ||
+            $harga === false || !is_finite($harga) || $harga <= 0 ||
             $stok === false || $stok < 0
         ) {
             http_response_code(400);
@@ -279,17 +279,17 @@ class ProductController
 
         $panjang = filter_var(
             $_POST['panjang_standar'] ?? null,
-            FILTER_VALIDATE_FLOAT
+            FILTER_VALIDATE_INT
         );
 
         $lebar = filter_var(
             $_POST['lebar_standar'] ?? null,
-            FILTER_VALIDATE_FLOAT
+            FILTER_VALIDATE_INT
         );
 
         $tinggi = filter_var(
             $_POST['tinggi_standar'] ?? null,
-            FILTER_VALIDATE_FLOAT
+            FILTER_VALIDATE_INT
         );
 
         $harga = filter_var(
@@ -311,10 +311,10 @@ class ProductController
             strlen($nama) > 150 ||
             !in_array($kategori, ['SPREI', 'BED_COVER'], true) ||
             $deskripsi === '' ||
-            $panjang === false || !is_finite($panjang) || $panjang <= 0 ||
-            $lebar === false || !is_finite($lebar) || $lebar <= 0 ||
-            $tinggi === false || !is_finite($tinggi) || $tinggi <= 0 ||
-            $harga === false || !is_finite($harga) || $harga < 0 ||
+            $panjang === false || $panjang <= 0 ||
+            $lebar === false || $lebar <= 0 ||
+            $tinggi === false || $tinggi <= 0 ||
+            $harga === false || !is_finite($harga) || $harga <= 0 ||
             $stok === false || $stok < 0
         ) {
             http_response_code(400);

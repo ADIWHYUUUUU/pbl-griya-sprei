@@ -185,7 +185,7 @@ $formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
                             id="panjang_standar"
                             name="panjang_standar"
                             min="1"
-                            step="0.01"
+                            step="1"
                             value="<?= e($product['panjang_standar'] ?? '') ?>"
                             required
                         >
@@ -198,7 +198,7 @@ $formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
                             id="lebar_standar"
                             name="lebar_standar"
                             min="1"
-                            step="0.01"
+                            step="1"
                             value="<?= e($product['lebar_standar'] ?? '') ?>"
                             required
                         >
@@ -211,7 +211,7 @@ $formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
                             id="tinggi_standar"
                             name="tinggi_standar"
                             min="1"
-                            step="0.01"
+                            step="1"
                             value="<?= e($product['tinggi_standar'] ?? '') ?>"
                             required
                         >
@@ -226,7 +226,7 @@ $formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
                     type="number"
                     id="harga_dasar"
                     name="harga_dasar"
-                    min="0"
+                    min="1"
                     step="1"
                     value="<?= e($product['harga_dasar'] ?? '') ?>"
                     required

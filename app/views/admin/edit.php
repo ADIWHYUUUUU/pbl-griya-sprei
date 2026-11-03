@@ -133,21 +133,21 @@ $presets = [
                         <div class="edit-field">
                             <label for="panjang_standar">Panjang Kasur</label>
                             <div class="edit-input-group">
-                                <input class="edit-input" type="number" min="1" step="0.01" id="panjang_standar" name="panjang_standar" value="<?= $escape($product['panjang_standar']) ?>" required>
+                                <input class="edit-input" type="number" min="1" step="1" id="panjang_standar" name="panjang_standar" value="<?= $escape($product['panjang_standar']) ?>" required>
                                 <span>cm</span>
                             </div>
                         </div>
                         <div class="edit-field">
                             <label for="lebar_standar">Lebar Kasur</label>
                             <div class="edit-input-group">
-                                <input class="edit-input" type="number" min="1" step="0.01" id="lebar_standar" name="lebar_standar" value="<?= $escape($product['lebar_standar']) ?>" required>
+                                <input class="edit-input" type="number" min="1" step="1" id="lebar_standar" name="lebar_standar" value="<?= $escape($product['lebar_standar']) ?>" required>
                                 <span>cm</span>
                             </div>
                         </div>
                         <div class="edit-field">
                             <label for="tinggi_standar">Tinggi Karet</label>
                             <div class="edit-input-group">
-                                <input class="edit-input" type="number" min="1" step="0.01" id="tinggi_standar" name="tinggi_standar" value="<?= $escape($product['tinggi_standar']) ?>" required>
+                                <input class="edit-input" type="number" min="1" step="1" id="tinggi_standar" name="tinggi_standar" value="<?= $escape($product['tinggi_standar']) ?>" required>
                                 <span>cm</span>
                             </div>
                         </div>
@@ -166,7 +166,7 @@ $presets = [
                             <label for="harga_dasar">Harga Dasar</label>
                             <div class="edit-input-group">
                                 <span>Rp</span>
-                                <input class="edit-input" type="number" min="0" step="1" id="harga_dasar" name="harga_dasar" value="<?= $escape($product['harga_dasar']) ?>" required>
+                                <input class="edit-input" type="number" min="1" step="1" id="harga_dasar" name="harga_dasar" value="<?= $escape($product['harga_dasar']) ?>" required>
                             </div>
                         </div>
                         <div class="edit-field">
