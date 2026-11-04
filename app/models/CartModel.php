@@ -44,7 +44,7 @@ class CartModel
         $this->assertStorageReady();
         $statement = $this->pdo->prepare(
             'INSERT INTO keranjang_pelanggan (id_user, item_id, item_data)
-            VALUES (:id_user, :item_id, CAST(:item_data AS JSONB))
+            VALUES (:id_user, :item_id, :item_data)
             ON CONFLICT (id_user, item_id)
             DO UPDATE SET item_data = EXCLUDED.item_data, updated_at = now()'
         );

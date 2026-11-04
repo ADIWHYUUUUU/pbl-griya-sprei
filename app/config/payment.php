@@ -4,19 +4,23 @@ return [
     'accounts' => [
         'TRANSFER_BCA' => [
             'label' => 'Transfer BCA',
-            'account' => 'Griya Sprei Malang - 0118927719',
+            'bank_name' => 'Bank Central Asia',
+            'account' => 'a.n. Yuanita Anies H - 3151182311',
         ],
         'TRANSFER_BRI' => [
             'label' => 'Transfer BRI',
-            'account' => 'TODO - Rekening BRI belum dikonfigurasi',
+            'bank_name' => 'Bank Rakyat Indonesia',
+            'account' => 'a.n. Yuanita Anies H - 754901006601530',
         ],
         'TRANSFER_BSI' => [
             'label' => 'Transfer BSI',
-            'account' => 'TODO - Rekening BSI belum dikonfigurasi',
+            'bank_name' => 'Bank Syariah Indonesia',
+            'account' => 'a.n. Yuanita Anies H - 7273863545',
         ],
         'TRANSFER_MANDIRI' => [
             'label' => 'Transfer Mandiri',
-            'account' => 'TODO - Rekening Mandiri belum dikonfigurasi',
+            'bank_name' => 'Bank Mandiri',
+            'account' => 'a.n. Yuanita Anies H - 1440009329894',
         ],
     ],
 ];

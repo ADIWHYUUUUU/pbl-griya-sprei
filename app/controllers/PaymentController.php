@@ -89,6 +89,9 @@ class PaymentController
             $this->setError($orderId, 'Nominal transfer harus sama dengan total tagihan.');
         }
 
+        $senderName = $this->getOptionalText('nama_pemilik_pengirim', 100, 'Nama pemilik rekening maksimal 100 karakter.', $orderId);
+        $senderAccount = $this->getOptionalText('nomor_rekening_pengirim', 50, 'Nomor rekening pengirim maksimal 50 karakter.', $orderId);
+
         $file = $_FILES['bukti_transfer'] ?? null;
         if (!is_array($file)) {
             $this->setError($orderId, 'Bukti transfer wajib diunggah.');
@@ -98,11 +101,10 @@ class PaymentController
             $upload = save_upload(
                 $file,
                 'bukti-transfer',
-                2 * 1024 * 1024,
+                8 * 1024 * 1024,
                 [
                     'image/jpeg' => 'jpg',
                     'image/png' => 'png',
-                    'application/pdf' => 'pdf',
                 ]
             );
         } catch (InvalidArgumentException | RuntimeException $error) {
@@ -110,7 +112,7 @@ class PaymentController
         }
 
         try {
-            $this->model->create($orderId, $method, $amount, $upload);
+            $this->model->create($orderId, $method, $amount, $upload, $senderName, $senderAccount);
         } catch (DomainException $error) {
             $this->removeUpload($upload['path']);
             $this->setError($orderId, $error->getMessage());
@@ -135,8 +137,29 @@ class PaymentController
             'nominal_transfer' => is_string($_POST['nominal_transfer'] ?? null)
                 ? $_POST['nominal_transfer']
                 : '',
+            'nama_pemilik_pengirim' => is_string($_POST['nama_pemilik_pengirim'] ?? null)
+                ? $_POST['nama_pemilik_pengirim']
+                : '',
+            'nomor_rekening_pengirim' => is_string($_POST['nomor_rekening_pengirim'] ?? null)
+                ? $_POST['nomor_rekening_pengirim']
+                : '',
         ];
         $this->redirect($orderId);
+    }
+
+    private function getOptionalText(string $key, int $maxLength, string $errorMessage, int $orderId): string
+    {
+        $value = $_POST[$key] ?? '';
+        if (!is_string($value)) {
+            $this->setError($orderId, $errorMessage);
+        }
+
+        $value = trim($value);
+        if (mb_strlen($value, 'UTF-8') > $maxLength) {
+            $this->setError($orderId, $errorMessage);
+        }
+
+        return $value;
     }
 
     private function removeUpload(string $relativePath): void

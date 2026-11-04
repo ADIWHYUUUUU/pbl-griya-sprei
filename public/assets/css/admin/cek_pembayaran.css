@@ -439,6 +439,28 @@
 .proof-mismatch {
   color: #a45a32;
 }
+.sender-transfer-details {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--payment-border);
+  border-radius: 8px;
+  background: #fff;
+}
+.sender-transfer-details div {
+  display: grid;
+  gap: 4px;
+}
+.sender-transfer-details dt {
+  color: #71806f;
+  font-size: 12px;
+}
+.sender-transfer-details dd {
+  color: var(--payment-text, #2a2a2a);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
 .payment-verification-form {
   margin-top: 22px;
   padding-top: 16px;

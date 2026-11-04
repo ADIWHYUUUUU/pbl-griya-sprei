@@ -131,6 +131,10 @@ $statusLabels = [
                         <em class="proof-mismatch">! Nominal berbeda dari tagihan (selisih <?= $escape('Rp ' . number_format($difference, 0, ',', '.')) ?>)</em>
                     <?php endif; ?>
                 </div>
+                <dl class="sender-transfer-details">
+                    <div><dt>Nama pemilik rekening pengirim</dt><dd><?= $escape($payment['nama_pemilik_pengirim'] ?: '-') ?></dd></div>
+                    <div><dt>Nomor rekening pengirim</dt><dd><?= $escape($payment['nomor_rekening_pengirim'] ?: '-') ?></dd></div>
+                </dl>
                 <?php if ($isWaiting): ?>
                     <form class="payment-verification-form" action="/?action=admin-payment-verify-save" method="POST" id="paymentVerificationForm">
                         <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']) ?>">

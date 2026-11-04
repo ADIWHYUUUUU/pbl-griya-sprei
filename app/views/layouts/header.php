@@ -32,7 +32,7 @@ $activeNavPage = match ($currentPage) {
     'index.php', 'customer-home' => 'home',
     'customer-catalog', 'customer-detail' => 'catalog',
     'customer-cart' => '',
-    'customer-orders', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
+    'customer-orders', 'customer-payment', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
     default => '',
 };
 

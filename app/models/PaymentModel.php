@@ -18,8 +18,12 @@ class PaymentModel
         $statement = $this->pdo->prepare(
             'SELECT p.id_pesanan, p.no_invoice, p.tanggal_pesan,
                    p.status_pesanan::text AS status_pesanan,
-                   p.tagihan_pokok, p.ongkir, p.diskon
+                   p.alamat_pengiriman, p.catatan_alamat,
+                   p.metode_pengiriman::text AS metode_pengiriman,
+                   p.catatan_pengiriman, p.tagihan_pokok, p.ongkir, p.diskon,
+                   u.nama AS nama_pelanggan, u.no_hp AS telepon_pelanggan
             FROM pesanan p
+            JOIN "user" u ON u.id_user = p.id_user
             WHERE p.id_pesanan = :id_pesanan AND p.id_user = :id_user'
         );
         $statement->execute([':id_pesanan' => $orderId, ':id_user' => $userId]);
@@ -29,7 +33,9 @@ class PaymentModel
         }
 
         $itemStatement = $this->pdo->prepare(
-            'SELECT d.jumlah, d.harga_satuan, produk.nama_produk
+            'SELECT d.jumlah, COALESCE(d.harga_satuan, produk.harga_dasar) AS harga_satuan,
+                    d.panjang, d.lebar, d.tinggi, d.tambah_sarban, d.tambah_sargul,
+                    d.tipe_ukuran::text AS tipe_ukuran, produk.nama_produk
              FROM detail_pesanan d
              JOIN produk ON produk.id_produk = d.id_produk
              WHERE d.id_pesanan = :id_pesanan
@@ -54,7 +60,14 @@ class PaymentModel
         return $order;
     }
 
-    public function create(int $orderId, string $method, float $amount, array $upload): void
+    public function create(
+        int $orderId,
+        string $method,
+        float $amount,
+        array $upload,
+        string $senderName,
+        string $senderAccount
+    ): void
     {
         $this->pdo->beginTransaction();
         try {
@@ -81,12 +94,14 @@ class PaymentModel
             $statement = $this->pdo->prepare(
                 'INSERT INTO pembayaran (
                     id_pesanan, metode_pembayaran, nominal_transfer, bukti_transfer,
-                    status_pembayaran, bukti_nama_asli, bukti_ukuran, bukti_mime
+                    status_pembayaran, bukti_nama_asli, bukti_ukuran, bukti_mime,
+                    nama_pemilik_pengirim, nomor_rekening_pengirim
                  ) VALUES (
                     :id_pesanan, CAST(:metode_pembayaran AS metode_pembayaran_enum),
                     :nominal_transfer, :bukti_transfer,
                     CAST(:status_pembayaran AS status_pembayaran_enum),
-                    :bukti_nama_asli, :bukti_ukuran, :bukti_mime
+                    :bukti_nama_asli, :bukti_ukuran, :bukti_mime,
+                    :nama_pemilik_pengirim, :nomor_rekening_pengirim
                  )'
             );
             $statement->execute([
@@ -98,6 +113,8 @@ class PaymentModel
                 ':bukti_nama_asli' => $upload['original_name'],
                 ':bukti_ukuran' => $upload['size'],
                 ':bukti_mime' => $upload['mime'],
+                ':nama_pemilik_pengirim' => $senderName !== '' ? $senderName : null,
+                ':nomor_rekening_pengirim' => $senderAccount !== '' ? $senderAccount : null,
             ]);
             $this->pdo->commit();
         } catch (Throwable $error) {
@@ -173,6 +190,8 @@ class PaymentModel
                 b.bukti_nama_asli,
                 b.bukti_ukuran,
                 b.bukti_mime,
+                b.nama_pemilik_pengirim,
+                b.nomor_rekening_pengirim,
                 p.no_invoice,
                 p.status_pesanan::text AS status_pesanan,
                 p.alamat_pengiriman,
