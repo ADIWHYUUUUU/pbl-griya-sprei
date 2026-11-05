@@ -109,50 +109,7 @@ main.container {
   opacity: 1;
 }
 
-@media (max-width: 900px) {
-  .isi {
-    padding: 20px 18px 40px;
-  }
-  .judul-halaman {
-    font-size: 22px;
-  }
-  .pesanan-isi {
-    grid-template-columns: 60px 1fr;
-  }
-  .info-tagihan {
-    grid-column: 1 / -1;
-    text-align: left;
-  }
-  .tombol {
-    font-size: 11px;
-    padding: 8px 12px;
-  }
-}
-
-@media (max-width: 560px) {
-  .breadcrumb,
-  .sub-judul {
-    font-size: 11px;
-  }
-  .kartu {
-    padding: 14px;
-  }
-  .pesanan-kepala {
-    align-items: flex-start;
-  }
-  .pesanan-isi {
-    display: block;
-  }
-  .foto-produk {
-    width: 100%;
-    height: 120px;
-    margin-bottom: 10px;
-  }
-  .info-tagihan .nominal,
-  .info-tagihan .belum {
-    font-size: 18px;
-  }
-}
+/* (Aturan responsif ada di bagian paling bawah file) */
 
 /* ---------- Kartu dan pencarian ---------- */
 .kartu {
@@ -635,4 +592,233 @@ body.ada-modal {
 .grid-spek b {
   font-size: 14px;
   margin: 2px 0;
+}
+
+/* =====================================================
+   RESPONSIF - TABLET & HP
+   (header & footer diatur di base.css)
+   ===================================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .isi {
+    padding: 20px 0 40px;
+    font-size: 13px;
+  }
+
+  .judul-halaman {
+    font-size: 22px;
+  }
+
+  .kartu {
+    padding: 16px;
+  }
+
+  .pesanan-isi {
+    grid-template-columns: 64px minmax(0, 1fr) 180px;
+    gap: 14px;
+  }
+
+  .foto-produk {
+    width: 64px;
+    height: 64px;
+  }
+
+  .info-tagihan .nominal {
+    font-size: 18px;
+  }
+
+  .info-tagihan .belum {
+    font-size: 16px;
+  }
+
+  .tombol {
+    padding: 8px 13px;
+    font-size: 11.5px;
+  }
+}
+
+/* Tablet potret */
+@media (max-width: 760px) {
+  .pesanan-isi {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .info-tagihan {
+    grid-column: 1 / -1;
+    padding-top: 10px;
+    border-top: 1px dashed var(--garis);
+    text-align: left;
+  }
+}
+
+/* HP */
+@media (max-width: 640px) {
+  .isi {
+    padding: 14px 0 32px;
+    font-size: 12.5px;
+  }
+
+  .breadcrumb,
+  .sub-judul {
+    font-size: 11px;
+  }
+
+  .judul-halaman {
+    font-size: 19px;
+  }
+
+  .sub-judul {
+    margin-bottom: 14px;
+  }
+
+  .kartu {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .kotak-cari {
+    gap: 8px;
+    padding: 6px 6px 6px 10px;
+  }
+
+  .kotak-cari input {
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .pesanan-kepala {
+    align-items: flex-start;
+    gap: 8px;
+    padding-bottom: 10px;
+    font-size: 11px;
+  }
+
+  .info-waktu span {
+    display: block;
+    margin: 2px 0 0;
+  }
+
+  .badge {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+
+  .pesanan-isi {
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px 0 10px;
+  }
+
+  .foto-produk {
+    width: 52px;
+    height: 52px;
+    border-radius: 6px;
+  }
+
+  .info-produk h3 {
+    font-size: 13px;
+  }
+
+  .info-produk p {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+
+  .info-tagihan .nominal,
+  .info-tagihan .belum {
+    font-size: 16px;
+  }
+
+  .kotak-status {
+    padding: 9px 11px;
+    font-size: 11px;
+  }
+
+  .pesanan-aksi,
+  .pesanan-aksi .kiri {
+    width: 100%;
+  }
+
+  .pesanan-aksi .tombol {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .tombol {
+    padding: 8px 12px;
+    font-size: 11.5px;
+  }
+
+  /* Modal detail */
+  .modal-latar {
+    padding: 12px;
+  }
+
+  .modal {
+    max-height: calc(100vh - 24px);
+    font-size: 12px;
+  }
+
+  .modal-kepala {
+    padding: 14px 14px 12px;
+  }
+
+  .modal-kepala h2 {
+    font-size: 15px;
+  }
+
+  .modal-isi {
+    padding: 12px 14px;
+  }
+
+  .modal-kaki {
+    padding: 12px 14px 14px;
+  }
+
+  .modal-kaki .tombol {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .bagian-detail {
+    padding: 12px;
+  }
+
+  .bagian-detail p {
+    overflow-wrap: anywhere;
+  }
+
+  .grid-spek {
+    grid-template-columns: 1fr;
+  }
+
+  .ringkas-pesanan {
+    flex-direction: column;
+  }
+
+  .ringkas-pesanan .kanan {
+    text-align: left;
+  }
+}
+
+/* HP kecil */
+@media (max-width: 380px) {
+  .kotak-cari svg {
+    display: none;
+  }
+
+  .pesanan-isi {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .foto-produk {
+    width: 44px;
+    height: 44px;
+  }
+
+  .judul-halaman {
+    font-size: 17px;
+  }
 }

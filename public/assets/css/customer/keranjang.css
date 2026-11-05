@@ -1028,39 +1028,6 @@ small {
   line-height: 1.6;
 }
 
-@media (min-width: 701px) and (max-width: 1000px) {
-  .header {
-    grid-template-columns: minmax(150px, 1fr) auto auto;
-    height: 64px;
-    padding: 0 16px;
-    gap: 14px;
-  }
-
-  .nav {
-    grid-column: auto;
-    order: initial;
-    gap: 14px;
-  }
-
-  .nav__link {
-    font-size: 11px;
-  }
-
-  .header__actions {
-    gap: 12px;
-  }
-
-  .brand__tagline {
-    font-size: 9px;
-  }
-
-  .footer__inner {
-    grid-template-columns: 1fr 1fr 140px;
-    gap: 18px;
-    padding: 32px 24px;
-  }
-}
-
 @media (max-width: 900px) {
   .dua-kolom {
     grid-template-columns: 1fr;
@@ -1329,4 +1296,120 @@ small {
 .cart-item-select input {
   width: 20px;
   height: 20px;
+}
+
+/* =====================================================
+   RESPONSIF TAMBAHAN - TABLET & HP
+   (header & footer diatur di base.css)
+   ===================================================== */
+@media (max-width: 1024px) {
+  .isi > h1 {
+    font-size: 21px;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1024px) {
+
+  .produk {
+    min-height: 0;
+  }
+
+  .foto-produk {
+    flex-basis: 140px;
+    width: 140px;
+    height: 140px;
+  }
+
+  .judul-baris h2 {
+    font-size: 17px;
+  }
+
+  .spesifikasi small {
+    font-size: 12px;
+  }
+
+  .spesifikasi p {
+    font-size: 14px;
+  }
+
+  .checkout-button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .isi > h1 {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .baris-atas {
+    margin: 16px 0;
+  }
+
+  .kotak-cari,
+  .baris-atas > .tombol {
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .kotak-cari input {
+    height: 100%;
+    font-size: 13px;
+  }
+
+  .baris-atas > .tombol {
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .cart-select-all {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .bawah {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .ringkasan {
+    padding: 14px;
+  }
+
+  .ringkasan h2 {
+    font-size: 15px;
+  }
+
+  .checkout-button--all {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  .kosong-besar h2,
+  .kosong-besar p {
+    font-size: 12px;
+  }
+
+  .paginasi a {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  .cart-item-select {
+    flex-basis: 18px;
+  }
+
+  .cart-item-select input {
+    width: 18px;
+    height: 18px;
+  }
+
+  .checkout-button {
+    padding: 0 10px;
+    font-size: 11px;
+  }
 }

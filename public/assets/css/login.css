@@ -231,7 +231,45 @@ button { cursor: pointer; }
 /* =========================================
    7. RESPONSIF
    ========================================= */
+/* Tablet */
+@media (max-width: 1024px) {
+  .login-card { max-width: 460px; }
+  .brand { margin-bottom: 40px; }
+}
+
+/* HP */
 @media (max-width: 520px) {
-  .brand { flex-direction: column; text-align: center; gap: 8px; }
-  .brand__tagline { font-size: 11px; }
+  .page-login { padding: 16px; }
+  .login-card { max-height: none; padding: 20px 18px; }
+  .login-card::before { width: 110px; height: 110px; top: -40px; right: -40px; }
+
+  .brand { flex-direction: column; text-align: center; gap: 8px; margin: 6px 0 28px; }
+  .brand__logo { width: 38px; height: 38px; }
+  .brand__name { font-size: 18px; }
+  .brand__tagline { font-size: 10.5px; }
+
+  .field__label { font-size: 13px; margin-bottom: 6px; }
+  .input { height: 42px; padding: 0 12px; gap: 8px; }
+  .input input { font-size: 13px; }
+  .input svg { width: 16px; height: 16px; }
+  .field__hint { font-size: 10.5px; }
+  .flash-message { font-size: 11.5px; }
+  .remember { font-size: 12px; }
+
+  .btn-submit,
+  .btn-home { height: 42px; font-size: 13px; }
+  .btn-submit svg { width: 16px; height: 16px; }
+  .register { margin-top: 18px; font-size: 12.5px; }
+}
+
+/* HP kecil */
+@media (max-width: 360px) {
+  .page-login { padding: 10px; }
+  .login-card { padding: 16px 14px; }
+  .brand__logo { width: 32px; height: 32px; }
+  .brand__name { font-size: 16px; }
+  .brand__tagline { font-size: 10px; }
+  .input { height: 40px; }
+  .btn-submit,
+  .btn-home { height: 40px; font-size: 12.5px; }
 }

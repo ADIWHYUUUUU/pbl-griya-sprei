@@ -675,3 +675,372 @@
     font-size: 14px;
   }
 }
+
+/* =====================================================
+   RESPONSIF TAMBAHAN - TABLET & HP
+   (header & footer diatur di base.css)
+   ===================================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .payment-page {
+    font-size: 15px;
+  }
+
+  .payment-breadcrumb {
+    font-size: 13px;
+  }
+
+  .payment-header {
+    margin-bottom: 20px;
+  }
+
+  .payment-header h1 {
+    font-size: 30px;
+  }
+
+  .payment-header p {
+    font-size: 15px;
+  }
+
+  .delivery-card {
+    margin-bottom: 20px;
+    padding: 20px 22px;
+    font-size: 15px;
+  }
+
+  .delivery-card > strong {
+    font-size: 16px;
+  }
+
+  .payment-overview {
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+    gap: 18px;
+  }
+
+  .order-card,
+  .payment-summary {
+    padding: 22px;
+  }
+
+  .order-card h2,
+  .payment-summary h2,
+  .payment-step h2 {
+    font-size: 18px;
+  }
+
+  .order-card h2,
+  .payment-summary h2 {
+    margin-bottom: 16px;
+  }
+
+  .order-table__row,
+  .order-table__row > strong,
+  .payment-summary {
+    font-size: 14px;
+  }
+
+  .order-product strong {
+    font-size: 15px;
+  }
+
+  .order-product small {
+    font-size: 13px;
+  }
+
+  .payment-step {
+    padding: 22px;
+  }
+
+  .step-description {
+    font-size: 14px;
+  }
+
+  .method-option__summary {
+    min-height: 54px;
+    font-size: 15px;
+  }
+
+  .account-number {
+    font-size: 24px;
+  }
+
+  .copy-amount,
+  .copy-account,
+  .upload-remove,
+  .upload-browse {
+    min-height: 46px;
+    font-size: 14px;
+  }
+
+  .payment-field {
+    font-size: 14px;
+  }
+
+  .payment-field input {
+    min-height: 50px;
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  .payment-submit {
+    font-size: 15px;
+  }
+}
+
+/* Tablet potret: ringkasan biaya pindah ke bawah */
+@media (max-width: 760px) {
+  .payment-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* HP */
+@media (max-width: 640px) {
+  .payment-page {
+    padding: 14px 14px 32px;
+    font-size: 13px;
+  }
+
+  .payment-breadcrumb {
+    margin-bottom: 12px;
+    font-size: 11.5px;
+  }
+
+  .payment-header {
+    margin-bottom: 14px;
+  }
+
+  .payment-header h1 {
+    font-size: 21px;
+  }
+
+  .payment-header p {
+    font-size: 12.5px;
+  }
+
+  .delivery-card {
+    margin-bottom: 14px;
+    padding: 14px;
+    font-size: 13px;
+  }
+
+  .delivery-card h2,
+  .delivery-card .delivery-method {
+    font-size: 11.5px;
+  }
+
+  .delivery-card > strong {
+    font-size: 14px;
+  }
+
+  .payment-overview {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .order-card,
+  .payment-summary,
+  .payment-step {
+    padding: 14px;
+  }
+
+  .order-card h2,
+  .payment-summary h2,
+  .payment-step h2 {
+    font-size: 15px;
+  }
+
+  .order-table__head {
+    padding: 9px 8px;
+    font-size: 11.5px;
+  }
+
+  .order-table__head,
+  .order-table__row {
+    grid-template-columns: minmax(0, 1fr) 46px 84px;
+    gap: 6px;
+  }
+
+  .order-table__row {
+    padding: 12px 8px;
+  }
+
+  .order-table__row,
+  .order-table__row > strong {
+    font-size: 12px;
+  }
+
+  .order-product strong {
+    font-size: 12.5px;
+  }
+
+  .order-product small {
+    font-size: 11px;
+  }
+
+  .payment-summary {
+    font-size: 12.5px;
+  }
+
+  .summary-total span {
+    font-size: 13px;
+  }
+
+  .summary-total strong {
+    font-size: 17px;
+  }
+
+  .summary-hint,
+  .payment-footer-note,
+  .upload-help,
+  .payment-notice,
+  .payment-message {
+    font-size: 12px;
+  }
+
+  .copy-amount,
+  .copy-account {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 12.5px;
+  }
+
+  .copy-account {
+    width: 100%;
+  }
+
+  .step-description {
+    font-size: 12.5px;
+  }
+
+  .method-options {
+    margin-top: 12px;
+  }
+
+  .method-option {
+    padding: 0 8px 10px;
+    border-radius: 10px;
+  }
+
+  .method-option__summary {
+    min-height: 48px;
+    gap: 9px;
+    padding: 6px;
+    font-size: 13px;
+  }
+
+  .bank-radio {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+
+  .method-option input:checked + .method-option__summary .bank-radio {
+    border-width: 5px;
+  }
+
+  .bank-logo {
+    min-width: 44px;
+    height: 26px;
+    font-size: 11.5px;
+  }
+
+  .account-details {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 0;
+    padding-top: 12px;
+  }
+
+  .account-owner {
+    font-size: 12px;
+  }
+
+  .account-number {
+    font-size: 19px;
+  }
+
+  .upload-control {
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .upload-file-icon {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    font-size: 11px;
+  }
+
+  .upload-file-info {
+    flex-basis: calc(100% - 54px);
+  }
+
+  .upload-file-info strong {
+    font-size: 13px;
+  }
+
+  .upload-file-info small {
+    font-size: 11.5px;
+  }
+
+  .upload-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .upload-remove,
+  .upload-browse {
+    min-height: 38px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+  }
+
+  .payment-field {
+    margin-top: 14px;
+    font-size: 12.5px;
+  }
+
+  .payment-field input {
+    min-height: 42px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .payment-submit {
+    min-height: 42px;
+    font-size: 13.5px;
+  }
+
+  .payment-footer-note {
+    margin-top: -4px;
+  }
+}
+
+/* HP kecil */
+@media (max-width: 380px) {
+  .payment-header h1 {
+    font-size: 19px;
+  }
+
+  .order-table__head,
+  .order-table__row {
+    grid-template-columns: minmax(0, 1fr) 40px 76px;
+  }
+
+  .account-number {
+    font-size: 17px;
+  }
+
+  .summary-total strong {
+    font-size: 15px;
+  }
+}
