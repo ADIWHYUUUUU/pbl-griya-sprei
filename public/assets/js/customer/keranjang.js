@@ -153,31 +153,44 @@ if (cartSelectionRoot) {
       return selectableCartIdSet.has(itemId);
     })
   );
-  var selectAllCheckbox = document.getElementById("cartSelectAll");
+  var selectAllButton = document.getElementById("cartSelectAll");
+  var selectAllLabel = selectAllButton ? selectAllButton.querySelector("[data-select-all-label]") : null;
   var selectionCount = document.getElementById("cartSelectionCount");
+  var summaryCount = document.getElementById("summarySelectedCount");
   var checkoutCount = document.getElementById("checkoutSelectedCount");
   var checkoutButton = document.getElementById("checkoutSelectedButton");
   var selectedItemsContainer = document.getElementById("selectedCartItems");
   var checkoutSelectionForm = document.getElementById("checkoutSelectionForm");
   var itemCheckboxes = document.querySelectorAll(".cart-item-checkbox");
 
+  function isAllSelected() {
+    return (
+      selectableCartIds.length > 0 &&
+      selectableCartIds.every(function (itemId) {
+        return selectedCartIds.has(itemId);
+      })
+    );
+  }
+
   function updateCartSelection() {
     itemCheckboxes.forEach(function (checkbox) {
       checkbox.checked = selectedCartIds.has(checkbox.value);
     });
 
-    if (selectAllCheckbox) {
-      selectAllCheckbox.checked =
-        selectableCartIds.length > 0 &&
-        selectableCartIds.every(function (itemId) {
-          return selectedCartIds.has(itemId);
-        });
-      selectAllCheckbox.indeterminate =
-        selectedCartIds.size > 0 && !selectAllCheckbox.checked;
+    if (selectAllButton) {
+      var allSelected = isAllSelected();
+      selectAllButton.setAttribute("aria-pressed", String(allSelected));
+      selectAllButton.classList.toggle("is-active", allSelected);
+      if (selectAllLabel) {
+        selectAllLabel.textContent = allSelected ? "Batalkan Semua" : "Pilih Semua";
+      }
     }
 
     if (selectionCount) {
       selectionCount.textContent = selectedCartIds.size + " produk dipilih";
+    }
+    if (summaryCount) {
+      summaryCount.textContent = String(selectedCartIds.size);
     }
     if (checkoutCount) {
       checkoutCount.textContent = String(selectedCartIds.size);
@@ -210,10 +223,11 @@ if (cartSelectionRoot) {
     });
   });
 
-  if (selectAllCheckbox) {
-    selectAllCheckbox.addEventListener("change", function () {
+  if (selectAllButton) {
+    selectAllButton.addEventListener("click", function () {
+      var selectAll = !isAllSelected();
       selectableCartIds.forEach(function (itemId) {
-        if (selectAllCheckbox.checked) {
+        if (selectAll) {
           selectedCartIds.add(itemId);
         } else {
           selectedCartIds.delete(itemId);
@@ -234,4 +248,13 @@ if (cartSelectionRoot) {
   }
 
   updateCartSelection();
+}
+
+// Notifikasi (toast) hilang otomatis setelah beberapa detik
+var cartToast = document.querySelector(".cart-toast");
+
+if (cartToast) {
+  setTimeout(function () {
+    cartToast.classList.add("is-hidden");
+  }, 4000);
 }
