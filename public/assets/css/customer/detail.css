@@ -369,7 +369,7 @@ textarea:focus {
 /* 5. RESPONSIF */
 
 /* Tablet */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .detail {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -426,7 +426,7 @@ textarea:focus {
 }
 
 /* Tablet potret */
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .detail__left {
     grid-template-columns: 1fr;
   }
@@ -436,7 +436,7 @@ textarea:focus {
 }
 
 /* HP */
-@media (max-width: 640px) {
+@media (max-width: 480px) {
   .breadcrumb {
     flex-wrap: wrap;
     margin: 14px 0 10px;

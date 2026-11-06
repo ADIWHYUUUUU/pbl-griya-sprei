@@ -472,7 +472,7 @@ small {
   color: #fff;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 480px) {
   .edit-cart__header {
     padding: 15px 16px 12px;
   }
@@ -659,7 +659,7 @@ small {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .baris-atas {
     flex-direction: column;
   }
@@ -780,7 +780,7 @@ small {
 /* =====================================================
    TAMPILAN HP - BAGIAN KOSONG (layar kecil)
    ===================================================== */
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .kosong-besar {
     padding: 44px 16px 52px;
   }
@@ -1034,7 +1034,7 @@ small {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .baris-atas {
     flex-direction: row;
     gap: 8px;
@@ -1218,7 +1218,7 @@ small {
   flex: 0 0 16px;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .baris-atas {
     gap: 10px;
     margin: 24px 0;
@@ -1302,13 +1302,13 @@ small {
    RESPONSIF TAMBAHAN - TABLET & HP
    (header & footer diatur di base.css)
    ===================================================== */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .isi > h1 {
     font-size: 21px;
   }
 }
 
-@media (min-width: 701px) and (max-width: 1024px) {
+@media (min-width: 481px) and (max-width: 900px) {
 
   .produk {
     min-height: 0;
@@ -1337,7 +1337,7 @@ small {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 480px) {
   .isi > h1 {
     font-size: 18px;
     margin-bottom: 12px;

@@ -801,7 +801,7 @@ body.ada-modal {
     margin-top: 18px;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 480px) {
     #modalAlamat {
         padding: 12px;
     }
@@ -828,7 +828,7 @@ body.ada-modal {
    ===================================================== */
 
 /* Tablet */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
     .isi {
         padding: 20px 0 40px;
         font-size: 13px;
@@ -871,7 +871,7 @@ body.ada-modal {
 }
 
 /* Tablet potret */
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .pilihan-kirim {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
@@ -879,7 +879,7 @@ body.ada-modal {
 }
 
 /* HP */
-@media (max-width: 640px) {
+@media (max-width: 480px) {
     .isi {
         padding: 14px 0 32px;
         font-size: 12.5px;

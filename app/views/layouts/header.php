@@ -39,7 +39,7 @@ $activeNavPage = match ($currentPage) {
 ?>
 
 <!-- ===== HEADER ===== -->
-<header class="header">
+<header class="header" id="siteHeader">
     <div class="brand">
         <img
             class="brand__logo"
@@ -54,7 +54,7 @@ $activeNavPage = match ($currentPage) {
     </div>
 
     <!-- NAVBAR -->
-    <nav class="nav" aria-label="Navigasi utama">
+    <nav class="nav" id="mainNav" aria-label="Navigasi utama">
         <a href="/?page=customer-home"
             class="nav__link<?= $activeNavPage === 'home' ? ' nav__link--active' : ''; ?>"
             <?= $activeNavPage === 'home' ? 'aria-current="page"' : ''; ?>>
@@ -175,8 +175,53 @@ $activeNavPage = match ($currentPage) {
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
                 </svg>
-                Masuk / Daftar
+                <span class="btn-login__text">Masuk / Daftar</span>
             </a>
         <?php endif; ?>
+
+        <!-- Tombol burger (tampil di tablet & HP) -->
+        <button
+            class="burger"
+            type="button"
+            aria-label="Buka menu"
+            aria-controls="mainNav"
+            aria-expanded="false">
+            <span class="burger__bar"></span>
+            <span class="burger__bar"></span>
+            <span class="burger__bar"></span>
+        </button>
     </div>
 </header>
+
+<script>
+    (function () {
+        var header = document.getElementById('siteHeader');
+        var burger = header ? header.querySelector('.burger') : null;
+        if (!burger) return;
+
+        function setOpen(open) {
+            header.classList.toggle('header--open', open);
+            burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+            burger.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
+        }
+
+        burger.addEventListener('click', function () {
+            setOpen(!header.classList.contains('header--open'));
+        });
+
+        // Tutup menu: klik link, klik di luar header, tekan Esc, atau layar jadi laptop
+        header.querySelectorAll('.nav__link').forEach(function (link) {
+            link.addEventListener('click', function () { setOpen(false); });
+        });
+        document.addEventListener('click', function (e) {
+            if (!header.contains(e.target)) setOpen(false);
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') setOpen(false);
+        });
+        var laptop = window.matchMedia('(min-width: 901px)');
+        var onChange = function (e) { if (e.matches) setOpen(false); };
+        if (laptop.addEventListener) laptop.addEventListener('change', onChange);
+        else laptop.addListener(onChange);
+    })();
+</script>

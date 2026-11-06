@@ -592,7 +592,7 @@
   text-align: center;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .payment-page {
     padding: 20px 14px 40px;
   }
@@ -682,7 +682,7 @@
    ===================================================== */
 
 /* Tablet */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .payment-page {
     font-size: 15px;
   }
@@ -789,14 +789,14 @@
 }
 
 /* Tablet potret: ringkasan biaya pindah ke bawah */
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .payment-overview {
     grid-template-columns: 1fr;
   }
 }
 
 /* HP */
-@media (max-width: 640px) {
+@media (max-width: 480px) {
   .payment-page {
     padding: 14px 14px 32px;
     font-size: 13px;
@@ -1042,5 +1042,44 @@
 
   .summary-total strong {
     font-size: 15px;
+  }
+}
+
+/* =========================================
+   TOMBOL KEMBALI KE PESANAN SAYA
+   Disembunyikan di laptop, tampil di tablet & HP
+   ========================================= */
+.payment-back {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .payment-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    margin-top: 20px;
+    padding: 0 14px 0 10px;
+    border: 1px solid #40533c;
+    border-radius: 8px;
+    background: #40533c;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .payment-back:hover {
+    background: #33452f;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-back {
+    width: 100%;
+    justify-content: center;
+    height: 42px;
+    margin-top: 16px;
+    font-size: 13.5px;
   }
 }

@@ -232,13 +232,13 @@ button { cursor: pointer; }
    7. RESPONSIF
    ========================================= */
 /* Tablet */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .login-card { max-width: 460px; }
   .brand { margin-bottom: 40px; }
 }
 
 /* HP */
-@media (max-width: 520px) {
+@media (max-width: 480px) {
   .page-login { padding: 16px; }
   .login-card { max-height: none; padding: 20px 18px; }
   .login-card::before { width: 110px; height: 110px; top: -40px; right: -40px; }

@@ -600,7 +600,7 @@ body.ada-modal {
    ===================================================== */
 
 /* Tablet */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .isi {
     padding: 20px 0 40px;
     font-size: 13px;
@@ -639,7 +639,7 @@ body.ada-modal {
 }
 
 /* Tablet potret */
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .pesanan-isi {
     grid-template-columns: 60px minmax(0, 1fr);
   }
@@ -653,7 +653,7 @@ body.ada-modal {
 }
 
 /* HP */
-@media (max-width: 640px) {
+@media (max-width: 480px) {
   .isi {
     padding: 14px 0 32px;
     font-size: 12.5px;

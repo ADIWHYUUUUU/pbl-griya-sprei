@@ -359,9 +359,50 @@ button {
   color: #b42318;
 }
 
+
 /* =========================================
-   7. RESPONSIF (TABLET & HP)
-   Logo, tombol, dan font ikut mengecil
+   7. NAVBAR BURGER
+   Tombol burger hanya tampil di tablet & HP
+   ========================================= */
+.header {
+  position: relative;
+  z-index: 100;
+}
+.burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 0 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text);
+}
+.burger__bar {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.header--open .burger__bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.header--open .burger__bar:nth-child(2) {
+  opacity: 0;
+}
+.header--open .burger__bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* =========================================
+   8. RESPONSIF
+   Laptop  : > 900px (tampilan default di atas)
+   Tablet  : <= 900px
+   HP      : <= 480px
    ========================================= */
 
 /* Hindari teks membesar otomatis di HP */
@@ -373,18 +414,17 @@ img {
   max-width: 100%;
 }
 
-/* ---------- TABLET (<= 1024px) ---------- */
-@media (max-width: 1024px) {
+/* ---------- TABLET (<= 900px) ---------- */
+@media (max-width: 900px) {
   .container {
     padding: 0 20px;
   }
 
-  /* Header: brand & aksi di atas, menu di baris bawah */
+  /* Header: logo kiri, keranjang + akun + burger kanan */
   .header {
     grid-template-columns: minmax(0, 1fr) auto;
-    height: auto;
-    padding: 12px 20px 0;
-    row-gap: 6px;
+    height: 64px;
+    padding: 0 20px;
     column-gap: 12px;
   }
   .brand {
@@ -407,25 +447,50 @@ img {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .burger {
+    display: inline-flex;
+  }
+
+  /* Menu jadi panel dropdown di bawah header */
   .nav {
-    grid-column: 1 / -1;
-    order: 3;
-    justify-content: center;
-    gap: 24px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 20px 14px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    display: none;
+  }
+  .header--open .nav {
+    display: flex;
   }
   .nav__link {
-    padding: 8px 0 10px;
-    font-size: 13px;
+    padding: 13px 4px;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border);
   }
+  .nav__link:last-child {
+    border-bottom: 0;
+  }
+  .nav__link--active {
+    border-color: var(--border);
+    font-weight: 600;
+  }
+
   .header__actions {
-    gap: 16px;
+    gap: 14px;
   }
   .cart svg {
     width: 22px;
     height: 22px;
   }
   .btn-login {
-    height: 34px;
+    height: 36px;
     padding: 0 14px;
     font-size: 13px;
   }
@@ -457,14 +522,15 @@ img {
   }
 }
 
-/* ---------- HP (<= 640px) ---------- */
-@media (max-width: 640px) {
+/* ---------- HP (<= 480px) ---------- */
+@media (max-width: 480px) {
   .container {
     padding: 0 14px;
   }
 
   .header {
-    padding: 10px 14px 0;
+    height: 58px;
+    padding: 0 14px;
     column-gap: 8px;
   }
   .brand {
@@ -478,31 +544,19 @@ img {
     font-size: 14px;
   }
   .brand__tagline {
-    font-size: 9px;
-  }
-
-  /* Menu bisa digeser ke samping jika tidak muat */
-  .nav {
-    justify-content: flex-start;
-    gap: 20px;
-    margin: 0 -14px;
-    padding: 0 14px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    border-top: 1px solid var(--border);
-  }
-  .nav::-webkit-scrollbar {
     display: none;
   }
+
+  .nav {
+    padding: 4px 14px 10px;
+  }
   .nav__link {
-    flex: none;
-    padding: 9px 0 8px;
-    font-size: 12.5px;
-    white-space: nowrap;
+    padding: 12px 4px;
+    font-size: 14px;
   }
 
   .header__actions {
-    gap: 12px;
+    gap: 10px;
   }
   .cart svg {
     width: 20px;
@@ -516,18 +570,18 @@ img {
     font-size: 9px;
   }
   .btn-login {
-    height: 30px;
+    height: 34px;
     padding: 0 10px;
     gap: 6px;
     border-radius: 7px;
-    font-size: 11.5px;
+    font-size: 12px;
   }
   .btn-login svg {
     width: 14px;
     height: 14px;
   }
   .user-dropdown__trigger span {
-    max-width: 90px;
+    max-width: 80px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -539,6 +593,11 @@ img {
     padding: 9px 10px;
     font-size: 13px;
     overflow-wrap: anywhere;
+  }
+  .burger {
+    width: 36px;
+    height: 36px;
+    padding: 0 8px;
   }
 
   .btn {
@@ -578,33 +637,17 @@ img {
   }
 }
 
-/* ---------- HP KECIL (<= 380px) ---------- */
-@media (max-width: 380px) {
-  .brand__logo {
-    width: 26px;
-    height: 26px;
-  }
-  .brand__name {
-    font-size: 13px;
-  }
-  .brand__tagline {
+/* HP sangat kecil: tombol Masuk cukup ikon agar header tidak sesak */
+@media (max-width: 360px) {
+  .btn-login__text {
     display: none;
   }
-  .btn-login {
-    height: 28px;
-    padding: 0 8px;
-    font-size: 11px;
+  a.btn-login {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
   }
   .user-dropdown__trigger span {
-    max-width: 64px;
-  }
-  .nav {
-    gap: 16px;
-  }
-  .nav__link {
-    font-size: 12px;
-  }
-  .btn {
-    font-size: 11.5px;
+    max-width: 56px;
   }
 }
