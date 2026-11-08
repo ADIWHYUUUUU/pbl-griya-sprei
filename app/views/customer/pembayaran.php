@@ -199,19 +199,23 @@ $copyTotal = fmod($total, 1.0) === 0.0
 
                 <section class="payment-step upload-step">
                     <h2>2. Unggah bukti transfer</h2>
-                    <div class="upload-control">
-                        <span class="upload-file-icon" aria-hidden="true">JPG</span>
-                        <span class="upload-file-info">
-                            <strong class="upload-file-name">Belum ada file dipilih</strong>
-                            <small class="upload-file-size">JPG atau PNG · maksimal 8 MB</small>
+                    <div class="upload-control" data-state="empty" role="group" tabindex="0" aria-label="Area unggah bukti transfer. Seret file JPG atau PNG ke area ini.">
+                        <span class="upload-empty">
+                            <strong>Pilih file atau seret ke sini</strong>
+                            <small>JPG atau PNG, maksimal 8 MB. Pastikan nominal dan tanggal terlihat jelas.</small>
                         </span>
-                        <span class="upload-actions">
-                            <button class="upload-remove" type="button" disabled>Hapus</button>
-                            <button class="upload-browse" type="button">Pilih file</button>
+                        <span class="upload-file-icon" aria-hidden="true" hidden>JPG</span>
+                        <span class="upload-file-info" hidden>
+                            <strong class="upload-file-name"></strong>
+                            <small class="upload-file-size" aria-live="polite"></small>
+                        </span>
+                        <span class="upload-actions" hidden>
+                            <button class="upload-remove" type="button">Hapus file</button>
+                            <button class="upload-browse" type="button">Pilih file lain</button>
                         </span>
                         <input id="payment-proof" type="file" name="bukti_transfer" accept=".jpg,.jpeg,.png" aria-label="Pilih bukti transfer" required>
                     </div>
-                    <p class="upload-help">JPG atau PNG, maksimal 8 MB. Pastikan nominal dan tanggal terlihat jelas.</p>
+                    <p class="upload-help" aria-live="polite">JPG atau PNG, maksimal 8 MB. Pastikan nominal dan tanggal terlihat jelas.</p>
                     <label class="payment-field">
                         Nama pemilik rekening pengirim <span>(opsional)</span>
                         <input type="text" name="nama_pemilik_pengirim" maxlength="100" value="<?= $escape($form['nama_pemilik_pengirim'] ?? '') ?>" placeholder="Contoh: Vico Dwi Wijaya" autocomplete="name">
@@ -221,7 +225,8 @@ $copyTotal = fmod($total, 1.0) === 0.0
                         <input type="text" name="nomor_rekening_pengirim" maxlength="50" value="<?= $escape($form['nomor_rekening_pengirim'] ?? '') ?>" placeholder="Contoh: 1234567890" inputmode="numeric" autocomplete="off">
                     </label>
                 </section>
-                <button class="payment-submit" type="submit"<?= $accounts === [] ? ' disabled' : '' ?>>Kirim bukti pembayaran</button>
+                <button class="payment-submit" type="submit"<?= $accounts === [] ? ' disabled' : '' ?>>Kirim Bukti Pembayaran</button>
+                <p class="payment-submit-hint" aria-live="polite">Pilih file bukti transfer untuk melanjutkan.</p>
                 <p class="payment-footer-note">Setelah dikirim, admin akan memverifikasi. Status tampil di Pesanan Saya.</p>
             </form>
         <?php endif; ?>
