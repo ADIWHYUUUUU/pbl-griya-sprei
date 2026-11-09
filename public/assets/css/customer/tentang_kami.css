@@ -1,0 +1,251 @@
+/* =========================================
+   TENTANG_KAMI.CSS - khusus halaman Tentang Kami
+   ========================================= */
+
+/* 1. HERO (latar hijau selebar layar) */
+.about-hero {
+  background: #e6ebe2;
+  border-bottom: 1px solid var(--border);
+}
+.about-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  gap: 60px;
+  align-items: center;
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+.about-eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green-dark);
+}
+.about-hero__title {
+  max-width: 560px;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+.about-hero__desc {
+  max-width: 520px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.btn--lg {
+  height: 44px;
+  padding: 0 24px;
+  font-size: 14px;
+}
+.about-hero__image {
+  height: 320px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: #dfe5da;
+  overflow: hidden;
+}
+.about-hero__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 2. SECTION UMUM */
+.about-section {
+  margin: 56px 0;
+}
+.about-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.about-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.about-text {
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.about-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.about-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.about-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* 3. CERITA KAMI */
+.about-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  gap: 40px;
+  align-items: start;
+}
+.about-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+.about-stat strong {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.about-stat span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* 4. YANG KAMI PEGANG */
+.about-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* 5. KUNJUNGI KAMI */
+.about-visit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.about-visit__info {
+  padding: 24px;
+}
+.about-visit__info .about-title {
+  margin-bottom: 16px;
+}
+.about-visit__info dt {
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 14px;
+}
+.about-visit__info dt:first-child {
+  margin-top: 0;
+}
+.about-visit__info dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.about-visit__info dd a {
+  color: var(--green-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.about-visit__map {
+  min-height: 300px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #dfe5da;
+}
+.about-visit__map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  border: 0;
+}
+
+/* =========================================
+   6. RESPONSIF
+   ========================================= */
+
+/* ---------- TABLET (<= 900px) ---------- */
+@media (max-width: 900px) {
+  .about-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding-top: 36px;
+    padding-bottom: 40px;
+  }
+  .about-hero__title {
+    font-size: 30px;
+  }
+  .about-hero__desc {
+    font-size: 15px;
+    margin-bottom: 22px;
+  }
+  .about-hero__image {
+    height: 240px;
+  }
+
+  .about-section {
+    margin: 40px 0;
+  }
+  .about-story {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .about-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .about-visit {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- HP (<= 480px) ---------- */
+@media (max-width: 480px) {
+  .about-hero__title {
+    font-size: 24px;
+    line-height: 1.2;
+  }
+  .about-hero__desc {
+    font-size: 13.5px;
+  }
+  .btn--lg {
+    width: 100%;
+    height: 42px;
+  }
+  .about-hero__image {
+    height: 180px;
+    border-radius: 12px;
+  }
+
+  .about-section {
+    margin: 32px 0;
+  }
+  .about-title {
+    font-size: 18px;
+  }
+  .about-values {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .about-card {
+    padding: 16px;
+  }
+  .about-visit__map,
+  .about-visit__map iframe {
+    min-height: 240px;
+  }
+}

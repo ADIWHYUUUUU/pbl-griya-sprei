@@ -32,6 +32,7 @@ $activeNavPage = match ($currentPage) {
     'index.php', 'customer-home' => 'home',
     'customer-catalog', 'customer-detail' => 'catalog',
     'customer-cart' => '',
+    'customer-about' => 'about',
     'customer-orders', 'customer-payment', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
     default => '',
 };
@@ -72,6 +73,11 @@ $activeNavPage = match ($currentPage) {
                 Pesanan Saya
             </a>
         <?php endif; ?>
+        <a href="/?page=customer-about"
+            class="nav__link<?= $activeNavPage === 'about' ? ' nav__link--active' : ''; ?>"
+            <?= $activeNavPage === 'about' ? 'aria-current="page"' : ''; ?>>
+            Tentang Kami
+        </a>
     </nav>
 
     <!-- HEADER ACTIONS -->

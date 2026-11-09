@@ -69,6 +69,7 @@ $isCustomerLoggedIn = ($_SESSION['login'] ?? false) === true
                 <?php if ($isCustomerLoggedIn): ?>
                     <li><a href="/?page=customer-orders">Pesanan Saya</a></li>
                 <?php endif; ?>
+                <li><a href="/?page=customer-about">Tentang Kami</a></li>
             </ul>
         </div>
 

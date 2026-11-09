@@ -47,22 +47,30 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
         <p class="hero__desc">
           <?= $homepageValue('hero_description', 'Pilih model kain, tentukan ukuran panjang × lebar × tinggi kasur presisi cm, tambahkan sarung bantal guling, dan nikmati tidur nyaman dengan bahan MicroSilk & Katun Jepang halus.'); ?>
         </p>
-        <a
-          href="/?page=customer-catalog"
-          class="btn btn--lg"
-        >
-          Lihat Katalog
-        </a>
+        <div class="hero__actions">
+          <a
+            href="/?page=customer-catalog"
+            class="btn btn--lg"
+          >
+            Lihat Katalog
+          </a>
+          <button type="button" class="btn btn--lg btn--outline" data-buka-panduan>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 16.5L16.5 3 21 7.5 7.5 21z" /><path d="M7.5 12l2 2M10.5 9l2 2M13.5 6l2 2" />
+            </svg>
+            Cara Ukur Kasur
+          </button>
+        </div>
       </div>
       <div
         class="hero__image media"
         style="--ph:#9bb87a"
       ><?php if (!empty($homepage['hero_image'])): ?><img src="<?= $homepageValue('hero_image'); ?>" alt="Suasana produk Griya Sprei"><?php endif; ?></div>
     </section>
-    <!-- ===== JELAJAHI KATALOG ===== -->
+    <!-- ===== KATEGORI PRODUK ===== -->
     <section class="section" id="explore">
       <h2 class="section__title">
-        <?= $homepageValue('explore_title', 'Jelajahi katalog'); ?>
+        <?= $homepageValue('explore_title', 'Kategori produk'); ?>
       </h2>
       <div class="explore">
         <!-- SPREI -->
@@ -101,6 +109,27 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
             </div>
             <a
               href="/?page=customer-catalog&category=bedcover"
+              class="btn"
+            >
+              Lihat
+            </a>
+          </div>
+        </article>
+        <!-- SARUNG BANTAL & GULING -->
+        <article class="explore__card">
+          <div
+            class="explore__image media"
+            style="--ph:#9bb87a"
+          ><?php if (!empty($homepage['sarung_image'])): ?><img src="<?= $homepageValue('sarung_image'); ?>" alt="Sarung bantal dan guling"><?php endif; ?></div>
+          <div class="explore__row">
+            <div>
+              <h3><?= $homepageValue('sarung_title', 'Sarung Bantal & Guling'); ?></h3>
+              <p>
+                <?= $homepageValue('sarung_description', 'Bisa ditambahkan saat memesan sprei.'); ?>
+              </p>
+            </div>
+            <a
+              href="/?page=customer-catalog&category=sprei"
               class="btn"
             >
               Lihat
@@ -176,9 +205,116 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
         </article>
       </div>
     </section>
+    <!-- ===== CARA MENGUKUR KASUR (popup, dibuka dari tombol di hero) ===== -->
+    <dialog class="guide-modal" id="panduanUkuran" aria-labelledby="panduanUkuranJudul">
+      <header class="guide-modal__head">
+        <div>
+          <h2 id="panduanUkuranJudul">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z" /><path d="M14 6l3 3" /></svg>
+            Cara Mengukur Kasur
+          </h2>
+          <p>Ukur kasur tanpa sprei, pakai meteran kain</p>
+        </div>
+        <button type="button" class="guide-modal__close" data-tutup-panduan aria-label="Tutup">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </header>
+
+      <div class="guide-modal__body">
+        <svg class="guide-modal__diagram" viewBox="0 0 345 130" role="img" aria-label="Ilustrasi kasur: P panjang, L lebar, T tinggi">
+          <path d="M60 30 L90 8 L320 8 L290 30 Z" fill="#f1f2ee" stroke="#4f6350" stroke-width="1.2" stroke-linejoin="round" />
+          <path d="M290 30 L320 8 L320 62 L290 84 Z" fill="#d4dccf" stroke="#4f6350" stroke-width="1.2" stroke-linejoin="round" />
+          <rect x="60" y="30" width="230" height="54" rx="3" fill="#e6ebe2" stroke="#4f6350" stroke-width="1.2" />
+          <line x1="40" y1="30" x2="40" y2="84" stroke="#a07f3c" stroke-width="2" />
+          <text x="18" y="62" font-size="12" font-weight="600" fill="#a07f3c">T</text>
+          <line x1="296" y1="94" x2="328" y2="70" stroke="#3f5a7a" stroke-width="2" />
+          <text x="332" y="96" font-size="12" font-weight="600" fill="#3f5a7a">L</text>
+          <line x1="60" y1="100" x2="290" y2="100" stroke="#b0583f" stroke-width="2" />
+          <text x="175" y="120" font-size="12" font-weight="600" fill="#b0583f" text-anchor="middle">P = Panjang</text>
+        </svg>
+
+        <ol class="guide-modal__steps">
+          <li><b>Panjang (P):</b> ukur dari kepala sampai kaki kasur.</li>
+          <li><b>Lebar (L):</b> ukur sisi kiri ke kanan.</li>
+          <li><b>Tinggi (T):</b> ukur ketebalan kasur dari atas ke bawah — ini menentukan panjang karet sprei.</li>
+          <li>Pakai ukuran bulat dalam cm. Kalau ragu antara dua angka, pilih yang lebih besar.</li>
+        </ol>
+
+        <div class="guide-modal__sizes">
+          <h3>Ukuran standar di Indonesia</h3>
+          <dl>
+            <div><dt>Single</dt><dd>120 × 200 cm</dd></div>
+            <div><dt>Queen</dt><dd>160 × 200 cm</dd></div>
+            <div><dt>King</dt><dd>180 × 200 cm</dd></div>
+            <div><dt>Super King</dt><dd>200 × 200 cm</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <footer class="guide-modal__foot">
+        <button type="button" class="btn" data-tutup-panduan>Mengerti</button>
+      </footer>
+    </dialog>
+    <!-- ===== FAQ ===== -->
+    <section class="section">
+      <h2 class="section__title">Pertanyaan yang sering diajukan</h2>
+      <p class="section__desc">Jawaban singkat seputar pemesanan di Griya Sprei.</p>
+      <div class="faq">
+        <details class="faq__item">
+          <summary>Apakah saya harus membayar saat memesan?</summary>
+          <p>Tidak. Setelah Anda mengajukan pesanan, Admin memeriksa spesifikasi kasur terlebih dahulu. Tagihan resmi muncul di halaman Pesanan Saya, lalu Anda bisa membayar.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Bagaimana jika saya tidak yakin dengan ukuran kasur?</summary>
+          <p>Ukur panjang, lebar, dan tinggi kasur sesuai panduan di atas. Jika masih ragu, hubungi kami lewat WhatsApp dan kami bantu memastikan ukurannya.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Bagaimana cara membayar?</summary>
+          <p>Transfer ke rekening bank sesuai nominal di tagihan, lalu unggah bukti transfer di halaman pembayaran. Admin akan memverifikasi pembayaran Anda.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Bisa memesan dalam jumlah besar untuk kos, homestay, atau rumah sakit?</summary>
+          <p>Bisa. Hubungi kami lewat WhatsApp agar kebutuhan jumlah dan ukurannya bisa dibicarakan bersama.</p>
+        </details>
+        <details class="faq__item">
+          <summary>Bagaimana saya tahu pesanan sudah dikirim?</summary>
+          <p>Status pesanan dan nomor resi tampil di halaman Pesanan Saya setelah pesanan dikirim.</p>
+        </details>
+      </div>
+    </section>
+    <!-- ===== CTA WHATSAPP ===== -->
+    <section class="section cta">
+      <div>
+        <h2>Butuh ukuran khusus atau pesanan dalam jumlah besar?</h2>
+        <p>Hubungi kami dan kami bantu menentukan spesifikasinya.</p>
+      </div>
+      <a class="btn btn--lg cta__btn" href="https://wa.me/+62111122223333" target="_blank" rel="noopener">Hubungi via WhatsApp</a>
+    </section>
   </main>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
   <script>window.homepageContent = <?= json_encode($homepage, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?: '{}'; ?>;</script>
   <script src="/assets/js/customer/beranda.js"></script>
+  <script>
+    (function () {
+      var modal = document.getElementById('panduanUkuran');
+      if (!modal || typeof modal.showModal !== 'function') return;
+      document.querySelectorAll('[data-buka-panduan]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          modal.showModal();
+          document.body.style.overflow = 'hidden';
+        });
+      });
+      modal.querySelectorAll('[data-tutup-panduan]').forEach(function (btn) {
+        btn.addEventListener('click', function () { modal.close(); });
+      });
+      // Klik di luar kotak popup untuk menutup
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) modal.close();
+      });
+      modal.addEventListener('close', function () {
+        document.body.style.overflow = '';
+      });
+    })();
+  </script>
 </body>
 </html>
