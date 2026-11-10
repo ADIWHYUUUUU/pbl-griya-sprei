@@ -236,7 +236,7 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
         <ol class="guide-modal__steps">
           <li><b>Panjang (P):</b> ukur dari kepala sampai kaki kasur.</li>
           <li><b>Lebar (L):</b> ukur sisi kiri ke kanan.</li>
-          <li><b>Tinggi (T):</b> ukur ketebalan kasur dari atas ke bawah — ini menentukan panjang karet sprei.</li>
+          <li><b>Tinggi (T):</b> ukur ketebalan kasur dari atas ke bawah.</li>
           <li>Pakai ukuran bulat dalam cm. Kalau ragu antara dua angka, pilih yang lebih besar.</li>
         </ol>
 
