@@ -24,6 +24,8 @@ $namaBulan = [
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
 ];
 $tahunSekarang = (int) date('Y');
+$dashboard = new DashboardModel($pdo);
+$tahunAwalLaporan = min($tahunSekarang, $dashboard->getEarliestOrderYear() ?? $tahunSekarang);
 $bulanSekarang = (int) date('n');
 $bacaAngkaQuery = static function ($value, int $default): int {
     if (!is_string($value) && !is_int($value)) {
@@ -39,11 +41,10 @@ $tahunLaporan = $bacaAngkaQuery($_GET['tahun'] ?? $tahunSekarang, $tahunSekarang
 if ($bulanLaporan < 1 || $bulanLaporan > 12) {
     $bulanLaporan = $bulanSekarang;
 }
-if ($tahunLaporan < $tahunSekarang - 5 || $tahunLaporan > $tahunSekarang + 1) {
+if ($tahunLaporan < $tahunAwalLaporan || $tahunLaporan > $tahunSekarang) {
     $tahunLaporan = $tahunSekarang;
 }
 
-$dashboard = new DashboardModel($pdo);
 $stats = $dashboard->getStats();
 $pesananTerbaru = $dashboard->getRecentOrders();
 $pembayaranVerifikasi = $dashboard->getWaitingVerificationPayments();
@@ -451,7 +452,7 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                 </select>
                 <label class="sr-only" for="lapTahun">Pilih tahun laporan</label>
                 <select class="report-select" id="lapTahun" name="tahun">
-                    <?php for ($tahun = $tahunSekarang - 5; $tahun <= $tahunSekarang + 1; $tahun++): ?>
+                    <?php for ($tahun = $tahunAwalLaporan; $tahun <= $tahunSekarang; $tahun++): ?>
                         <option value="<?= $tahun ?>" <?= $tahunLaporan === $tahun ? 'selected' : '' ?>><?= $tahun ?></option>
                     <?php endfor; ?>
                 </select>

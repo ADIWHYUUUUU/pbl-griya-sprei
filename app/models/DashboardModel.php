@@ -64,6 +64,16 @@ class DashboardModel
         return $statement->fetchAll();
     }
 
+    public function getEarliestOrderYear(): ?int
+    {
+        $statement = $this->pdo->query(
+            'SELECT MIN(EXTRACT(YEAR FROM tanggal_pesan))::int FROM pesanan'
+        );
+        $year = $statement->fetchColumn();
+
+        return $year === false || $year === null ? null : (int) $year;
+    }
+
     public function getOrdersForMonth(int $month, int $year): array
     {
         $start = new DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month));
