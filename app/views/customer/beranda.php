@@ -59,7 +59,7 @@ if ($isLogin && $popupCustomerId > 0) {
           <?= $homepageValue('hero_pill', 'Griya Sprei Malang · Homemade sejak 2010'); ?>
         </span>
         <h2 class="hero__title">
-          <?= $homepageValue('hero_title', 'Sprei dan bed cover pas di kasur Anda, ukuran standar maupun custom.'); ?>
+          <?= $homepageValue('hero_title', 'Griya Sprei adalah usaha bedding lokal yang fokus pada pembuatan sprei custom dengan kualitas jahitan rapi dan bahan berkualitas.'); ?>
         </h2>
         <p class="hero__desc">
           <?= $homepageValue('hero_description', 'Pilih model kain, tentukan ukuran panjang × lebar × tinggi kasur presisi cm, tambahkan sarung bantal guling, dan nikmati tidur nyaman dengan bahan MicroSilk & Katun Jepang halus.'); ?>

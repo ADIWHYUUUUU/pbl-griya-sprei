@@ -6,5 +6,10 @@
         "25": "SELESAI|0|",
         "24": "MENUNGGU_PEMBAYARAN|0|",
         "16": "DIPROSES|0|"
+    },
+    "14": {
+        "42": "MENUNGGU_VERIFIKASI|0|",
+        "41": "MENUNGGU_VERIFIKASI|0|",
+        "40": "MENUNGGU_VERIFIKASI|0|"
     }
 }

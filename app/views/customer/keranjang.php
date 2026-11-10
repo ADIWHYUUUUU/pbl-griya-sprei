@@ -131,6 +131,16 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
 
             <div class="dua-kolom" data-cart-selectable-ids="<?= aman(json_encode($selectableCartIds)) ?>">
                 <section class="daftar-produk" aria-label="Daftar produk keranjang">
+                    <div class="kartu pilih-semua">
+                        <span id="cartSelectionCount" aria-live="polite">0 produk dipilih</span>
+                        <button type="button" class="tombol-garis tombol-kecil" id="cartSelectAll" aria-pressed="false" <?= $selectableCartIds === [] ? 'disabled' : '' ?>>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3.5" y="3.5" width="17" height="17" rx="3" />
+                                <path d="m8 12 3 3 5-6" />
+                            </svg>
+                            <span data-select-all-label>Pilih Semua</span>
+                        </button>
+                    </div>
                     <?php if ($visibleItems === []): ?>
                         <div class="kartu kosong">
                             <h2>Keranjang masih kosong.</h2>
@@ -138,17 +148,6 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             <a href="/?page=customer-catalog" class="tombol">Lihat Katalog</a>
                         </div>
                     <?php else: ?>
-                        <div class="kartu pilih-semua">
-                            <span id="cartSelectionCount" aria-live="polite">0 produk dipilih</span>
-                            <button type="button" class="tombol-garis tombol-kecil" id="cartSelectAll" aria-pressed="false" <?= $selectableCartIds === [] ? 'disabled' : '' ?>>
-                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <rect x="3.5" y="3.5" width="17" height="17" rx="3" />
-                                    <path d="m8 12 3 3 5-6" />
-                                </svg>
-                                <span data-select-all-label>Pilih Semua</span>
-                            </button>
-                        </div>
-
                         <?php foreach ($visibleItems as $entry): ?>
                             <?php
                             $item = $entry['data'];

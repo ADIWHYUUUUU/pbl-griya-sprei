@@ -152,6 +152,10 @@ small {
 /* =====================================================
    ISI HALAMAN
    ===================================================== */
+main.container {
+  max-width: 1243px;
+}
+
 .isi {
   padding: 32px 0 56px;
   font-size: 14px;
@@ -181,8 +185,8 @@ small {
 /* Layout: kiri produk, kanan ringkasan */
 .dua-kolom {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 20px;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 24px;
   align-items: start;
 }
 
@@ -410,7 +414,12 @@ small {
 
 /* ---------- Keranjang kosong ---------- */
 .kosong {
-  padding: 48px 24px;
+  display: flex;
+  min-height: 345px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
   text-align: center;
 }
 
@@ -894,6 +903,10 @@ small {
 
   .kartu {
     padding: 16px;
+  }
+
+  .kosong {
+    min-height: 300px;
   }
 
   .pilih-semua {
