@@ -127,9 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
     proofName.closest(".upload-file-info").hidden = false;
     uploadActions.hidden = false;
     proofName.textContent = file.name;
-    proofSize.textContent = isSending
-      ? "Mengunggah..."
-      : error?.message ?? `${formatFileSize(file.size)} · siap dikirim`;
+    proofSize.textContent = error?.message ?? `${formatFileSize(file.size)} · siap dikirim`;
     proofIcon.textContent = file.name.split(".").pop().toUpperCase().slice(0, 4) || "FILE";
     uploadHelp.textContent = error?.state === "size-error"
       ? "Coba kompres foto atau ambil tangkapan layar bukti transfer."
@@ -137,11 +135,11 @@ document.addEventListener("DOMContentLoaded", function () {
     uploadHelp.classList.toggle("upload-help--error", Boolean(error));
     submitHint.hidden = Boolean(error) || isSending;
     submitHint.textContent = "Pilih file bukti transfer untuk melanjutkan.";
-    submitButton.disabled = !accountsAvailable || Boolean(error) || isSending;
-    submitButton.textContent = isSending ? "Mengirim..." : "Kirim Bukti Pembayaran";
+    submitButton.disabled = !accountsAvailable || Boolean(error);
+    submitButton.textContent = "Kirim Bukti Pembayaran";
     chooseFileButton.textContent = "Pilih file lain";
-    chooseFileButton.disabled = isSending;
-    removeFileButton.disabled = isSending;
+    chooseFileButton.disabled = false;
+    removeFileButton.disabled = false;
   }
 
   if (proofInput) {
@@ -155,6 +153,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     form.addEventListener("submit", function (event) {
+      if (form.dataset.submitting === "true") {
+        event.preventDefault();
+        return;
+      }
+
       const file = proofInput.files[0];
       if (!file || getProofError(file)) {
         event.preventDefault();
@@ -163,6 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      form.dataset.submitting = "true";
       updateProofFile(true);
     });
 

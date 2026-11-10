@@ -11,5 +11,17 @@
         "42": "MENUNGGU_VERIFIKASI|0|",
         "41": "MENUNGGU_VERIFIKASI|0|",
         "40": "MENUNGGU_VERIFIKASI|0|"
+    },
+    "9": {
+        "47": "DIKIRIM|1|JNT123",
+        "45": "MENUNGGU_VERIFIKASI|0|",
+        "44": "MENUNGGU_PEMBAYARAN|0|",
+        "43": "MENUNGGU_PEMBAYARAN|0|",
+        "35": "MENUNGGU_PEMBAYARAN|0|",
+        "34": "DIKIRIM|1|JNT12121121121",
+        "30": "DIKIRIM|2|JNT2525252525",
+        "28": "DIPROSES|1|",
+        "27": "MENUNGGU_PEMBAYARAN|0|",
+        "17": "DIKIRIM|0|"
     }
 }
