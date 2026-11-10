@@ -1,6 +1,18 @@
-CREATE TYPE jenis_kain_enum AS ENUM (
-    'TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'
-);
+DO $$
+BEGIN
+    CREATE TYPE jenis_kain_enum AS ENUM (
+        'TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END
+$$;
+
+ALTER TYPE jenis_kain_enum ADD VALUE IF NOT EXISTS 'TENCEL';
+ALTER TYPE jenis_kain_enum ADD VALUE IF NOT EXISTS 'KATUN_JEPANG';
+ALTER TYPE jenis_kain_enum ADD VALUE IF NOT EXISTS 'KATUN_LOKAL';
+ALTER TYPE jenis_kain_enum ADD VALUE IF NOT EXISTS 'MICROTENCEL';
+ALTER TYPE jenis_kain_enum ADD VALUE IF NOT EXISTS 'MICROTEX';
 
 ALTER TABLE produk
-    ADD COLUMN jenis_kain jenis_kain_enum;
+    ADD COLUMN IF NOT EXISTS jenis_kain jenis_kain_enum;
