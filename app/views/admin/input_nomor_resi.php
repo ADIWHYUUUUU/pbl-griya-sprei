@@ -159,6 +159,7 @@ $customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_al
             </div>
         </main>
     </div>
+    <script src="/assets/js/admin/sidebar.js"></script>
     <script src="/assets/js/admin/input_nomor_resi.js"></script>
 </body>
 </html>

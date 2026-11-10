@@ -214,6 +214,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
         </div>
     </div>
 
+    <script src="/assets/js/admin/sidebar.js"></script>
     <script src="/assets/js/admin/nomor_resi.js"></script>
 </body>
 </html>

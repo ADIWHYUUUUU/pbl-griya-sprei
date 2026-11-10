@@ -3,6 +3,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const backdrop = document.getElementById('sidebarBackdrop');
     const closeButton = document.getElementById('sidebarClose');
     const toggleButton = document.getElementById('burgerBtn');
+    const logoutDialog = document.querySelector('.logout-dialog');
+    const logoutTrigger = document.querySelector('[data-open-logout-dialog]');
+
+    if (logoutDialog && logoutTrigger && typeof logoutDialog.showModal === 'function') {
+        logoutTrigger.addEventListener('click', function () {
+            logoutDialog.showModal();
+        });
+
+        logoutDialog.querySelector('[data-close-logout-dialog]')?.addEventListener('click', function () {
+            logoutDialog.close();
+        });
+    } else if (logoutTrigger) {
+        logoutTrigger.addEventListener('click', function () {
+            if (window.confirm('Apakah Anda yakin ingin keluar dari sistem admin?')) {
+                document.getElementById('adminLogoutForm').submit();
+            }
+        });
+    }
 
     if (!sidebar || !backdrop || !toggleButton) return;
 

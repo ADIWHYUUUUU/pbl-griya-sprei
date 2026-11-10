@@ -57,12 +57,23 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <span><?= htmlspecialchars((string) $namaAdmin, ENT_QUOTES, 'UTF-8') ?></span>
             </div>
         </div>
-        <form action="/?action=admin-logout" method="POST" class="sidebar-logout-form">
+        <form action="/?action=admin-logout" method="POST" class="sidebar-logout-form" id="adminLogoutForm">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) $csrfToken, ENT_QUOTES, 'UTF-8') ?>">
-            <button type="submit" class="logout-link">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
-            <span>Keluar</span>
+            <button type="button" class="logout-link" data-open-logout-dialog>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+                <span>Keluar</span>
             </button>
+            <dialog class="logout-dialog" aria-labelledby="logoutDialogTitle" aria-describedby="logoutDialogDescription">
+                <div class="logout-dialog__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+                </div>
+                <h2 id="logoutDialogTitle">Keluar Akun?</h2>
+                <p id="logoutDialogDescription">Apakah Anda yakin ingin keluar dari sistem admin?</p>
+                <div class="logout-dialog__actions">
+                    <button type="button" class="logout-dialog__cancel" data-close-logout-dialog>Batal</button>
+                    <button type="submit" class="logout-dialog__confirm">Keluar</button>
+                </div>
+            </dialog>
         </form>
     </div>
 </aside>
