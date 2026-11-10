@@ -49,6 +49,14 @@ $produk = [
     'stok' => (int) $dataProduk['stok'],
     'deskripsi' => $dataProduk['deskripsi']
 ];
+$bolehTambahSarung = $produk['varian'] === 'SPREI';
+$labelProduk = match ($produk['varian']) {
+    'SPREI' => 'Sprei',
+    'BED_COVER' => 'Bed Cover',
+    'SARUNG_BANTAL' => 'Sarung Bantal',
+    'SARUNG_GULING' => 'Sarung Guling',
+    default => 'Produk',
+};
 
 // ==========================================
 // 9. GAMBAR PRODUK
@@ -441,12 +449,13 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
 
                     <div>
 
-                        <h3>Jumlah Sprei</h3>
+                        <h3>Jumlah <?= aman($labelProduk) ?></h3>
 
-                        <p>
-                            Set standar termasuk
-                            2 sarung bantal + 2 sarung guling
-                        </p>
+                        <?php if ($bolehTambahSarung): ?>
+                            <p>Set standar termasuk 2 sarung bantal + 2 sarung guling</p>
+                        <?php else: ?>
+                            <p>Tentukan jumlah produk yang ingin dipesan.</p>
+                        <?php endif; ?>
 
                     </div>
 
@@ -459,27 +468,28 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                         <button
                             type="button"
                             data-step="-1"
-                            aria-label="Kurangi jumlah sprei">−</button>
+                            aria-label="Kurangi jumlah <?= aman(strtolower($labelProduk)) ?>">−</button>
 
                         <output id="qtySprei">1</output>
 
                         <button
                             type="button"
                             data-step="1"
-                            aria-label="Tambah jumlah sprei">+</button>
+                            aria-label="Tambah jumlah <?= aman(strtolower($labelProduk)) ?>">+</button>
 
                     </div>
 
                 </div>
 
-                <!-- ==================================
-                 TAMBAHAN SARUNG
-            =================================== -->
-                <p class="form__label">
-                    Tambahan Sarung Bantal &amp; Guling
-                </p>
+                <?php if ($bolehTambahSarung): ?>
+                    <!-- ==================================
+                     TAMBAHAN SARUNG
+                    =================================== -->
+                    <p class="form__label">
+                        Tambahan Sarung Bantal &amp; Guling
+                    </p>
 
-                <div class="extras">
+                    <div class="extras">
 
                     <?php foreach ($tambahan as $t): ?>
 
@@ -527,7 +537,8 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
 
                     <?php endforeach; ?>
 
-                </div>
+                    </div>
+                <?php endif; ?>
 
                 <!-- ==================================
                  CATATAN

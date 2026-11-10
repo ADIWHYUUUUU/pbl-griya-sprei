@@ -167,8 +167,9 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             $itemLength = (int) ($item['panjang'] ?? 0);
                             $itemWidth = (int) ($item['lebar'] ?? 0);
                             $itemHeight = (int) ($item['tinggi'] ?? 0);
-                            $itemPillows = (int) ($item['qtyBantal'] ?? 0);
-                            $itemBolsters = (int) ($item['qtyGuling'] ?? 0);
+                            $bolehTambahSarung = ($product['kategori_produk'] ?? '') === 'SPREI';
+                            $itemPillows = $bolehTambahSarung ? (int) ($item['qtyBantal'] ?? 0) : 0;
+                            $itemBolsters = $bolehTambahSarung ? (int) ($item['qtyGuling'] ?? 0) : 0;
                             $itemNote = (string) ($item['catatan'] ?? '');
                             $extras = [];
                             if ($itemPillows > 0) {
@@ -247,9 +248,10 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                             <p class="edit-cart__hint" data-edit-dimension-hint>Dimensi standar produk. Ukuran standar tidak dapat diubah.</p>
                                                         </fieldset>
 
-                                                        <fieldset class="edit-cart__section">
-                                                            <legend>Tambahkan sarung bantal dan guling</legend>
-                                                            <div class="edit-cart__extras">
+                                                        <?php if ($bolehTambahSarung): ?>
+                                                            <fieldset class="edit-cart__section">
+                                                                <legend>Tambahkan sarung bantal dan guling</legend>
+                                                                <div class="edit-cart__extras">
                                                                 <label class="edit-cart__extra">
                                                                     <span>Sarung Bantal</span>
                                                                     <span class="edit-cart__stepper">
@@ -266,8 +268,9 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                                         <button type="button" aria-label="Tambah sarung guling" data-quantity-step="1">+</button>
                                                                     </span>
                                                                 </label>
-                                                            </div>
-                                                        </fieldset>
+                                                                </div>
+                                                            </fieldset>
+                                                        <?php endif; ?>
 
                                                         <label class="edit-cart__field edit-cart__note">Catatan jahitan khusus workshop
                                                             <textarea name="catatan" maxlength="1000" rows="3"><?= aman($itemNote) ?></textarea>

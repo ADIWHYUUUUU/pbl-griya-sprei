@@ -170,6 +170,20 @@ $formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
                     <option value="">-- Pilih Kategori --</option>
                     <option value="SPREI" <?= ($product['kategori_produk'] ?? '') === 'SPREI' ? 'selected' : '' ?>>Sprei</option>
                     <option value="BED_COVER" <?= in_array(($product['kategori_produk'] ?? ''), ['BED_COVER', 'BEDCOVER'], true) ? 'selected' : '' ?>>Bedcover</option>
+                    <option value="SARUNG_BANTAL" <?= ($product['kategori_produk'] ?? '') === 'SARUNG_BANTAL' ? 'selected' : '' ?>>Sarung Bantal</option>
+                    <option value="SARUNG_GULING" <?= ($product['kategori_produk'] ?? '') === 'SARUNG_GULING' ? 'selected' : '' ?>>Sarung Guling</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="jenis_kain">Jenis Kain</label>
+                <select id="jenis_kain" name="jenis_kain" required>
+                    <option value="">-- Pilih Jenis Kain --</option>
+                    <option value="TENCEL" <?= ($product['jenis_kain'] ?? '') === 'TENCEL' ? 'selected' : '' ?>>Tencel</option>
+                    <option value="KATUN_JEPANG" <?= ($product['jenis_kain'] ?? '') === 'KATUN_JEPANG' ? 'selected' : '' ?>>Katun Jepang</option>
+                    <option value="KATUN_LOKAL" <?= ($product['jenis_kain'] ?? '') === 'KATUN_LOKAL' ? 'selected' : '' ?>>Katun lokal</option>
+                    <option value="MICROTENCEL" <?= ($product['jenis_kain'] ?? '') === 'MICROTENCEL' ? 'selected' : '' ?>>Microtencel</option>
+                    <option value="MICROTEX" <?= ($product['jenis_kain'] ?? '') === 'MICROTEX' ? 'selected' : '' ?>>Microtex</option>
                 </select>
             </div>
 

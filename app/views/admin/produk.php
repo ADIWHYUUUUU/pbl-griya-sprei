@@ -59,6 +59,7 @@ function e($value)
                             <th>Gambar</th>
                             <th>Nama Produk</th>
                             <th>Kategori</th>
+                            <th>Jenis Kain</th>
                             <th>Ukuran Standar</th>
                             <th>Harga Dasar</th>
                             <th>Stok</th>
@@ -68,7 +69,7 @@ function e($value)
                     <tbody>
                     <?php if (empty($products)): ?>
                         <tr>
-                            <td colspan="8" class="product-empty">Belum ada produk yang ditambahkan.</td>
+                            <td colspan="9" class="product-empty">Belum ada produk yang ditambahkan.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($products as $product): ?>
@@ -86,7 +87,20 @@ function e($value)
                                 <?php endif; ?>
                             </td>
                             <td class="product-name"><?= e($product['nama_produk']) ?></td>
-                            <td><?= e($product['kategori_produk']) ?></td>
+                            <td><?= e([
+                                'SPREI' => 'Sprei',
+                                'BED_COVER' => 'Bed Cover',
+                                'BEDCOVER' => 'Bed Cover',
+                                'SARUNG_BANTAL' => 'Sarung Bantal',
+                                'SARUNG_GULING' => 'Sarung Guling',
+                            ][$product['kategori_produk']] ?? $product['kategori_produk']) ?></td>
+                            <td><?= e([
+                                'TENCEL' => 'Tencel',
+                                'KATUN_JEPANG' => 'Katun Jepang',
+                                'KATUN_LOKAL' => 'Katun lokal',
+                                'MICROTENCEL' => 'Microtencel',
+                                'MICROTEX' => 'Microtex',
+                            ][$product['jenis_kain'] ?? ''] ?? 'Belum diatur') ?></td>
                             <td class="product-nowrap">
                                 <?= e($product['panjang_standar']) ?> ×
                                 <?= e($product['lebar_standar']) ?> ×

@@ -102,8 +102,9 @@ class OrderController
                 }
             }
 
-            $pillows = $this->readInteger($item['qtyBantal'] ?? 0);
-            $bolsters = $this->readInteger($item['qtyGuling'] ?? 0);
+            $allowsExtras = ($product['kategori_produk'] ?? '') === 'SPREI';
+            $pillows = $allowsExtras ? $this->readInteger($item['qtyBantal'] ?? 0) : 0;
+            $bolsters = $allowsExtras ? $this->readInteger($item['qtyGuling'] ?? 0) : 0;
             $note = $item['catatan'] ?? '';
             if (
                 $pillows === null || $pillows < 0 || $pillows > 20 ||
@@ -272,8 +273,9 @@ class OrderController
             }
         }
 
-        $quantityPillow = $this->readInteger($_POST['qtyBantal'] ?? null);
-        $quantityBolster = $this->readInteger($_POST['qtyGuling'] ?? null);
+        $allowsExtras = ($product['kategori_produk'] ?? '') === 'SPREI';
+        $quantityPillow = $allowsExtras ? $this->readInteger($_POST['qtyBantal'] ?? 0) : 0;
+        $quantityBolster = $allowsExtras ? $this->readInteger($_POST['qtyGuling'] ?? 0) : 0;
         if (
             $quantityPillow === null || $quantityPillow < 0 || $quantityPillow > 20 ||
             $quantityBolster === null || $quantityBolster < 0 || $quantityBolster > 20
@@ -425,8 +427,9 @@ class OrderController
                 }
             }
 
-            $quantityPillow = $this->readInteger($_POST['qtyBantal'] ?? null);
-            $quantityBolster = $this->readInteger($_POST['qtyGuling'] ?? null);
+            $allowsExtras = ($product['kategori_produk'] ?? '') === 'SPREI';
+            $quantityPillow = $allowsExtras ? $this->readInteger($_POST['qtyBantal'] ?? 0) : 0;
+            $quantityBolster = $allowsExtras ? $this->readInteger($_POST['qtyGuling'] ?? 0) : 0;
             if (
                 $quantityPillow === null || $quantityPillow < 0 || $quantityPillow > 20 ||
                 $quantityBolster === null || $quantityBolster < 0 || $quantityBolster > 20

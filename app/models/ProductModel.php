@@ -48,6 +48,7 @@ class ProductModel
         $sql = "INSERT INTO produk (
                     nama_produk,
                     kategori_produk,
+                    jenis_kain,
                     panjang_standar,
                     lebar_standar,
                     tinggi_standar,
@@ -59,6 +60,7 @@ class ProductModel
                 VALUES (
                     :nama_produk,
                     :kategori_produk,
+                    :jenis_kain,
                     :panjang_standar,
                     :lebar_standar,
                     :tinggi_standar,
@@ -73,6 +75,7 @@ class ProductModel
         return $stmt->execute([
             ':nama_produk'     => $data['nama_produk'],
             ':kategori_produk' => $data['kategori_produk'],
+            ':jenis_kain'      => $data['jenis_kain'],
             ':panjang_standar' => $data['panjang_standar'],
             ':lebar_standar'   => $data['lebar_standar'],
             ':tinggi_standar'  => $data['tinggi_standar'],
@@ -91,6 +94,7 @@ class ProductModel
         $sql = "UPDATE produk SET
                     nama_produk = :nama_produk,
                     kategori_produk = :kategori_produk,
+                    jenis_kain = :jenis_kain,
                     panjang_standar = :panjang_standar,
                     lebar_standar = :lebar_standar,
                     tinggi_standar = :tinggi_standar,
@@ -106,6 +110,7 @@ class ProductModel
             ':id_produk'       => $id,
             ':nama_produk'     => $data['nama_produk'],
             ':kategori_produk' => $data['kategori_produk'],
+            ':jenis_kain'      => $data['jenis_kain'],
             ':panjang_standar' => $data['panjang_standar'],
             ':lebar_standar'   => $data['lebar_standar'],
             ':tinggi_standar'  => $data['tinggi_standar'],

@@ -434,6 +434,8 @@ class OrderModel
         $categoryCode = match ($firstItem['kategori_produk'] ?? '') {
             'SPREI' => 'SP',
             'BED_COVER' => 'BC',
+            'SARUNG_BANTAL' => 'SB',
+            'SARUNG_GULING' => 'SG',
             default => throw new UnexpectedValueException('Kategori produk tidak valid untuk nomor invoice.'),
         };
         $productId = filter_var($firstItem['id_produk'] ?? null, FILTER_VALIDATE_INT, [

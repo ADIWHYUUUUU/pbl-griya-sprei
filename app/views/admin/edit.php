@@ -119,6 +119,20 @@ $presets = [
                         <select class="edit-input" id="kategori_produk" name="kategori_produk" required>
                             <option value="SPREI" <?= $kategori === 'SPREI' ? 'selected' : '' ?>>Sprei</option>
                             <option value="BED_COVER" <?= $kategori === 'BED_COVER' ? 'selected' : '' ?>>Bed Cover</option>
+                            <option value="SARUNG_BANTAL" <?= $kategori === 'SARUNG_BANTAL' ? 'selected' : '' ?>>Sarung Bantal</option>
+                            <option value="SARUNG_GULING" <?= $kategori === 'SARUNG_GULING' ? 'selected' : '' ?>>Sarung Guling</option>
+                        </select>
+                    </div>
+
+                    <div class="edit-field">
+                        <label for="jenis_kain">Jenis Kain <span class="edit-required">*</span></label>
+                        <select class="edit-input" id="jenis_kain" name="jenis_kain" required>
+                            <option value="">Pilih jenis kain</option>
+                            <option value="TENCEL" <?= ($product['jenis_kain'] ?? '') === 'TENCEL' ? 'selected' : '' ?>>Tencel</option>
+                            <option value="KATUN_JEPANG" <?= ($product['jenis_kain'] ?? '') === 'KATUN_JEPANG' ? 'selected' : '' ?>>Katun Jepang</option>
+                            <option value="KATUN_LOKAL" <?= ($product['jenis_kain'] ?? '') === 'KATUN_LOKAL' ? 'selected' : '' ?>>Katun lokal</option>
+                            <option value="MICROTENCEL" <?= ($product['jenis_kain'] ?? '') === 'MICROTENCEL' ? 'selected' : '' ?>>Microtencel</option>
+                            <option value="MICROTEX" <?= ($product['jenis_kain'] ?? '') === 'MICROTEX' ? 'selected' : '' ?>>Microtex</option>
                         </select>
                     </div>
                 </section>

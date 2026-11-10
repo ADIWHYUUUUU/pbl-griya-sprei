@@ -10,9 +10,25 @@ $catalogProducts = array_map(static function ($product) {
     $category = (string) ($product['kategori_produk'] ?? '');
     $categoryKey = strtoupper(str_replace(['_', ' '], '', $category));
     $categoryLabel = match ($categoryKey) {
-      'SPREI' => 'Sprei Katun',
-      'BEDCOVER' => 'Bedcover Set',
+      'SPREI' => 'Sprei',
+      'BEDCOVER' => 'Bed Cover',
+      'SARUNGBANTAL' => 'Sarung Bantal',
+      'SARUNGGULING' => 'Sarung Guling',
       default => $category,
+    };
+    $categoryFilter = match ($categoryKey) {
+      'BEDCOVER' => 'bedcover',
+      'SARUNGBANTAL', 'SARUNGGULING' => 'sarung',
+      default => 'sprei',
+    };
+    $fabric = (string) ($product['jenis_kain'] ?? '');
+    $fabricLabel = match ($fabric) {
+      'TENCEL' => 'Tencel',
+      'KATUN_JEPANG' => 'Katun Jepang',
+      'KATUN_LOKAL' => 'Katun lokal',
+      'MICROTENCEL' => 'Microtencel',
+      'MICROTEX' => 'Microtex',
+      default => 'Belum diatur',
     };
     $imageName = (string) ($product['gambar_produk'] ?? '');
     return [
@@ -21,9 +37,9 @@ $catalogProducts = array_map(static function ($product) {
         // DATA PRODUK
         'name' => $product['nama_produk'] ?? '',
         'type' => $categoryLabel,
-        'category' => $categoryKey === 'BEDCOVER'
-            ? 'bedcover'
-            : 'sprei',
+        'category' => $categoryFilter,
+        'fabric' => $fabric,
+        'fabricLabel' => $fabricLabel,
         'size' => implode(' × ', $dimensions),
         'price' => (float) ($product['harga_dasar'] ?? 0),
         'color' => '#e8e4d8',
@@ -82,23 +98,29 @@ $email     = "griyasprei@gmail.com";
         <input
           type="search"
           id="searchInput"
-          placeholder="Cari sprei, bedcover, motif..."
+          placeholder="Cari produk, jenis kain, motif..."
         >
       </label>
-      <button class="chip chip--active" data-category="all">
-        Semua Produk
-      </button>
-      <button class="chip" data-category="sprei">
-        Sprei Katun
-      </button>
-      <button class="chip" data-category="bedcover">
-        Bedcover Set
-      </button>
-      <select
-        class="select"
-        id="sizeFilter"
-        aria-label="Filter ukuran"
-      >
+      <select class="select filter-select" id="categoryFilter" aria-label="Filter kategori produk">
+        <option value="all">Semua Kategori</option>
+        <option value="sprei">Sprei</option>
+        <option value="bedcover">Bed Cover</option>
+        <option value="sarung">Sarung Bantal &amp; Guling</option>
+      </select>
+      <select class="select filter-select" id="fabricFilter" aria-label="Filter jenis kain">
+        <option value="all">Semua Jenis Kain</option>
+        <option value="TENCEL">Tencel</option>
+        <option value="KATUN_JEPANG">Katun Jepang</option>
+        <option value="KATUN_LOKAL">Katun lokal</option>
+        <option value="MICROTENCEL">Microtencel</option>
+        <option value="MICROTEX">Microtex</option>
+      </select>
+      <select class="select filter-select" id="priceSort" aria-label="Urutkan harga">
+        <option value="default">Urutkan Harga</option>
+        <option value="price-low">Harga Terendah</option>
+        <option value="price-high">Harga Tertinggi</option>
+      </select>
+      <select class="select filter-select" id="sizeFilter" aria-label="Filter ukuran">
         <option value="all">Filter Ukuran (Semua)</option>
         <option value="160 × 200 × 30">160 × 200 × 30</option>
         <option value="180 × 200 × 30">180 × 200 × 30</option>

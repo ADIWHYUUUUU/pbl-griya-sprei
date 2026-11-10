@@ -1,11 +1,16 @@
 CREATE TYPE kategori_produk_enum AS ENUM (
-    'SPREI', 'BED_COVER'
+    'SPREI', 'BED_COVER', 'SARUNG_BANTAL', 'SARUNG_GULING'
+);
+
+CREATE TYPE jenis_kain_enum AS ENUM (
+    'TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'
 );
 
 CREATE TABLE produk (
     id_produk       SERIAL PRIMARY KEY,
     nama_produk     VARCHAR(150)         NOT NULL,
     kategori_produk kategori_produk_enum NOT NULL,
+    jenis_kain      jenis_kain_enum,
     panjang_standar INTEGER              NOT NULL CHECK (panjang_standar > 0),
     lebar_standar   INTEGER              NOT NULL CHECK (lebar_standar > 0),
     tinggi_standar  INTEGER              NOT NULL CHECK (tinggi_standar > 0),

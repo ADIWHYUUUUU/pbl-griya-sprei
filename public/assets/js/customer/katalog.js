@@ -1,8 +1,10 @@
 const productGrid = document.getElementById("productGrid");
 const pagination = document.getElementById("pagination");
 const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const fabricFilter = document.getElementById("fabricFilter");
+const priceSort = document.getElementById("priceSort");
 const sizeFilter = document.getElementById("sizeFilter");
-const categoryButtons = [...document.querySelectorAll("[data-category]")];
 const products = Array.isArray(window.catalogProducts) ? window.catalogProducts : [];
 const pageSize = 8;
 const currency = new Intl.NumberFormat("id-ID", {
@@ -20,22 +22,18 @@ const escapeHtml = (value) =>
     "'": "&#39;",
   })[character]);
 
-let activeCategory = ["all", "sprei", "bedcover"].includes(window.catalogCategory)
+const availableCategories = ["all", "sprei", "bedcover", "sarung"];
+let activeCategory = availableCategories.includes(window.catalogCategory)
   ? window.catalogCategory
   : "all";
 let currentPage = 1;
 
 function setActiveCategory(category, updateHistory = false) {
-  activeCategory = ["all", "sprei", "bedcover"].includes(category)
+  activeCategory = availableCategories.includes(category)
     ? category
     : "all";
   currentPage = 1;
-
-  categoryButtons.forEach((button) => {
-    const selected = button.dataset.category === activeCategory;
-    button.classList.toggle("chip--active", selected);
-    button.setAttribute("aria-pressed", String(selected));
-  });
+  categoryFilter.value = activeCategory;
 
   if (updateHistory) {
     const url = new URL(window.location.href);
@@ -52,18 +50,27 @@ function setActiveCategory(category, updateHistory = false) {
 
 function getFilteredProducts() {
   const query = searchInput.value.trim().toLocaleLowerCase("id-ID");
+  const selectedFabric = fabricFilter.value;
   const selectedSize = sizeFilter.value;
-
-  return products.filter((product) => {
-    const searchableText = [product.name, product.type, product.desc, product.size]
+  const matchingProducts = products.filter((product) => {
+    const searchableText = [product.name, product.type, product.fabricLabel, product.desc, product.size]
       .join(" ")
       .toLocaleLowerCase("id-ID");
     return (
       (activeCategory === "all" || product.category === activeCategory) &&
+      (selectedFabric === "all" || product.fabric === selectedFabric) &&
       (selectedSize === "all" || product.size === selectedSize) &&
       searchableText.includes(query)
     );
   });
+
+  if (priceSort.value === "price-low") {
+    return matchingProducts.sort((first, second) => Number(first.price) - Number(second.price));
+  }
+  if (priceSort.value === "price-high") {
+    return matchingProducts.sort((first, second) => Number(second.price) - Number(first.price));
+  }
+  return matchingProducts;
 }
 
 function renderProducts() {
@@ -93,6 +100,7 @@ function renderProducts() {
                 <span class="card__type">${escapeHtml(product.type)}</span>
                 <span class="card__size">${escapeHtml(product.size || "Ukuran custom")}</span>
               </div>
+              <p class="card__fabric">Jenis kain: ${escapeHtml(product.fabricLabel || "Belum diatur")}</p>
               <h2 class="card__title">${escapeHtml(product.name)}</h2>
               <p class="card__desc">${escapeHtml(product.desc)}</p>
               <div class="card__footer">
@@ -153,10 +161,8 @@ function renderProducts() {
     </button>`;
 }
 
-categoryButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    setActiveCategory(button.dataset.category, true);
-  });
+categoryFilter.addEventListener("change", () => {
+  setActiveCategory(categoryFilter.value, true);
 });
 
 window.addEventListener("popstate", () => {
@@ -165,6 +171,16 @@ window.addEventListener("popstate", () => {
 });
 
 searchInput.addEventListener("input", () => {
+  currentPage = 1;
+  renderProducts();
+});
+
+fabricFilter.addEventListener("change", () => {
+  currentPage = 1;
+  renderProducts();
+});
+
+priceSort.addEventListener("change", () => {
   currentPage = 1;
   renderProducts();
 });
