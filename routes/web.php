@@ -20,9 +20,8 @@ return [
 	'admin-payment-verify' => __DIR__ . '/../app/views/admin/verifikasi_pembayaran.php',
 	'admin-resi-list' => __DIR__ . '/../app/views/admin/nomor_resi.php',
 	'admin-resi-input' => __DIR__ . '/../app/views/admin/input_nomor_resi.php',
-		'admin-products' => __DIR__ . '/../app/views/admin/produk.php',
+	'admin-products' => __DIR__ . '/../app/views/admin/produk.php',
 	'admin-add-product' => __DIR__ . '/../app/views/admin/tambah.php',
 	'admin-edit-product' => __DIR__ . '/../app/views/admin/edit.php',
-	'admin-edit-home' => __DIR__ . '/../app/views/admin/edit_beranda.php',
 	'admin-register' => __DIR__ . '/../app/views/admin/register.php',
 ];
