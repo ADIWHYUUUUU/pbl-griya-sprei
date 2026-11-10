@@ -329,6 +329,64 @@
   padding: 0 18px;
 }
 
+/* 5b-2. POPUP UPDATE PESANAN */
+.order-update-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.order-update {
+  --tone-bg: #e3ecf3;
+  --tone-text: #2d5575;
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--tone-text);
+  border-radius: 10px;
+  background: #f6f5f1;
+}
+.order-update--ok     { --tone-bg: #e1efe3; --tone-text: #2b5a33; }
+.order-update--warn   { --tone-bg: #fcefd2; --tone-text: #86600c; }
+.order-update--danger { --tone-bg: #f6dede; --tone-text: #8a2a2a; }
+.order-update__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px 10px;
+}
+.order-update__head b {
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-all;
+}
+.order-update__tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--tone-bg);
+  color: var(--tone-text);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.order-update p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.order-update__action {
+  justify-self: start;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tone-text);
+}
+.order-update__action:hover {
+  text-decoration: underline;
+}
+
 /* 5c. FAQ */
 .faq {
   background: var(--white);

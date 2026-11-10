@@ -129,6 +129,36 @@
   gap: 16px;
 }
 
+/* 4b. KAMI MELAYANI */
+.about-services {
+  list-style: none;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 12px;
+}
+.about-services li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.about-services li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e6ebe2;
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
 /* 5. KUNJUNGI KAMI */
 .about-visit {
   display: grid;

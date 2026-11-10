@@ -35,6 +35,10 @@ if ($customerId === false || $customerId === null) {
     exit('Akun customer tidak valid.');
 }
 
+// Customer sedang membuka Pesanan Saya: semua update dianggap sudah dibaca
+require_once __DIR__ . '/../../helpers/order_updates.php';
+orderUpdatesMarkSeen($customerId);
+
 $requestedSearch = $_GET['cari'] ?? '';
 $cari = is_string($requestedSearch) ? trim($requestedSearch) : '';
 $orders = (new OrderModel($pdo))->getCustomerOrders($customerId);

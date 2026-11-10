@@ -90,6 +90,17 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
         </div>
       </section>
 
+      <!-- ===== KAMI MELAYANI ===== -->
+      <section class="about-section">
+        <h2 class="about-title">Kami melayani</h2>
+        <ul class="about-card about-services">
+          <li>Custom segala ukuran kasur (single, double, king, ukuran tidak standar)</li>
+          <li>Pilihan bahan premium: Tencel, katun jepang &amp; katun lokal yang adem dan tidak luntur</li>
+          <li>Motif aesthetic terbaru, cocok untuk kamar kost, homestay, dan rumah tangga</li>
+          <li>Harga spesial grosir untuk kost, homestay, guesthouse, rumah sakit &amp; daycare</li>
+        </ul>
+      </section>
+
       <!-- ===== KUNJUNGI KAMI ===== -->
       <section class="about-section about-visit">
         <div class="about-card about-visit__info">

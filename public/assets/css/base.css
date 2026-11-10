@@ -181,6 +181,22 @@ button {
 .cart__badge[hidden] {
   display: none;
 }
+/* Badge jumlah update baru di menu Pesanan Saya (mirip badge keranjang) */
+.nav__badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 4px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--green-dark);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: 2px;
+}
 .btn-login {
   display: inline-flex;
   align-items: center;

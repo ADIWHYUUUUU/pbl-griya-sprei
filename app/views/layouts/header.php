@@ -27,6 +27,14 @@ $namaUser = $isLogin
     ? ($_SESSION['nama'] ?? 'Pelanggan')
     : '';
 
+// Jumlah pesanan yang punya update baru dari Admin (badge di menu Pesanan Saya)
+$orderUpdateCount = 0;
+$headerCustomerId = (int) ($_SESSION['id_user'] ?? 0);
+if ($isLogin && $headerCustomerId > 0) {
+    require_once __DIR__ . '/../../helpers/order_updates.php';
+    $orderUpdateCount = count(orderUpdatesUnseen($headerCustomerId));
+}
+
 $currentPage = $_GET['page'] ?? basename($_SERVER['SCRIPT_NAME'] ?? '');
 $activeNavPage = match ($currentPage) {
     'index.php', 'customer-home' => 'home',
@@ -71,6 +79,9 @@ $activeNavPage = match ($currentPage) {
                 class="nav__link<?= $activeNavPage === 'orders' ? ' nav__link--active' : ''; ?>"
                 <?= $activeNavPage === 'orders' ? 'aria-current="page"' : ''; ?>>
                 Pesanan Saya
+                <?php if ($orderUpdateCount > 0): ?>
+                    <span class="nav__badge" aria-label="<?= $orderUpdateCount ?> pesanan ada update baru"><?= $orderUpdateCount ?></span>
+                <?php endif; ?>
             </a>
         <?php endif; ?>
         <a href="/?page=customer-about"

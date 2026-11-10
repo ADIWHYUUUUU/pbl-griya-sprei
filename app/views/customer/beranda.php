@@ -19,6 +19,23 @@ $namaUser = $isLogin
     : '';
 // Mengambil nama customer dari session
 $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
+
+// Popup update pesanan: tampil sekali per sesi untuk setiap update baru dari Admin
+$popupOrders = [];
+$popupCustomerId = (int) ($_SESSION['id_user'] ?? 0);
+if ($isLogin && $popupCustomerId > 0) {
+    require_once __DIR__ . '/../../helpers/order_updates.php';
+    $popupShown = $_SESSION['popup_update_pesanan'] ?? [];
+    $popupShown = is_array($popupShown) ? $popupShown : [];
+    foreach (orderUpdatesUnseen($popupCustomerId) as $updatedOrder) {
+        $orderKey = (string) $updatedOrder['id_pesanan'];
+        if (($popupShown[$orderKey] ?? null) !== $updatedOrder['signature']) {
+            $popupOrders[] = $updatedOrder;
+            $popupShown[$orderKey] = $updatedOrder['signature'];
+        }
+    }
+    $_SESSION['popup_update_pesanan'] = $popupShown;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -255,6 +272,49 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
         <button type="button" class="btn" data-tutup-panduan>Mengerti</button>
       </footer>
     </dialog>
+
+    <?php if ($popupOrders !== []): ?>
+    <!-- ===== POPUP UPDATE PESANAN (muncul otomatis saat ada update dari Admin) ===== -->
+    <dialog class="guide-modal" id="popupUpdatePesanan" aria-labelledby="popupUpdatePesananJudul">
+      <header class="guide-modal__head">
+        <div>
+          <h2 id="popupUpdatePesananJudul">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+            Ada update pesanan
+          </h2>
+          <p>Admin telah memperbarui <?= count($popupOrders) ?> pesanan Anda</p>
+        </div>
+        <button type="button" class="guide-modal__close" data-tutup-update aria-label="Tutup">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </header>
+
+      <div class="guide-modal__body">
+        <ul class="order-update-list">
+          <?php foreach ($popupOrders as $updatedOrder): ?>
+            <?php $updateInfo = orderUpdateInfo($updatedOrder); ?>
+            <li class="order-update order-update--<?= htmlspecialchars($updateInfo['tone'], ENT_QUOTES, 'UTF-8') ?>">
+              <div class="order-update__head">
+                <b><?= htmlspecialchars($updatedOrder['kode'], ENT_QUOTES, 'UTF-8') ?></b>
+                <span class="order-update__tag"><?= htmlspecialchars($updateInfo['label'], ENT_QUOTES, 'UTF-8') ?></span>
+              </div>
+              <p><?= htmlspecialchars($updateInfo['message'], ENT_QUOTES, 'UTF-8') ?></p>
+              <?php if ($updateInfo['action_label'] !== ''): ?>
+                <a class="order-update__action" href="<?= htmlspecialchars($updateInfo['action_url'], ENT_QUOTES, 'UTF-8') ?>">
+                  <?= htmlspecialchars($updateInfo['action_label'], ENT_QUOTES, 'UTF-8') ?> →
+                </a>
+              <?php endif; ?>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+
+      <footer class="guide-modal__foot">
+        <button type="button" class="btn btn--outline" data-tutup-update>Nanti</button>
+        <a class="btn" href="/?page=customer-orders">Lihat Pesanan</a>
+      </footer>
+    </dialog>
+    <?php endif; ?>
     <!-- ===== FAQ ===== -->
     <section class="section">
       <h2 class="section__title">Pertanyaan yang sering diajukan</h2>
@@ -312,6 +372,23 @@ $namaUser = $_SESSION['nama'] ?? 'Pelanggan';
         if (e.target === modal) modal.close();
       });
       modal.addEventListener('close', function () {
+        document.body.style.overflow = '';
+      });
+    })();
+
+    // Popup update pesanan: langsung dibuka saat halaman dimuat
+    (function () {
+      var popup = document.getElementById('popupUpdatePesanan');
+      if (!popup || typeof popup.showModal !== 'function') return;
+      popup.showModal();
+      document.body.style.overflow = 'hidden';
+      popup.querySelectorAll('[data-tutup-update]').forEach(function (btn) {
+        btn.addEventListener('click', function () { popup.close(); });
+      });
+      popup.addEventListener('click', function (e) {
+        if (e.target === popup) popup.close();
+      });
+      popup.addEventListener('close', function () {
         document.body.style.overflow = '';
       });
     })();
