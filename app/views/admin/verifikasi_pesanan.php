@@ -77,9 +77,6 @@ $total = max(0, $principal + $order['ongkir'] - $order['diskon']);
                     <h1>Verifikasi Pesanan</h1>
                     <p>Periksa rincian pesanan, lalu tetapkan tagihan sebelum pelanggan membayar.</p>
                 </div>
-                <a class="verification-back" href="/?page=admin-orders">
-                    <span aria-hidden="true">←</span> Kembali ke cek Pesanan
-                </a>
             </header>
 
             <?php if (is_array($flash) && isset($flash['text'])): ?>

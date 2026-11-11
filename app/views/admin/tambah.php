@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
 if (
     ($_SESSION['login'] ?? false) !== true ||
     ($_SESSION['role'] ?? '') !== 'ADMIN'
@@ -12,310 +11,150 @@ if (
     exit;
 }
 
-
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-function e($value)
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-}
-
-$isEdit = isset($product) && is_array($product);
-$product = $product ?? [];
-$formAction = $isEdit ? 'admin-product-update' : 'admin-product-store';
+$escape = static function ($value): string {
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+};
+$product = is_array($product ?? null) ? $product : [];
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $isEdit ? 'Edit' : 'Tambah' ?> Produk - Griya Sprei</title>
-
-    <style>
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f6fa;
-            color: #252525;
-        }
-
-        .container {
-            max-width: 760px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .form-card {
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0,0,0,.06);
-        }
-
-        h1 { margin-top: 0; }
-
-        .form-group { margin-bottom: 18px; }
-
-        label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: bold;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 7px;
-            font: inherit;
-        }
-
-        textarea {
-            min-height: 110px;
-            resize: vertical;
-        }
-
-        .sizes {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .btn {
-            padding: 12px 18px;
-            border: none;
-            border-radius: 7px;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .btn-save {
-            background: #26734d;
-            color: white;
-        }
-
-        .btn-back {
-            background: #e8e8e8;
-            color: #252525;
-        }
-
-        .hint {
-            font-size: 13px;
-            color: #777;
-        }
-
-        @media (max-width: 540px) {
-            .sizes { grid-template-columns: 1fr; }
-        }
-    </style>
+    <title>Tambah Produk - Griya Sprei</title>
+    <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
+    <link rel="stylesheet" href="/assets/css/admin/product-form.css">
 </head>
+<body class="admin-dashboard admin-product-form-page">
+<div class="admin-layout">
+    <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
 
-<body>
+    <main class="dashboard-main product-form-main">
+        <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
+        <nav class="product-form-breadcrumb" aria-label="Breadcrumb">
+            <a href="/?page=admin-dashboard">Admin</a>
+            <span aria-hidden="true">›</span>
+            <a href="/?page=admin-products">Katalog Produk</a>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Tambah Produk Baru</span>
+        </nav>
 
-<main class="container">
+        <header class="product-form-heading">
+            <h1>Tambah Katalog Produk</h1>
+        </header>
 
-    <div class="form-card">
+        <form class="product-form-card" action="/?action=admin-product-store" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']) ?>">
 
-        <h1><?= $isEdit ? 'Edit' : 'Tambah' ?> Produk</h1>
-        <p><?= $isEdit ? 'Perbarui informasi produk Griya Sprei.' : 'Masukkan informasi produk baru Griya Sprei.' ?></p>
-
-        <form
-            action="/?action=<?= e($formAction) ?>"
-            method="POST"
-            enctype="multipart/form-data"
-        >
-
-            <input
-                type="hidden"
-                name="csrf_token"
-                value="<?= e($_SESSION['csrf_token']) ?>"
-            >
-
-            <?php if ($isEdit): ?>
-                <input type="hidden" name="id_produk" value="<?= (int) $product['id_produk'] ?>">
-            <?php endif; ?>
-
-            <div class="form-group">
-                <label for="nama_produk">Nama Produk</label>
-                <input
-                    type="text"
-                    id="nama_produk"
-                    name="nama_produk"
-                    maxlength="150"
-                    value="<?= e($product['nama_produk'] ?? '') ?>"
-                    required
-                >
+            <div class="product-form-card__heading">
+                <strong>Informasi Produk</strong>
+                <p>Masukkan data produk</p>
             </div>
 
-            <div class="form-group">
-                <label for="kategori_produk">Kategori Produk</label>
+            <div class="product-form-grid">
+                <label class="product-form-field product-form-field--full" for="nama_produk">
+                    <span>Nama Produk <b>*</b></span>
+                    <input type="text" id="nama_produk" name="nama_produk" maxlength="150" value="<?= $escape($product['nama_produk'] ?? '') ?>" required>
+                </label>
 
-                <select
-                    id="kategori_produk"
-                    name="kategori_produk"
-                    required
-                >
-                    <option value="">-- Pilih Kategori --</option>
-                    <option value="SPREI" <?= ($product['kategori_produk'] ?? '') === 'SPREI' ? 'selected' : '' ?>>Sprei</option>
-                    <option value="BED_COVER" <?= in_array(($product['kategori_produk'] ?? ''), ['BED_COVER', 'BEDCOVER'], true) ? 'selected' : '' ?>>Bedcover</option>
-                    <option value="SARUNG_BANTAL" <?= ($product['kategori_produk'] ?? '') === 'SARUNG_BANTAL' ? 'selected' : '' ?>>Sarung Bantal</option>
-                    <option value="SARUNG_GULING" <?= ($product['kategori_produk'] ?? '') === 'SARUNG_GULING' ? 'selected' : '' ?>>Sarung Guling</option>
-                </select>
-            </div>
+                <label class="product-form-field" for="kategori_produk">
+                    <span>Kategori <b>*</b></span>
+                    <select id="kategori_produk" name="kategori_produk" required>
+                        <option value="">Pilih kategori</option>
+                        <option value="SPREI">Sprei (Fitted Sheet)</option>
+                        <option value="BED_COVER">Bed Cover</option>
+                        <option value="SARUNG_BANTAL">Sarung Bantal</option>
+                        <option value="SARUNG_GULING">Sarung Guling</option>
+                    </select>
+                </label>
 
-            <div class="form-group">
-                <label for="jenis_kain">Jenis Kain</label>
-                <select id="jenis_kain" name="jenis_kain" required>
-                    <option value="">-- Pilih Jenis Kain --</option>
-                    <option value="TENCEL" <?= ($product['jenis_kain'] ?? '') === 'TENCEL' ? 'selected' : '' ?>>Tencel</option>
-                    <option value="KATUN_JEPANG" <?= ($product['jenis_kain'] ?? '') === 'KATUN_JEPANG' ? 'selected' : '' ?>>Katun Jepang</option>
-                    <option value="KATUN_LOKAL" <?= ($product['jenis_kain'] ?? '') === 'KATUN_LOKAL' ? 'selected' : '' ?>>Katun lokal</option>
-                    <option value="MICROTENCEL" <?= ($product['jenis_kain'] ?? '') === 'MICROTENCEL' ? 'selected' : '' ?>>Microtencel</option>
-                    <option value="MICROTEX" <?= ($product['jenis_kain'] ?? '') === 'MICROTEX' ? 'selected' : '' ?>>Microtex</option>
-                </select>
-            </div>
+                <label class="product-form-field" for="jenis_kain">
+                    <span>Jenis Kain <b>*</b></span>
+                    <select id="jenis_kain" name="jenis_kain" required>
+                        <option value="">Pilih jenis kain</option>
+                        <option value="TENCEL">Tencel</option>
+                        <option value="KATUN_JEPANG">Katun Jepang</option>
+                        <option value="KATUN_LOKAL">Katun Lokal</option>
+                        <option value="MICROTENCEL">Microtencel</option>
+                        <option value="MICROTEX">Microtex</option>
+                    </select>
+                </label>
 
-            <div class="form-group">
-                <label>Ukuran Standar (cm)</label>
-
-                <div class="sizes">
-
-                    <div>
-                        <label for="panjang_standar">Panjang</label>
-                        <input
-                            type="number"
-                            id="panjang_standar"
-                            name="panjang_standar"
-                            min="1"
-                            step="1"
-                            value="<?= e($product['panjang_standar'] ?? '') ?>"
-                            required
-                        >
+                <fieldset class="product-form-field product-form-field--full product-size-field">
+                    <legend>Ukuran Kasur (cm) <b>*</b></legend>
+                    <div class="product-size-grid">
+                        <label class="product-input-suffix">
+                            <span class="visually-hidden">Panjang</span>
+                            <input type="number" id="panjang_standar" name="panjang_standar" min="1" step="1" placeholder="Panjang" required>
+                            <span aria-hidden="true">P</span>
+                        </label>
+                        <label class="product-input-suffix">
+                            <span class="visually-hidden">Lebar</span>
+                            <input type="number" id="lebar_standar" name="lebar_standar" min="1" step="1" placeholder="Lebar" required>
+                            <span aria-hidden="true">L</span>
+                        </label>
+                        <label class="product-input-suffix">
+                            <span class="visually-hidden">Tinggi</span>
+                            <input type="number" id="tinggi_standar" name="tinggi_standar" min="1" step="1" placeholder="Tinggi" required>
+                            <span aria-hidden="true">T (Karet)</span>
+                        </label>
                     </div>
+                </fieldset>
 
-                    <div>
-                        <label for="lebar_standar">Lebar</label>
-                        <input
-                            type="number"
-                            id="lebar_standar"
-                            name="lebar_standar"
-                            min="1"
-                            step="1"
-                            value="<?= e($product['lebar_standar'] ?? '') ?>"
-                            required
-                        >
+                <label class="product-form-field" for="harga_dasar">
+                    <span>Harga Dasar (Rp) <b>*</b></span>
+                    <span class="product-currency-control">
+                        <span class="product-currency-prefix" aria-hidden="true">Rp</span>
+                        <input type="number" id="harga_dasar" name="harga_dasar" min="1" step="1" placeholder="Contoh: 185000" required>
+                    </span>
+                </label>
+
+                <label class="product-form-field" for="stok">
+                    <span>Stok <b>*</b></span>
+                    <span class="product-input-suffix">
+                        <input type="number" id="stok" name="stok" min="0" step="1" placeholder="Jumlah stok" required>
+                        <span aria-hidden="true">Set</span>
+                    </span>
+                </label>
+
+                <div class="product-form-field product-form-field--full">
+                    <span>Foto Produk <b>*</b></span>
+                    <div class="product-photo-picker">
+                        <span class="product-photo-preview" id="productPhotoPreview" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>
+                        </span>
+                        <div class="product-photo-copy">
+                            <strong id="productPhotoName">Belum ada foto dipilih</strong>
+                            <small>Format JPG atau PNG. Maksimal 2 MB.</small>
+                        </div>
+                        <input type="file" id="gambar_produk" name="gambar_produk" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required>
+                        <button type="button" class="product-photo-button" id="productPhotoButton">Pilih Foto</button>
                     </div>
-
-                    <div>
-                        <label for="tinggi_standar">Tinggi</label>
-                        <input
-                            type="number"
-                            id="tinggi_standar"
-                            name="tinggi_standar"
-                            min="1"
-                            step="1"
-                            value="<?= e($product['tinggi_standar'] ?? '') ?>"
-                            required
-                        >
-                    </div>
-
+                    <small class="product-photo-error" id="productPhotoError" role="status" aria-live="polite" hidden></small>
                 </div>
+
+                <label class="product-form-field product-form-field--full" for="deskripsi">
+                    <span>Deskripsi Singkat <small>(Opsional)</small></span>
+                    <textarea id="deskripsi" name="deskripsi" rows="3" placeholder="Tambahkan informasi singkat tentang produk"></textarea>
+                </label>
             </div>
 
-            <div class="form-group">
-                <label for="harga_dasar">Harga Dasar (Rp)</label>
-                <input
-                    type="number"
-                    id="harga_dasar"
-                    name="harga_dasar"
-                    min="1"
-                    step="1"
-                    value="<?= e($product['harga_dasar'] ?? '') ?>"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="stok">Stok</label>
-                <input
-                    type="number"
-                    id="stok"
-                    name="stok"
-                    min="0"
-                    step="1"
-                    value="<?= e($product['stok'] ?? '') ?>"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="deskripsi">Deskripsi Produk</label>
-                <textarea
-                    id="deskripsi"
-                    name="deskripsi"
-                    required
-                ><?= e($product['deskripsi'] ?? '') ?></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="gambar_produk">Gambar Produk</label>
-
-                <?php if ($isEdit && !empty($product['gambar_produk'])): ?>
-                    <p class="hint">Gambar saat ini:</p>
-                    <img
-                        src="/uploads/produk/<?= rawurlencode(basename($product['gambar_produk'])) ?>"
-                        class="product-image"
-                        alt="<?= e($product['nama_produk']) ?>"
-                        style="display: block; width: 140px; height: 140px; object-fit: cover; margin-bottom: 12px;"
-                    >
-                <?php endif; ?>
-
-                <input
-                    type="file"
-                    id="gambar_produk"
-                    name="gambar_produk"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    <?= $isEdit ? '' : 'required' ?>
-                >
-
-                <p class="hint">
-                    <?= $isEdit ? 'Pilih gambar baru jika ingin mengganti gambar yang sekarang. ' : '' ?>
-                    Format JPG, PNG, atau WEBP. Maksimal 2 MB.
-                </p>
-            </div>
-
-            <div class="actions">
-
-                <button type="submit" class="btn btn-save">
-                    <?= $isEdit ? 'Simpan Perubahan' : 'Simpan Produk' ?>
+            <footer class="product-form-actions">
+                <a href="/?page=admin-products" class="product-form-cancel">Batal</a>
+                <button type="submit" class="product-form-save">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+                    Simpan Produk
                 </button>
-
-                <a
-                    href="/?page=admin-products"
-                    class="btn btn-back"
-                >
-                    Kembali
-                </a>
-
-            </div>
-
+            </footer>
         </form>
-
-    </div>
-
-</main>
-
+    </main>
+</div>
+<script src="/assets/js/admin/sidebar.js"></script>
+<script src="/assets/js/admin/product-form.js"></script>
 </body>
 </html>

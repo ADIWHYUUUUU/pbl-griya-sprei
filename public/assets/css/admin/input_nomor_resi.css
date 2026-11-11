@@ -47,19 +47,39 @@ body.resi-input-page {
 }
 
 .page-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     margin-bottom: 12px;
     color: var(--teks-abu);
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.5;
 }
 
 .page-breadcrumb a {
-    color: var(--hijau-tua);
+    color: var(--teks-abu);
     text-decoration: none;
+}
+
+.page-breadcrumb a:hover {
+    color: var(--hijau-tua);
+    text-decoration: underline;
 }
 
 .page-breadcrumb strong {
     color: var(--teks);
+}
+
+.resi-back-link {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--hijau-tua);
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.resi-back-link:hover {
+    text-decoration: underline;
 }
 
 .page-title {

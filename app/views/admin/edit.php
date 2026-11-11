@@ -209,9 +209,9 @@ $presets = [
                         </span>
                         <div class="edit-photo-info">
                             <strong id="editPhotoName"><?= $escape($namaGambar !== '' ? $namaGambar : 'Belum ada foto') ?></strong>
-                            <small id="editPhotoHint">Format JPG, PNG, atau WebP. Maksimal 2 MB. Kosongkan jika tidak ingin mengganti foto.</small>
+                            <small id="editPhotoHint">Format JPG atau PNG. Maksimal 2 MB. Kosongkan jika tidak ingin mengganti foto.</small>
                         </div>
-                        <input type="file" id="gambar_produk" name="gambar_produk" accept="image/jpeg,image/png,image/webp" hidden>
+                        <input type="file" id="gambar_produk" name="gambar_produk" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden>
                         <button type="button" class="edit-photo-button" id="editPhotoPick">Pilih Foto</button>
                     </div>
                 </section>

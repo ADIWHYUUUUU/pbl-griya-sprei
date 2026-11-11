@@ -16,7 +16,7 @@ class AdminPaymentController
 
     public function index(int $page): array
     {
-        return $this->model->getAdminPayments($page, 5);
+        return $this->model->getAdminPayments($page, 10);
     }
 
     public function verifyForm(?int $paymentId): ?array

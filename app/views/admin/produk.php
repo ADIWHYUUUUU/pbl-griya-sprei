@@ -41,13 +41,14 @@ function e($value)
 
     <main class="dashboard-main">
         <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
+        <nav class="product-breadcrumb" aria-label="Breadcrumb">
+            <a href="/?page=admin-dashboard">Admin</a>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">Katalog Produk</span>
+        </nav>
         <header class="dashboard-header product-header">
-            <div>
-                <p class="eyebrow">PANEL ADMIN</p>
-                <h1>Manajemen Produk</h1>
-                <p class="dashboard-intro">Kelola katalog produk Griya Sprei.</p>
-            </div>
-            <a href="/?page=admin-add-product" class="product-add-button">+ Tambah Produk</a>
+            <h1>Katalog Produk</h1>
+            <a href="/?page=admin-add-product" class="product-add-button"><span aria-hidden="true">+</span> Tambah Produk</a>
         </header>
 
         <section class="product-table-card" aria-label="Daftar produk">
@@ -55,11 +56,9 @@ function e($value)
                 <table class="product-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Gambar</th>
                             <th>Nama Produk</th>
                             <th>Kategori</th>
-                            <th>Jenis Kain</th>
                             <th>Ukuran Standar</th>
                             <th>Harga Dasar</th>
                             <th>Stok</th>
@@ -69,12 +68,11 @@ function e($value)
                     <tbody>
                     <?php if (empty($products)): ?>
                         <tr>
-                            <td colspan="9" class="product-empty">Belum ada produk yang ditambahkan.</td>
+                            <td colspan="7" class="product-empty">Belum ada produk yang ditambahkan.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($products as $product): ?>
                             <tr>
-                            <td><?= (int) $product['id_produk'] ?></td>
                             <td>
                                 <?php if (!empty($product['gambar_produk'])): ?>
                                     <img
@@ -86,21 +84,18 @@ function e($value)
                                     <span class="product-image-empty">Belum ada gambar</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="product-name"><?= e($product['nama_produk']) ?></td>
-                            <td><?= e([
+                            <td class="product-name-cell">
+                                <strong><?= e($product['nama_produk']) ?></strong>
+                            </td>
+                            <td>
+                                <span class="product-category"><?= e([
                                 'SPREI' => 'Sprei',
                                 'BED_COVER' => 'Bed Cover',
                                 'BEDCOVER' => 'Bed Cover',
                                 'SARUNG_BANTAL' => 'Sarung Bantal',
                                 'SARUNG_GULING' => 'Sarung Guling',
-                            ][$product['kategori_produk']] ?? $product['kategori_produk']) ?></td>
-                            <td><?= e([
-                                'TENCEL' => 'Tencel',
-                                'KATUN_JEPANG' => 'Katun Jepang',
-                                'KATUN_LOKAL' => 'Katun lokal',
-                                'MICROTENCEL' => 'Microtencel',
-                                'MICROTEX' => 'Microtex',
-                            ][$product['jenis_kain'] ?? ''] ?? 'Belum diatur') ?></td>
+                                ][$product['kategori_produk']] ?? $product['kategori_produk']) ?></span>
+                            </td>
                             <td class="product-nowrap">
                                 <?= e($product['panjang_standar']) ?> ×
                                 <?= e($product['lebar_standar']) ?> ×

@@ -84,7 +84,15 @@ $customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_al
         <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
         <main class="dashboard-main">
             <div class="resi-input-content">
-                <div class="page-breadcrumb"><a href="/?page=admin-resi-list">&larr; Kembali ke Daftar</a> <span aria-hidden="true">›</span> <strong>Input Nomor Resi</strong></div>
+                <nav class="page-breadcrumb" aria-label="Breadcrumb">
+                    <a href="/?page=admin-dashboard">Admin</a>
+                    <span aria-hidden="true">›</span>
+                    <a href="/?page=admin-resi-list">Nomor Resi</a>
+                    <span aria-hidden="true">›</span>
+                    <strong aria-current="page">Input Nomor Resi</strong>
+                </nav>
+
+                <a class="resi-back-link" href="/?page=admin-resi-list">&larr; Kembali ke daftar</a>
 
                 <?php if (is_array($flash) && isset($flash['text'])): ?>
                     <div class="flash-message <?= $escape($flash['type'] ?? 'error') ?>" role="status">

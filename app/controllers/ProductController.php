@@ -118,7 +118,6 @@ class ProductController
             strlen($nama) > 150 ||
             !in_array($kategori, ['SPREI', 'BED_COVER', 'SARUNG_BANTAL', 'SARUNG_GULING'], true) ||
             !in_array($jenisKain, ['TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'], true) ||
-            $deskripsi === '' ||
             $panjang === false || $panjang <= 0 ||
             $lebar === false || $lebar <= 0 ||
             $tinggi === false || $tinggi <= 0 ||
@@ -156,7 +155,6 @@ class ProductController
         $allowedMime = [
             'image/jpeg' => 'jpg',
             'image/png'  => 'png',
-            'image/webp' => 'webp'
         ];
 
         if (!isset($allowedMime[$mime])) {
@@ -315,7 +313,6 @@ class ProductController
             strlen($nama) > 150 ||
             !in_array($kategori, ['SPREI', 'BED_COVER', 'SARUNG_BANTAL', 'SARUNG_GULING'], true) ||
             !in_array($jenisKain, ['TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'], true) ||
-            $deskripsi === '' ||
             $panjang === false || $panjang <= 0 ||
             $lebar === false || $lebar <= 0 ||
             $tinggi === false || $tinggi <= 0 ||
@@ -366,7 +363,6 @@ class ProductController
                 $allowedMime = [
                     'image/jpeg' => 'jpg',
                     'image/png'  => 'png',
-                    'image/webp' => 'webp'
                 ];
 
                 if (!isset($allowedMime[$mime])) {

@@ -74,6 +74,7 @@ $statusLabels = [
             <span>Admin</span><span aria-hidden="true">›</span><a href="/?page=admin-payments">Cek Pembayaran</a><span aria-hidden="true">›</span><strong>Verifikasi Pembayaran</strong>
         </div>
         <header class="payment-detail-header">
+            <a class="payment-detail-back" href="/?page=admin-payments">&larr; Kembali ke Cek Pembayaran</a>
             <div class="payment-title-row"><h1>Verifikasi Pembayaran</h1><span class="invoice-chip"><?= $escape($payment['no_invoice'] ?: 'ORD-' . $payment['id_pesanan']) ?></span></div>
         </header>
 
@@ -155,7 +156,6 @@ $statusLabels = [
                 <?php endif; ?>
             </section>
         </div>
-        <a class="payment-back-link" href="/?page=admin-payments">&larr; Kembali</a>
     </main>
 </div>
 <script src="/assets/js/admin/sidebar.js"></script>
