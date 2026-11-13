@@ -7,8 +7,6 @@ if (session_status() === PHP_SESSION_NONE) {
 $actions = [
 	'customer-login' => 'login',
 	'customer-register' => 'register',
-	'customer-forgot-password' => 'requestPasswordReset',
-	'customer-reset-password' => 'resetPassword',
 	'admin-login' => 'loginAdmin',
 	'admin-register' => 'registerAdmin',
 	'customer-logout' => 'logoutCustomer',
@@ -18,7 +16,6 @@ $action = $_GET['action'] ?? '';
 
 if ($action !== '') {
 	$isLogout = in_array($action, ['customer-logout', 'admin-logout'], true);
-	$isPasswordResetAction = in_array($action, ['customer-forgot-password', 'customer-reset-password'], true);
 	$productActions = [
 		'admin-product-store',
 		'admin-product-update',
@@ -33,7 +30,7 @@ if ($action !== '') {
 	$isAdminResiAction = $action === 'admin-order-resi-save';
 	$adminPaymentActions = ['admin-payment-verify-save'];
 	$isAdminPaymentAction = in_array($action, $adminPaymentActions, true);
-	if (!$isLogout && !$isPasswordResetAction && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
+	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -137,17 +134,6 @@ if ($action !== '') {
 			$_SESSION['admin_payment_message'] = 'Pembayaran gagal diproses. Silakan coba lagi.';
 			$_SESSION['admin_payment_message_type'] = 'error';
 			header('Location: /?page=admin-payments', true, 303);
-		} elseif ($isPasswordResetAction) {
-			$isEmailRequest = $action === 'customer-forgot-password'
-				&& filter_var(trim((string) ($_POST['email'] ?? '')), FILTER_VALIDATE_EMAIL);
-			$_SESSION['password_reset_message'] = $isEmailRequest
-				? 'Permintaan belum dapat diproses saat ini. Silakan coba lagi nanti.'
-				: 'Permintaan reset gagal diproses. Silakan coba lagi.';
-			$_SESSION['password_reset_message_type'] = 'error';
-			$target = $action === 'customer-reset-password'
-				? '/?page=customer-reset-password&token=' . rawurlencode((string) ($_POST['token'] ?? ''))
-				: '/?page=customer-forgot-password';
-			header('Location: ' . $target, true, 303);
 		} else {
 			echo json_encode(['success' => false, 'message' => 'Permintaan gagal diproses. Silakan coba lagi.']);
 		}
