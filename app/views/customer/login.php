@@ -90,6 +90,7 @@ unset($_SESSION['login_return_url']);
             </div>
 
             <!-- Ingat saya -->
+            <p class="forgot-password"><a href="/?page=customer-forgot-password">Lupa kata sandi?</a></p>
             <label class="remember">
                 <input type="checkbox" id="remember" name="remember">
                 <span class="remember__box"></span>

@@ -13,6 +13,7 @@ class AuthController
             require_once __DIR__ . '/../config/database.php';
             require_once __DIR__ . '/../models/UserModel.php';
             require_once __DIR__ . '/../models/CartModel.php';
+            require_once __DIR__ . '/../helpers/SmtpMailer.php';
 
             $this->model = new UserModel($pdo);
         }
@@ -349,6 +350,95 @@ class AuthController
         ]);
 
         return;
+    }
+
+    public function requestPasswordReset()
+    {
+        $email = trim($_POST['email'] ?? '');
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['password_reset_message'] = 'Format email tidak valid.';
+            $_SESSION['password_reset_message_type'] = 'error';
+            header('Location: /?page=customer-forgot-password', true, 303);
+            return;
+        }
+
+        $genericMessage = 'Jika email terdaftar, kami akan mengirim link reset kata sandi.';
+        $now = time();
+        $lastRequest = (int) ($_SESSION['password_reset_last_request'] ?? 0);
+        $_SESSION['password_reset_last_request'] = $now;
+
+        if ($now - $lastRequest >= 60) {
+            $user = $this->model->findByEmail($email);
+            if ($user && $user['role'] === 'CUSTOMER') {
+                $token = bin2hex(random_bytes(32));
+                if ($this->model->createPasswordResetToken(
+                    (int) $user['id_user'],
+                    hash('sha256', $token),
+                    60
+                )) {
+                    $baseUrl = rtrim((string) (getenv('APP_BASE_URL') ?: ''), '/');
+                    if ($baseUrl === '') {
+                        throw new RuntimeException('APP_BASE_URL belum dikonfigurasi.');
+                    }
+
+                    $resetUrl = $baseUrl . '/?page=customer-reset-password&token=' . rawurlencode($token);
+                    $mailer = new SmtpMailer();
+                    $mailer->send(
+                        $user['email'],
+                        $user['nama'],
+                        'Reset kata sandi Griya Sprei',
+                        "Halo " . $user['nama'] . ",\n\n"
+                            . "Gunakan link berikut untuk membuat kata sandi baru. Link berlaku selama 10 menit dan hanya dapat digunakan sekali:\n"
+                            . $resetUrl . "\n\n"
+                            . "Jika Anda tidak meminta reset kata sandi, abaikan email ini."
+                    );
+                }
+            }
+        }
+
+        $_SESSION['password_reset_message'] = $genericMessage;
+        $_SESSION['password_reset_message_type'] = 'success';
+        header('Location: /?page=customer-forgot-password', true, 303);
+    }
+
+    public function resetPassword()
+    {
+        $token = $_POST['token'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $confirmation = $_POST['konfirmasi_password'] ?? '';
+
+        if (!is_string($token) || !preg_match('/^[a-f0-9]{64}$/D', $token)) {
+            $_SESSION['password_reset_message'] = 'Link reset tidak valid atau sudah kedaluwarsa. Minta link baru.';
+            $_SESSION['password_reset_message_type'] = 'error';
+            header('Location: /?page=customer-forgot-password', true, 303);
+            return;
+        }
+        if (strlen($password) < 8) {
+            $this->redirectToResetForm($token, 'Kata sandi minimal 8 karakter.');
+            return;
+        }
+        if ($password !== $confirmation) {
+            $this->redirectToResetForm($token, 'Konfirmasi kata sandi tidak sama.');
+            return;
+        }
+
+        if ($this->model->resetCustomerPassword(hash('sha256', $token), password_hash($password, PASSWORD_DEFAULT))) {
+            $_SESSION['cart_message'] = 'Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru.';
+            $_SESSION['cart_message_type'] = 'success';
+            header('Location: /?page=customer-login', true, 303);
+            return;
+        }
+
+        $_SESSION['password_reset_message'] = 'Link reset tidak valid atau sudah kedaluwarsa. Minta link baru.';
+        $_SESSION['password_reset_message_type'] = 'error';
+        header('Location: /?page=customer-forgot-password', true, 303);
+    }
+
+    private function redirectToResetForm($token, $message)
+    {
+        $_SESSION['password_reset_message'] = $message;
+        $_SESSION['password_reset_message_type'] = 'error';
+        header('Location: /?page=customer-reset-password&token=' . rawurlencode($token), true, 303);
     }
 
     // =========================================
