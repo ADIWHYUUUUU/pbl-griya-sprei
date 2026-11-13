@@ -51,7 +51,8 @@ $pembayaranVerifikasi = $dashboard->getWaitingVerificationPayments();
 $pesananLaporan = $dashboard->getOrdersForMonth($bulanLaporan, $tahunLaporan);
 $produk = (new ProductController())->getAllProducts();
 
-$mingguan = array_fill(0, 4, ['total' => 0, 'transaksi' => 0]);
+$tanggalAkhirBulan = (int) date('t', strtotime(sprintf('%04d-%02d-01', $tahunLaporan, $bulanLaporan)));
+$harian = array_fill(1, $tanggalAkhirBulan, ['total' => 0, 'transaksi' => 0]);
 $totalPenjualan = 0.0;
 $jumlahSelesai = 0;
 $jumlahTerbayar = 0;
@@ -64,9 +65,8 @@ foreach ($pesananLaporan as $pesanan) {
 
     $total = (float) $pesanan['total'];
     $hari = (int) date('j', strtotime($pesanan['tanggal_pesan']));
-    $minggu = min(3, intdiv($hari - 1, 7));
-    $mingguan[$minggu]['total'] += $total;
-    $mingguan[$minggu]['transaksi']++;
+    $harian[$hari]['total'] += $total;
+    $harian[$hari]['transaksi']++;
     $totalPenjualan += $total;
     $jumlahTerbayar++;
     if ($pesanan['status_pesanan'] === 'SELESAI') {
@@ -74,8 +74,109 @@ foreach ($pesananLaporan as $pesanan) {
     }
 }
 
-$maksMingguan = max(1, ...array_column($mingguan, 'total'));
-$maksTransaksiMingguan = max(1, ...array_column($mingguan, 'transaksi'));
+$formatRupiah = static function ($amount): string {
+    return 'Rp ' . number_format((float) $amount, 0, ',', '.');
+};
+$esc = static function ($value): string {
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+};
+$maksPendapatanHarian = max(array_column($harian, 'total'));
+$formatNilaiGrafik = static function (float $nilai): string {
+    if ($nilai >= 1000000) {
+        $nilaiRingkas = $nilai / 1000000;
+        $satuan = 'jt';
+    } elseif ($nilai >= 1000) {
+        $nilaiRingkas = $nilai / 1000;
+        $satuan = 'rb';
+    } else {
+        return 'Rp ' . number_format($nilai, 0, ',', '.');
+    }
+
+    $desimal = abs($nilaiRingkas - round($nilaiRingkas)) < 0.05 || $nilaiRingkas >= 10 ? 0 : 1;
+    return 'Rp ' . number_format($nilaiRingkas, $desimal, ',', '.') . ' ' . $satuan;
+};
+$grafikHarian = static function (string $id) use (
+    $harian,
+    $tanggalAkhirBulan,
+    $maksPendapatanHarian,
+    $bulanLaporan,
+    $tahunLaporan,
+    $namaBulan,
+    $formatRupiah,
+    $formatNilaiGrafik,
+    $esc
+): string {
+    $jarakTanggal = 110;
+    $kiri = 100;
+    $kanan = $kiri + max(900, ($tanggalAkhirBulan - 1) * $jarakTanggal);
+    $lebar = $kanan + 20;
+    $tinggi = 360;
+    $atas = 48;
+    $bawah = 300;
+    $jumlahInterval = 4;
+    $langkah = 1.0;
+
+    if ($maksPendapatanHarian > 0) {
+        $langkahAwal = $maksPendapatanHarian / $jumlahInterval;
+        $orde = pow(10, floor(log10($langkahAwal)));
+        $langkah = ceil($langkahAwal / $orde) * $orde;
+    }
+
+    $batasAtas = $langkah * $jumlahInterval;
+    $rentangY = $bawah - $atas;
+    $rentangX = $kanan - $kiri;
+    $penyebutX = max(1, $tanggalAkhirBulan - 1);
+    $titik = [];
+
+    foreach ($harian as $hari => $dataHarian) {
+        $x = $kiri + (($hari - 1) / $penyebutX * $rentangX);
+        $y = $bawah - ($dataHarian['total'] / $batasAtas * $rentangY);
+        $tanggal = sprintf('%02d/%02d/%04d', $hari, $bulanLaporan, $tahunLaporan);
+        $titik[] = [
+            'x' => number_format($x, 2, '.', ''),
+            'y' => number_format($y, 2, '.', ''),
+            'tanggal' => $tanggal,
+            'pendapatan' => $dataHarian['total'],
+        ];
+    }
+
+    $path = implode(' ', array_map(
+        static function (array $titikHarian, int $index): string {
+            return ($index === 0 ? 'M ' : 'L ') . $titikHarian['x'] . ' ' . $titikHarian['y'];
+        },
+        $titik,
+        array_keys($titik)
+    ));
+    $labelPeriode = $namaBulan[$bulanLaporan - 1] . ' ' . $tahunLaporan;
+    $svg = '<div class="daily-line-chart"><svg id="' . $esc($id) .
+        '" width="' . $lebar . '" height="' . $tinggi . '" viewBox="0 0 ' . $lebar . ' ' . $tinggi .
+        '" role="img" aria-label="Grafik pendapatan harian ' . $esc($labelPeriode) . '">';
+
+    for ($interval = 0; $interval <= $jumlahInterval; $interval++) {
+        $nilai = $batasAtas - ($interval * $langkah);
+        $y = $atas + ($interval / $jumlahInterval * $rentangY);
+        $svg .= '<line class="daily-chart-grid" x1="' . $kiri . '" y1="' . $y .
+            '" x2="' . $kanan . '" y2="' . $y . '"></line>' .
+            '<text class="daily-chart-y-label" x="' . ($kiri - 10) . '" y="' . ($y + 4) .
+            '" text-anchor="end">' . $esc($formatNilaiGrafik($nilai)) . '</text>';
+    }
+
+    $svg .= '<path class="daily-chart-line" d="' . $path . '"></path>';
+    foreach ($titik as $titikHarian) {
+        $labelTitik = $titikHarian['tanggal'] . ': ' . $formatRupiah($titikHarian['pendapatan']);
+        $svg .= '<text class="daily-chart-value-label" x="' . $titikHarian['x'] .
+            '" y="' . ($titikHarian['y'] - 12) . '" text-anchor="middle">' .
+            $esc($formatRupiah($titikHarian['pendapatan'])) . '</text>' .
+            '<text class="daily-chart-x-label" x="' . $titikHarian['x'] .
+            '" y="' . ($bawah + 24) . '" text-anchor="middle">' .
+            $esc($titikHarian['tanggal']) . '</text>';
+        $svg .= '<circle class="daily-chart-point" cx="' . $titikHarian['x'] .
+            '" cy="' . $titikHarian['y'] . '" r="4" tabindex="0" aria-label="' .
+            $esc($labelTitik) . '"><title>' . $esc($labelTitik) . '</title></circle>';
+    }
+
+    return $svg . '</svg></div>';
+};
 $maksStok = max(1, ...array_map(static function ($item) {
     return (int) $item['stok'];
 }, $produk ?: [['stok' => 0]]));
@@ -84,8 +185,6 @@ $jumlahHalamanLaporan = max(1, (int) ceil(count($pesananLaporan) / 7));
 $halamanDiminta = $bacaAngkaQuery($_GET['halaman'] ?? 1, 1);
 $halamanLaporan = max(1, min($jumlahHalamanLaporan, $halamanDiminta));
 $pesananLaporanHalaman = array_slice($pesananLaporan, ($halamanLaporan - 1) * 7, 7);
-$tanggalAkhirBulan = (int) date('t', strtotime(sprintf('%04d-%02d-01', $tahunLaporan, $bulanLaporan)));
-
 $statusPesanan = [
     'MENUNGGU_PEMBAYARAN' => ['Menunggu Pembayaran', 'badge-info'],
     'MENUNGGU_VERIFIKASI' => ['Menunggu Verifikasi', 'badge-warn'],
@@ -94,9 +193,6 @@ $statusPesanan = [
     'SELESAI' => ['Selesai', 'badge-done'],
     'DIBATALKAN' => ['Dibatalkan', 'badge-danger'],
 ];
-$formatRupiah = static function ($amount): string {
-    return 'Rp ' . number_format((float) $amount, 0, ',', '.');
-};
 $formatTanggal = static function ($date): string {
     $bulanSingkat = [
         'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
@@ -107,9 +203,6 @@ $formatTanggal = static function ($date): string {
     return date('d', $timestamp)
         . ' ' . $bulanSingkat[(int) date('n', $timestamp) - 1]
         . ' ' . date('Y', $timestamp);
-};
-$esc = static function ($value): string {
-    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
 $statusBadge = static function ($status) use ($statusPesanan, $esc): string {
     $detail = $statusPesanan[$status] ?? [$status, 'badge-done'];
@@ -181,7 +274,7 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
 
     <section class="chart-section">
         <div class="section-header">
-            <h3>Grafik penjualan</h3>
+            <h3>Pendapatan per hari</h3>
             <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
         </div>
 
@@ -196,29 +289,7 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
             </div>
         </div>
 
-        <div class="bar-chart" id="barChart" role="img" aria-label="Grafik penjualan per minggu">
-            <?php foreach ($mingguan as $index => $minggu): ?>
-                <?php
-                $tinggiPenjualan = $minggu['total'] > 0
-                    ? max(4, (int) round($minggu['total'] / $maksMingguan * 100))
-                    : 0;
-                $tinggiTransaksi = $minggu['transaksi'] > 0
-                    ? max(4, (int) round($minggu['transaksi'] / $maksTransaksiMingguan * 100))
-                    : 0;
-                ?>
-                <div class="bar-group">
-                    <div class="bars">
-                        <span class="bar bar-a" style="height: <?= $tinggiPenjualan ?>%" title="<?= $esc($formatRupiah($minggu['total'])) ?>"></span>
-                        <span class="bar bar-b" style="height: <?= $tinggiTransaksi ?>%" title="<?= $esc($minggu['transaksi']) ?> transaksi"></span>
-                    </div>
-                    <span class="bar-label">Minggu <?= $index + 1 ?></span>
-                </div>
-            <?php endforeach; ?>
-        </div>
-        <div class="chart-legend">
-            <span><i class="dot dot-a"></i>Penjualan</span>
-            <span><i class="dot dot-b"></i>Transaksi</span>
-        </div>
+        <?= $grafikHarian('grafikPendapatan') ?>
     </section>
 
     <section class="verification-box" id="verifikasi">
@@ -442,7 +513,7 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                     <small class="muted">Ikhtisar grafik performa penjualan dan rekapitulasi transaksi bulanan</small>
                 </div>
             </div>
-            <form class="report-controls" action="/#modalLaporan" method="get">
+            <form class="report-controls" action="/?page=admin-dashboard#modalLaporan" method="get">
                 <input type="hidden" name="page" value="admin-dashboard">
                 <label class="sr-only" for="lapBulan">Pilih bulan laporan</label>
                 <select class="report-select" id="lapBulan" name="bulan">
@@ -478,26 +549,8 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
             </div>
 
             <section class="report-panel">
-                <h4 class="report-title" id="judulTren">Grafik tren penjualan mingguan (<?= $esc($namaBulan[$bulanLaporan - 1]) ?> <?= $tahunLaporan ?>)</h4>
-                <div class="trend-grid" id="lapTren">
-                    <?php foreach ($mingguan as $index => $minggu): ?>
-                        <?php
-                        $hariMulai = $index * 7 + 1;
-                        $hariSelesai = min(($index + 1) * 7, $tanggalAkhirBulan);
-                        $tinggiTren = $minggu['total'] > 0
-                            ? max(8, (int) round($minggu['total'] / $maksMingguan * 100))
-                            : 0;
-                        ?>
-                        <div class="trend-item">
-                            <strong><?= $esc($formatRupiah($minggu['total'])) ?></strong>
-                            <div class="trend-bar-track">
-                                <span class="trend-bar" style="height: <?= $tinggiTren ?>%"></span>
-                            </div>
-                            <span>Minggu <?= $index + 1 ?></span>
-                            <small>(<?= $hariMulai ?>–<?= $hariSelesai ?> <?= $esc(substr($namaBulan[$bulanLaporan - 1], 0, 3)) ?>)</small>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+                <h4 class="report-title" id="judulTren">Grafik pendapatan harian (<?= $esc($namaBulan[$bulanLaporan - 1]) ?> <?= $tahunLaporan ?>)</h4>
+                <?= $grafikHarian('grafikTrenHarian') ?>
             </section>
 
             <section class="report-table-panel">

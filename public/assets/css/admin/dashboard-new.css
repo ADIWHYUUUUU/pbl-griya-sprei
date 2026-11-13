@@ -239,63 +239,66 @@ main {
     text-decoration: underline;
 }
 
-.bar-chart {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);   /* 4 minggu */
-    gap: 18px;
-    height: 170px;
-    border-bottom: 1px solid var(--garis);
-}
-.bar-group {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    height: 100%;
-}
-.bars {
-    display: flex;
-    align-items: flex-end;    
-    gap: 6px;
+.daily-line-chart {
     width: 100%;
-    max-width: 90px;
-    height: 140px;   
-}          
-
-.bar {
-    flex: 1;
-    min-height: 3px;
-    border-radius: 4px 4px 0 0;
+    overflow-x: auto;
+    border: 1px solid #edf0f3;
+    border-radius: 8px;
+    background: #fff;
 }
 
-.bar-a { background-color: var(--hijau-tua); }    /* penjualan */
-.bar-b { background-color: var(--hijau-muda); }   /* transaksi */
-
-.bar-label {
-    margin-top: 8px;
-    font-size: 14px;
-    color: var(--teks-abu);
+.daily-line-chart svg {
+    display: block;
+    width: auto;
+    min-width: 100%;
+    max-width: none;
+    height: auto;
 }
 
-.chart-legend {
-    display: flex;
-    justify-content: flex-end;
-    gap: 16px;
-    margin-top: 12px;
-    font-size: 14px;
-    color: var(--teks-abu);
+.daily-chart-grid {
+    stroke: #e8ece8;
+    stroke-width: 1;
 }
 
-.dot {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    margin-right: 6px;
-    border-radius: 50%;
+.daily-chart-y-label,
+.daily-chart-x-label {
+    fill: #667085;
+    font-family: inherit;
+    font-size: 12px;
 }
 
-.dot-a { background-color: var(--hijau-tua); }
-.dot-b { background-color: var(--hijau-muda); }
+.daily-chart-value-label {
+    fill: #344054;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.daily-chart-x-label {
+    font-size: 11px;
+}
+
+.daily-chart-line {
+    fill: none;
+    stroke: #405540;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+
+.daily-chart-point {
+    fill: #fff;
+    stroke: #405540;
+    stroke-width: 2.5;
+    cursor: help;
+}
+
+.daily-chart-point:hover,
+.daily-chart-point:focus {
+    fill: #c9d6c9;
+    outline: none;
+    r: 6;
+}
 
 .table-wrap {
     width: 100%;
@@ -1017,53 +1020,6 @@ textarea.form-control {
     vertical-align: 1px;
 }
 
-.trend-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    padding: 12px;
-    background-color: var(--latar);
-}
-
-.trend-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    padding: 10px 8px 8px;
-    border: 1px solid var(--garis);
-    border-radius: 9px;
-    background: var(--putih);
-    font-size: 13px;
-    text-align: center;
-}
-
-.trend-item strong {
-    color: var(--teks);
-    font-size: 13px;
-}
-
-.trend-bar-track {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    width: 100%;
-    height: 58px;
-}
-
-.trend-bar {
-    width: min(38px, 60%);
-    min-height: 4px;
-    border-radius: 4px 4px 2px 2px;
-    background: var(--hijau-tua);
-}
-
-.trend-item small {
-    color: var(--teks-abu);
-    font-size: 13px;
-}
-
 .report-table-panel {
     margin-bottom: 0;
 }
@@ -1306,10 +1262,6 @@ textarea.form-control {
         margin-left: auto;
     }
 
-    .trend-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
     .report-table {
         min-width: 640px;
     }
@@ -1454,52 +1406,6 @@ body.admin-dashboard .metric-item .m-val {
     font-size: 14px;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-body.admin-dashboard .bar-chart {
-    height: 128px;
-    gap: 12px;
-    border-color: #edf0f3;
-}
-
-body.admin-dashboard .bars {
-    height: 100px;
-    max-width: 40px;
-    gap: 4px;
-}
-
-body.admin-dashboard .bar {
-    min-height: 0;
-    border-radius: 3px 3px 0 0;
-}
-
-body.admin-dashboard .bar-a,
-body.admin-dashboard .dot-a {
-    background-color: #405540;
-}
-
-body.admin-dashboard .bar-b,
-body.admin-dashboard .dot-b {
-    background-color: #c9d6c9;
-}
-
-body.admin-dashboard .bar-label {
-    margin-top: 5px;
-    color: var(--teks-abu);
-    font-size: 12px;
-}
-
-body.admin-dashboard .chart-legend {
-    gap: 10px;
-    margin-top: 8px;
-    font-size: 12px;
-}
-
-body.admin-dashboard .dot {
-    width: 7px;
-    height: 7px;
-    margin-right: 4px;
-    border-radius: 1px;
 }
 
 body.admin-dashboard .verif-item {
@@ -1897,49 +1803,6 @@ body.admin-dashboard #modalLaporan .report-panel .report-title::before {
     height: 7px;
 }
 
-body.admin-dashboard #modalLaporan .trend-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-    padding: 10px;
-    background: #f7f6f3;
-}
-
-body.admin-dashboard #modalLaporan .trend-item {
-    gap: 5px;
-    min-height: 100px;
-    padding: 8px 6px 7px;
-    border-color: var(--garis);
-    border-radius: 7px;
-    font-size: 12px;
-}
-
-body.admin-dashboard #modalLaporan .trend-item strong {
-    color: #475467;
-    font-size: 12px;
-    white-space: nowrap;
-}
-
-body.admin-dashboard #modalLaporan .trend-bar-track {
-    height: 44px;
-}
-
-body.admin-dashboard #modalLaporan .trend-bar {
-    width: 30px;
-    max-width: 55%;
-    min-height: 0;
-    border-radius: 4px;
-    background: #405540;
-}
-
-body.admin-dashboard #modalLaporan .trend-item > span {
-    color: #475467;
-    font-weight: 600;
-}
-
-body.admin-dashboard #modalLaporan .trend-item small {
-    font-size: 11px;
-}
-
 body.admin-dashboard #modalLaporan .report-table-panel {
     margin-bottom: 0;
 }
@@ -2027,7 +1890,4 @@ body.admin-dashboard #modalLaporan .pagination-controls a[aria-disabled="true"] 
         margin-left: auto;
     }
 
-    body.admin-dashboard #modalLaporan .trend-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
