@@ -137,8 +137,8 @@
   text-align: center;
 }
 .payment-status--waiting {
-  background: #dcefd9;
-  color: #416249;
+  background: #fcefd2;
+  color: #d98a00;
 }
 .payment-status--verified {
   background: #e1f1e4;
@@ -572,5 +572,304 @@
   }
   .payment-card {
     padding: 16px;
+  }
+}
+
+.admin-payment-page {
+  --payment-border: #e8e7df;
+  --payment-muted: #70746a;
+  background: #f6f5ef;
+}
+.admin-payment-page .payment-main {
+  padding: 0 28px 40px;
+}
+.admin-payment-page .payment-breadcrumb {
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 12px;
+}
+.admin-payment-page .payment-breadcrumb strong {
+  color: #293229;
+}
+.admin-payment-page .payment-header {
+  padding: 2px 0 12px;
+}
+.admin-payment-page .payment-header h1 {
+  color: #242d24;
+  font-size: 23px;
+  font-weight: 700;
+}
+.payment-queue-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding: 11px 13px;
+  border: 1px solid #f4d99e;
+  border-radius: 9px;
+  background: #fff1d3;
+}
+.payment-queue-banner > div,
+.payment-queue-banner strong,
+.payment-queue-banner span {
+  display: block;
+}
+.payment-queue-banner strong {
+  margin-bottom: 2px;
+  color: #68460f;
+  font-size: 15px;
+}
+.payment-queue-banner span {
+  color: #896322;
+  font-size: 12px;
+}
+.payment-queue-banner a {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border-radius: 6px;
+  background: #405642;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.payment-queue-banner a:hover {
+  background: #314633;
+}
+.payment-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) repeat(3, auto);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.payment-search,
+.payment-select-label select {
+  height: 34px;
+  border: 1px solid #d9d8cf;
+  border-radius: 6px;
+  background: #fff;
+  color: #424a40;
+  font: inherit;
+  font-size: 13px;
+}
+.payment-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+}
+.payment-search > span {
+  font-size: 13px;
+}
+.payment-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.payment-search input::placeholder {
+  color: #73796e;
+  opacity: 1;
+}
+.payment-select-label select {
+  max-width: 160px;
+  padding: 0 9px;
+  cursor: pointer;
+}
+.payment-table-panel {
+  border-color: #e5e4dc;
+  border-radius: 9px;
+  box-shadow: none;
+}
+.payment-tabs {
+  display: flex;
+  align-items: stretch;
+  min-height: 34px;
+  padding: 0 12px;
+  border-bottom: 1px solid #eeede6;
+}
+.payment-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -1px;
+  padding: 0 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #5d645b;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.payment-tab span {
+  display: inline-grid;
+  min-width: 16px;
+  height: 16px;
+  place-items: center;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #efeee8;
+  color: #5d645b;
+  font-size: 11px;
+}
+.payment-tab.is-active {
+  border-bottom-color: #405642;
+  color: #2e382e;
+  font-weight: 700;
+}
+.payment-table {
+  min-width: 760px;
+  table-layout: auto;
+}
+.payment-table th {
+  padding: 8px 10px;
+  background: #f5f4ed;
+  color: #596057;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.payment-table td {
+  padding: 8px 10px;
+  border-top-color: #eeede6;
+  color: #303830;
+  font-size: 12px;
+}
+.payment-table td > strong {
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+.payment-table td > small {
+  font-size: 11px;
+}
+.payment-table tr[data-payment-row] td:first-child {
+  border-left: 3px solid transparent;
+}
+.payment-table tr[data-payment-row][data-status="MENUNGGU_VERIFIKASI"] {
+  background: #fffaf0;
+}
+.payment-table tr[data-payment-row][data-status="MENUNGGU_VERIFIKASI"] td:first-child {
+  border-left-color: #e99a00;
+}
+.payment-invoice {
+  color: #303830;
+}
+.payment-phone {
+  margin-top: 2px;
+  color: #596057;
+  font-size: 11px;
+}
+.payment-method-short {
+  color: #4a5148;
+  font-size: 12px;
+}
+.payment-status {
+  max-width: none;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.payment-status::before {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+.payment-status--waiting {
+  background: #fff0d2;
+  color: #a76a00;
+}
+.payment-status--verified {
+  background: #e0f0dc;
+  color: #35663c;
+}
+.payment-status--rejected {
+  background: #fbe5e2;
+  color: #a13d34;
+}
+.payment-total {
+  font-size: 12px !important;
+}
+.payment-action {
+  min-width: 84px;
+  padding: 8px 9px;
+  border: 1px solid #405642;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.payment-action--pending {
+  background: #405642;
+  color: #fff;
+}
+.payment-action--secondary {
+  background: #fff;
+  color: #405642;
+}
+.payment-action--secondary:hover {
+  background: #f2f5f0;
+}
+.payment-table-note {
+  margin: 9px 2px 0;
+  color: #70746a;
+  font-size: 12px;
+}
+.payment-empty-filter[hidden] {
+  display: none;
+}
+.payment-pagination {
+  margin-top: 14px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+@media (max-width: 760px) {
+  .admin-payment-page .payment-main {
+    padding: 0 18px 32px;
+  }
+  .payment-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+  .payment-search {
+    grid-column: 1 / -1;
+  }
+  .payment-select-label select {
+    width: 100%;
+    max-width: none;
+  }
+}
+@media (max-width: 480px) {
+  .payment-queue-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .payment-queue-banner a {
+    align-self: stretch;
+    text-align: center;
+  }
+  .payment-tabs {
+    overflow-x: auto;
+    padding: 0 5px;
+  }
+  .payment-tab {
+    flex: 0 0 auto;
+    padding: 0 7px;
+    font-size: 10px;
   }
 }

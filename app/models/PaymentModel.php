@@ -135,6 +135,30 @@ class PaymentModel
         $totalPages = max(1, (int) ceil($totalRows / $perPage));
         $page = min($page, $totalPages);
 
+        $statusStatement = $this->pdo->prepare(
+            'SELECT status_pembayaran::text AS status_pembayaran, COUNT(*) AS total
+             FROM pembayaran
+             GROUP BY status_pembayaran'
+        );
+        $statusStatement->execute();
+        $statusCounts = [
+            'MENUNGGU_VERIFIKASI' => 0,
+            'TERVERIFIKASI' => 0,
+            'DITOLAK' => 0,
+        ];
+        foreach ($statusStatement->fetchAll() as $statusRow) {
+            $statusCounts[$statusRow['status_pembayaran']] = (int) $statusRow['total'];
+        }
+
+        $oldestWaitingStatement = $this->pdo->prepare(
+            'SELECT id_pembayaran, tanggal_upload
+             FROM pembayaran
+             WHERE status_pembayaran::text = :status
+             ORDER BY tanggal_upload ASC, id_pembayaran ASC
+             LIMIT 1'
+        );
+        $oldestWaitingStatement->execute([':status' => 'MENUNGGU_VERIFIKASI']);
+
         $statement = $this->pdo->prepare(
             'SELECT
                 b.id_pembayaran,
@@ -171,6 +195,9 @@ class PaymentModel
             'rows' => $statement->fetchAll(),
             'page' => $page,
             'total_pages' => $totalPages,
+            'total_rows' => $totalRows,
+            'status_counts' => $statusCounts,
+            'oldest_waiting' => $oldestWaitingStatement->fetch() ?: null,
         ];
     }
 
