@@ -80,6 +80,10 @@ $email     = "griyasprei@gmail.com";
   <!-- HEADER -->
   <?php require __DIR__ . '/../layouts/header.php'; ?>
   <main class="container">
+    <section class="catalog-heading">
+      <h1>Katalog</h1>
+      <p>Klik produk untuk melihat detail dan memesan. Isi ukuran kasur Anda saat memesan. Ukuran produk ditulis P × L × T (cm).</p>
+    </section>
     <!-- TOOLBAR -->
     <section class="toolbar">
       <label class="search">
@@ -100,12 +104,6 @@ $email     = "griyasprei@gmail.com";
           placeholder="Cari produk, jenis kain, motif..."
         >
       </label>
-      <select class="select filter-select" id="categoryFilter" aria-label="Filter kategori produk">
-        <option value="all">Semua Kategori</option>
-        <option value="sprei">Sprei</option>
-        <option value="bedcover">Bed Cover</option>
-        <option value="sarung">Sarung Bantal &amp; Guling</option>
-      </select>
       <select class="select filter-select" id="fabricFilter" aria-label="Filter jenis kain">
         <option value="all">Semua Jenis Kain</option>
         <option value="TENCEL">Tencel</option>
@@ -114,11 +112,6 @@ $email     = "griyasprei@gmail.com";
         <option value="MICROTENCEL">Microtencel</option>
         <option value="MICROTEX">Microtex</option>
       </select>
-      <select class="select filter-select" id="priceSort" aria-label="Urutkan harga">
-        <option value="default">Urutkan Harga</option>
-        <option value="price-low">Harga Terendah</option>
-        <option value="price-high">Harga Tertinggi</option>
-      </select>
       <select class="select filter-select" id="sizeFilter" aria-label="Filter ukuran">
         <option value="all">Filter Ukuran (Semua)</option>
         <option value="160 × 200 × 30">160 × 200 × 30</option>
@@ -126,7 +119,25 @@ $email     = "griyasprei@gmail.com";
         <option value="180 × 200 × 35">180 × 200 × 35</option>
         <option value="200 × 200 × 35">200 × 200 × 35</option>
       </select>
+      <select class="select filter-select" id="priceSort" aria-label="Urutkan harga">
+        <option value="default">Urutkan Harga</option>
+        <option value="price-low">Harga Terendah</option>
+        <option value="price-high">Harga Tertinggi</option>
+      </select>
     </section>
+    <div class="catalog-categories" aria-label="Filter kategori produk">
+      <span class="catalog-categories__label">Kategori</span>
+      <div class="catalog-categories__options" id="categoryFilters">
+        <button class="category-chip" type="button" data-category="all">Semua</button>
+        <button class="category-chip" type="button" data-category="sprei">Sprei</button>
+        <button class="category-chip" type="button" data-category="bedcover">Bed Cover</button>
+        <button class="category-chip" type="button" data-category="sarung">Sarung Bantal &amp; Guling</button>
+      </div>
+    </div>
+    <div class="catalog-results">
+      <p id="catalogSummary" aria-live="polite"></p>
+      <button class="catalog-reset" type="button" id="resetFilters">Reset filter</button>
+    </div>
     <!-- GRID PRODUK -->
     <section
       class="grid"

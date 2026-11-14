@@ -1,10 +1,12 @@
 const productGrid = document.getElementById("productGrid");
 const pagination = document.getElementById("pagination");
 const searchInput = document.getElementById("searchInput");
-const categoryFilter = document.getElementById("categoryFilter");
+const categoryFilters = document.getElementById("categoryFilters");
 const fabricFilter = document.getElementById("fabricFilter");
 const priceSort = document.getElementById("priceSort");
 const sizeFilter = document.getElementById("sizeFilter");
+const catalogSummary = document.getElementById("catalogSummary");
+const resetFilters = document.getElementById("resetFilters");
 const products = Array.isArray(window.catalogProducts) ? window.catalogProducts : [];
 const pageSize = 8;
 const currency = new Intl.NumberFormat("id-ID", {
@@ -33,7 +35,11 @@ function setActiveCategory(category, updateHistory = false) {
     ? category
     : "all";
   currentPage = 1;
-  categoryFilter.value = activeCategory;
+  categoryFilters.querySelectorAll("[data-category]").forEach((button) => {
+    const isActive = button.dataset.category === activeCategory;
+    button.classList.toggle("category-chip--active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
 
   if (updateHistory) {
     const url = new URL(window.location.href);
@@ -81,6 +87,7 @@ function renderProducts() {
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
+  catalogSummary.innerHTML = `Menampilkan <strong>${pageProducts.length} produk</strong> · Halaman ${currentPage} dari ${pageCount}`;
 
   if (filteredProducts.length === 0) {
     productGrid.innerHTML = '<p class="empty">Produk tidak ditemukan.</p>';
@@ -92,7 +99,7 @@ function renderProducts() {
           : "";
         return `
           <article class="card" id="product-${Number(product.id) || 0}">
-            <div class="card__image" style="--img-color:${escapeHtml(product.color || "#cccccc")}">
+            <div class="card__image">
               ${imageUrl}
             </div>
             <div class="card__body">
@@ -100,8 +107,8 @@ function renderProducts() {
                 <span class="card__type">${escapeHtml(product.type)}</span>
                 <span class="card__size">${escapeHtml(product.size || "Ukuran custom")}</span>
               </div>
-              <p class="card__fabric">Jenis kain: ${escapeHtml(product.fabricLabel || "Belum diatur")}</p>
               <h2 class="card__title">${escapeHtml(product.name)}</h2>
+              <p class="card__fabric">Jenis kain: ${escapeHtml(product.fabricLabel || "Belum diatur")}</p>
               <p class="card__desc">${escapeHtml(product.desc)}</p>
               <div class="card__footer">
                 <div class="card__price-group">
@@ -112,7 +119,7 @@ function renderProducts() {
                   class="card__detail-button"
                   href="/?page=customer-detail&id=${Number(product.id) || 0}"
                   aria-label="Lihat detail ${escapeHtml(product.name)}"
-                >Lihat Detail</a>
+                ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
               </div>
             </div>
           </article>`;
@@ -161,8 +168,10 @@ function renderProducts() {
     </button>`;
 }
 
-categoryFilter.addEventListener("change", () => {
-  setActiveCategory(categoryFilter.value, true);
+categoryFilters.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-category]");
+  if (!button) return;
+  setActiveCategory(button.dataset.category, true);
 });
 
 window.addEventListener("popstate", () => {
@@ -188,6 +197,14 @@ priceSort.addEventListener("change", () => {
 sizeFilter.addEventListener("change", () => {
   currentPage = 1;
   renderProducts();
+});
+
+resetFilters.addEventListener("click", () => {
+  searchInput.value = "";
+  fabricFilter.value = "all";
+  sizeFilter.value = "all";
+  priceSort.value = "default";
+  setActiveCategory("all", true);
 });
 
 pagination.addEventListener("click", (event) => {
