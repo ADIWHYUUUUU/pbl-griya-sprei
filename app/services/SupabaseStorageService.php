@@ -150,14 +150,12 @@ final class SupabaseStorageService
             CURLOPT_FOLLOWLOCATION => false,
         ];
         if (!curl_setopt_array($curl, $options)) {
-            curl_close($curl);
             throw new RuntimeException('Unable to configure Supabase Storage request.');
         }
 
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $curlError = curl_error($curl);
-        curl_close($curl);
         if ($response === false) {
             throw new RuntimeException('Supabase Storage request failed: ' . $curlError);
         }

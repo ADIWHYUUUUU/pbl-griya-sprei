@@ -348,7 +348,6 @@ class PasswordResetService
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $curlError = curl_errno($curl);
-        curl_close($curl);
         if ($response === false || $status < 200 || $status >= 300) {
             error_log('[password-reset] Brevo delivery failed; HTTP status ' . $status . ', cURL error ' . $curlError . '.');
             return false;
