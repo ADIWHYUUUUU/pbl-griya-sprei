@@ -228,6 +228,16 @@ button { cursor: pointer; }
 .register a { color: var(--green); font-weight: 600; }
 .register a:hover { text-decoration: underline; }
 
+.forgot-password { display: block; margin-top: 12px; color: var(--green); font-size: 13px; text-align: right; }
+.forgot-password:hover, .reset-back:hover { text-decoration: underline; }
+.login-card--reset { max-height: none; }
+.reset-intro { margin-bottom: 24px; }
+.reset-intro h2 { margin-bottom: 6px; font-size: 18px; font-weight: 600; }
+.reset-intro p, .reset-back { color: var(--muted); font-size: 13px; }
+.reset-back { display: block; margin-top: 20px; text-align: center; }
+#resendCodeButton { margin-top: 10px; background: transparent; }
+#resendCodeButton:hover { background: var(--bg); }
+
 /* =========================================
    7. RESPONSIF
    ========================================= */

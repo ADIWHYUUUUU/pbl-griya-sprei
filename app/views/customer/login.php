@@ -103,6 +103,7 @@ unset($_SESSION['login_return_url']);
                 </svg>
                 Masuk ke Akun
             </button>
+            <a class="forgot-password" href="/?page=customer-password-forgot">Lupa password?</a>
         </form>
 
         <a class="btn-home" href="<?= htmlspecialchars($returnUrl, ENT_QUOTES, 'UTF-8') ?>"><?= $returnUrl === '/?page=customer-home' ? 'Kembali ke Beranda' : 'Kembali ke Halaman Sebelumnya' ?></a>

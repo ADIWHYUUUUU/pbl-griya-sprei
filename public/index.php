@@ -3,6 +3,9 @@
 if (session_status() === PHP_SESSION_NONE) {
 	session_start();
 }
+if (empty($_SESSION['csrf_token'])) {
+	$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 $actions = [
 	'customer-login' => 'login',
@@ -11,6 +14,12 @@ $actions = [
 	'admin-register' => 'registerAdmin',
 	'customer-logout' => 'logoutCustomer',
 	'admin-logout' => 'logoutAdmin',
+];
+$passwordResetActions = [
+	'customer-password-reset-request' => 'requestCode',
+	'customer-password-reset-resend' => 'resendCode',
+	'customer-password-reset-verify' => 'verifyCode',
+	'customer-password-reset-save' => 'savePassword',
 ];
 $action = $_GET['action'] ?? '';
 
@@ -30,6 +39,7 @@ if ($action !== '') {
 	$isAdminResiAction = $action === 'admin-order-resi-save';
 	$adminPaymentActions = ['admin-payment-verify-save'];
 	$isAdminPaymentAction = in_array($action, $adminPaymentActions, true);
+	$isPasswordResetAction = isset($passwordResetActions[$action]);
 	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
@@ -41,7 +51,7 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
+	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction && !$isPasswordResetAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
@@ -84,15 +94,32 @@ if ($action !== '') {
 			} else {
 				$controller->delete($_POST['id_produk'] ?? null);
 			}
+		} elseif ($isPasswordResetAction) {
+			require_once __DIR__ . '/../app/controllers/PasswordResetController.php';
+			$controller = new PasswordResetController();
+			$controller->{$passwordResetActions[$action]}();
 		} else {
 			require_once __DIR__ . '/../app/controllers/AuthController.php';
 			$controller = new AuthController(!$isLogout);
 			$controller->{$actions[$action]}();
 		}
 	} catch (Throwable $error) {
-		error_log($error->getMessage());
+		if ($isPasswordResetAction) {
+			$sqlState = $error instanceof PDOException ? (string) $error->getCode() : '';
+			error_log(
+				'[password-reset] Request failed: ' . get_class($error)
+				. ($sqlState !== '' ? '; SQLSTATE ' . $sqlState : '') . '.'
+			);
+		} else {
+			error_log($error->getMessage());
+		}
 		http_response_code(500);
-		if ($isCartAction) {
+		if ($isPasswordResetAction) {
+			$message = in_array($sqlState ?? '', ['42703', '42P01'], true)
+				? 'Kolom reset password belum tersedia. Jalankan migration database terlebih dahulu.'
+				: 'Permintaan gagal diproses. Silakan periksa konfigurasi dan error log server.';
+			echo json_encode(['success' => false, 'message' => $message]);
+		} elseif ($isCartAction) {
 			echo 'Keranjang gagal diproses. Silakan coba lagi.';
 		} elseif ($isOrderAction) {
 			$_SESSION['checkout_message'] = 'Pesanan gagal disimpan. Silakan coba lagi.';
@@ -159,6 +186,25 @@ if (!isset($pages[$page])) {
 	http_response_code(404);
 	echo 'Halaman tidak ditemukan.';
 	exit;
+}
+
+if (in_array($page, ['customer-password-otp', 'customer-password-reset'], true)) {
+	try {
+		require_once __DIR__ . '/../app/controllers/PasswordResetController.php';
+		$passwordResetController = new PasswordResetController();
+		$canAccess = $page === 'customer-password-otp'
+			? $passwordResetController->canVerify()
+			: $passwordResetController->canReset();
+		if (!$canAccess) {
+			header('Location: /?page=customer-password-forgot', true, 303);
+			exit;
+		}
+	} catch (Throwable $error) {
+		error_log('[password-reset] Page access check failed: ' . get_class($error) . '.');
+		http_response_code(500);
+		echo 'Halaman reset kata sandi gagal dimuat. Silakan coba lagi.';
+		exit;
+	}
 }
 
 if (
