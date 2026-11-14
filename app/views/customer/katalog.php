@@ -12,13 +12,12 @@ $catalogProducts = array_map(static function ($product) {
     $categoryLabel = match ($categoryKey) {
       'SPREI' => 'Sprei',
       'BEDCOVER' => 'Bed Cover',
-      'SARUNGBANTAL' => 'Sarung Bantal',
-      'SARUNGGULING' => 'Sarung Guling',
+      'SARUNGBANTAL', 'SARUNGGULING', 'SARUNGBANTALGULING' => 'Sarung Bantal & Guling',
       default => $category,
     };
     $categoryFilter = match ($categoryKey) {
       'BEDCOVER' => 'bedcover',
-      'SARUNGBANTAL', 'SARUNGGULING' => 'sarung',
+      'SARUNGBANTAL', 'SARUNGGULING', 'SARUNGBANTALGULING' => 'sarung',
       default => 'sprei',
     };
     $fabric = (string) ($product['jenis_kain'] ?? '');

@@ -47,7 +47,13 @@ class ProductController
 
     private function normalizeProductCategory($category)
     {
-        return $category === 'BEDCOVER' ? 'BED_COVER' : $category;
+        if ($category === 'BEDCOVER') {
+            return 'BED_COVER';
+        }
+        if (in_array($category, ['SARUNG_BANTAL', 'SARUNG_GULING'], true)) {
+            return 'SARUNG_BANTAL_GULING';
+        }
+        return $category;
     }
 
 
@@ -116,7 +122,7 @@ class ProductController
         if (
             $nama === '' ||
             strlen($nama) > 150 ||
-            !in_array($kategori, ['SPREI', 'BED_COVER', 'SARUNG_BANTAL', 'SARUNG_GULING'], true) ||
+            !in_array($kategori, ['SPREI', 'BED_COVER', 'SARUNG_BANTAL_GULING'], true) ||
             !in_array($jenisKain, ['TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'], true) ||
             $panjang === false || $panjang <= 0 ||
             $lebar === false || $lebar <= 0 ||
@@ -311,7 +317,7 @@ class ProductController
         if (
             $nama === '' ||
             strlen($nama) > 150 ||
-            !in_array($kategori, ['SPREI', 'BED_COVER', 'SARUNG_BANTAL', 'SARUNG_GULING'], true) ||
+            !in_array($kategori, ['SPREI', 'BED_COVER', 'SARUNG_BANTAL_GULING'], true) ||
             !in_array($jenisKain, ['TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'], true) ||
             $panjang === false || $panjang <= 0 ||
             $lebar === false || $lebar <= 0 ||

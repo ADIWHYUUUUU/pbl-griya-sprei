@@ -436,6 +436,7 @@ class OrderModel
             'BED_COVER' => 'BC',
             'SARUNG_BANTAL' => 'SB',
             'SARUNG_GULING' => 'SG',
+            'SARUNG_BANTAL_GULING' => 'SBG',
             default => throw new UnexpectedValueException('Kategori produk tidak valid untuk nomor invoice.'),
         };
         $productId = filter_var($firstItem['id_produk'] ?? null, FILTER_VALIDATE_INT, [

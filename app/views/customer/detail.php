@@ -53,8 +53,9 @@ $bolehTambahSarung = $produk['varian'] === 'SPREI';
 $labelProduk = match ($produk['varian']) {
     'SPREI' => 'Sprei',
     'BED_COVER' => 'Bed Cover',
-    'SARUNG_BANTAL' => 'Sarung Bantal',
-    'SARUNG_GULING' => 'Sarung Guling',
+    'SARUNG_BANTAL' => 'Sarung Bantal & Guling',
+    'SARUNG_GULING' => 'Sarung Bantal & Guling',
+    'SARUNG_BANTAL_GULING' => 'Sarung Bantal & Guling',
     default => 'Produk',
 };
 

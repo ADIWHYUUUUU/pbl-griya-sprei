@@ -68,8 +68,7 @@ $product = is_array($product ?? null) ? $product : [];
                         <option value="">Pilih kategori</option>
                         <option value="SPREI">Sprei (Fitted Sheet)</option>
                         <option value="BED_COVER">Bed Cover</option>
-                        <option value="SARUNG_BANTAL">Sarung Bantal</option>
-                        <option value="SARUNG_GULING">Sarung Guling</option>
+                        <option value="SARUNG_BANTAL_GULING">Sarung Bantal &amp; Guling</option>
                     </select>
                 </label>
 

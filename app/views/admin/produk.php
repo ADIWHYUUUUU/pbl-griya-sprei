@@ -92,8 +92,9 @@ function e($value)
                                 'SPREI' => 'Sprei',
                                 'BED_COVER' => 'Bed Cover',
                                 'BEDCOVER' => 'Bed Cover',
-                                'SARUNG_BANTAL' => 'Sarung Bantal',
-                                'SARUNG_GULING' => 'Sarung Guling',
+                                'SARUNG_BANTAL' => 'Sarung Bantal & Guling',
+                                'SARUNG_GULING' => 'Sarung Bantal & Guling',
+                                'SARUNG_BANTAL_GULING' => 'Sarung Bantal & Guling',
                                 ][$product['kategori_produk']] ?? $product['kategori_produk']) ?></span>
                             </td>
                             <td class="product-nowrap">

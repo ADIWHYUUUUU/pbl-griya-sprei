@@ -42,6 +42,9 @@ $escape = static function ($value): string {
 $kategori = $product['kategori_produk'] === 'BEDCOVER'
     ? 'BED_COVER'
     : $product['kategori_produk'];
+if (in_array($kategori, ['SARUNG_BANTAL', 'SARUNG_GULING'], true)) {
+    $kategori = 'SARUNG_BANTAL_GULING';
+}
 $gambar = !empty($product['gambar_produk'])
     ? '/uploads/produk/' . rawurlencode(basename($product['gambar_produk']))
     : null;
@@ -119,8 +122,7 @@ $presets = [
                         <select class="edit-input" id="kategori_produk" name="kategori_produk" required>
                             <option value="SPREI" <?= $kategori === 'SPREI' ? 'selected' : '' ?>>Sprei</option>
                             <option value="BED_COVER" <?= $kategori === 'BED_COVER' ? 'selected' : '' ?>>Bed Cover</option>
-                            <option value="SARUNG_BANTAL" <?= $kategori === 'SARUNG_BANTAL' ? 'selected' : '' ?>>Sarung Bantal</option>
-                            <option value="SARUNG_GULING" <?= $kategori === 'SARUNG_GULING' ? 'selected' : '' ?>>Sarung Guling</option>
+                            <option value="SARUNG_BANTAL_GULING" <?= $kategori === 'SARUNG_BANTAL_GULING' ? 'selected' : '' ?>>Sarung Bantal &amp; Guling</option>
                         </select>
                     </div>
 
