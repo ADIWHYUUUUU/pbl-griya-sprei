@@ -15,6 +15,13 @@ require_once __DIR__ . '/../../controllers/ProductController.php';
 
 $controller = new ProductController();
 $products = $controller->getAllProducts();
+$successMessages = [
+    'created' => 'Produk berhasil ditambahkan.',
+    'updated' => 'Produk berhasil diperbarui.',
+    'deleted' => 'Produk berhasil dihapus.',
+];
+$successKey = $_GET['success'] ?? '';
+$successMessage = is_string($successKey) ? ($successMessages[$successKey] ?? '') : '';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -41,6 +48,17 @@ function e($value)
 
     <main class="dashboard-main">
         <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
+        <?php if ($successMessage !== ''): ?>
+            <div class="product-toast" id="productToast" role="status" aria-live="polite">
+                <span class="product-toast__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="m5 12 4 4L19 6" />
+                    </svg>
+                </span>
+                <span class="product-toast__message"><?= e($successMessage) ?></span>
+                <button class="product-toast__close" type="button" aria-label="Tutup notifikasi">&times;</button>
+            </div>
+        <?php endif; ?>
         <nav class="product-breadcrumb" aria-label="Breadcrumb">
             <a href="/?page=admin-dashboard">Admin</a>
             <span aria-hidden="true">›</span>
@@ -131,5 +149,6 @@ function e($value)
     </main>
 </div>
 <script src="/assets/js/admin/sidebar.js"></script>
+<script src="/assets/js/admin/product-toast.js"></script>
 </body>
 </html>

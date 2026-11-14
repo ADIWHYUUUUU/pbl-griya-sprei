@@ -234,6 +234,89 @@
   text-align: center;
 }
 
+.admin-products .product-toast {
+  position: fixed;
+  z-index: 1100;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(390px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 1px solid #cce8d3;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(28, 62, 38, 0.16);
+  color: #263d2b;
+  animation: product-toast-in 0.25s ease-out;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.admin-products .product-toast__icon {
+  display: grid;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f6ec;
+  color: #238542;
+}
+
+.admin-products .product-toast__icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.admin-products .product-toast__message {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.admin-products .product-toast__close {
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b756d;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admin-products .product-toast__close:hover {
+  background: #f0f5f1;
+  color: #263d2b;
+}
+
+.admin-products .product-toast.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(12px);
+}
+
+@keyframes product-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 768px) {
   .admin-products .product-breadcrumb {
     margin: -20px -20px 0;
@@ -246,6 +329,12 @@
 }
 
 @media (max-width: 480px) {
+  .admin-products .product-toast {
+    top: 12px;
+    right: 12px;
+    width: calc(100vw - 24px);
+  }
+
   .admin-products .product-table th,
   .admin-products .product-table td {
     padding-right: 12px;
