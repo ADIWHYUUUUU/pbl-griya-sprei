@@ -178,13 +178,13 @@ if ($isLogin && $popupCustomerId > 0) {
           </div>
           <p>
             Tentukan bahan kain, ukuran, dan ekstra 
-            sarbangul dengan cara melihat katalog
+            sarbangul dengan cara melihat katalog.
           </p>
         </article>
         <article class="step">
           <div class="step__head">
             <span>2</span>
-            <h3>Checkout Pesanan</h3>
+            <h3>Ajukan Pesanan</h3>
           </div>
           <p>
             Isi alamat pengiriman dan pilih
@@ -194,7 +194,7 @@ if ($isLogin && $popupCustomerId > 0) {
         <article class="step">
           <div class="step__head">
             <span>3</span>
-            <h3>Menentukan Harga</h3>
+            <h3>Pengecekan Harga</h3>
           </div>
           <p>
             Ukuran dan jenis kasur sedang diperiksa,
@@ -214,7 +214,7 @@ if ($isLogin && $popupCustomerId > 0) {
         <article class="step">
           <div class="step__head">
             <span>5</span>
-            <h3> Status </h3>
+            <h3>Pantau Status</h3>
           </div>
           <p>
             Pantau status pengerjaan secara real-time.
@@ -322,7 +322,7 @@ if ($isLogin && $popupCustomerId > 0) {
       <div class="faq">
         <details class="faq__item">
           <summary>Apakah saya harus membayar saat memesan?</summary>
-          <p>Tidak. Setelah Anda mengajukan pesanan, Admin memeriksa spesifikasi kasur terlebih dahulu. Tagihan resmi muncul di halaman Pesanan Saya, lalu Anda bisa membayar.</p>
+          <p>Tidak. Setelah Anda mengajukan pesanan, Kami memeriksa spesifikasi kasur terlebih dahulu. Tagihan resmi muncul di halaman Pesanan Saya, lalu Anda bisa membayar.</p>
         </details>
         <details class="faq__item">
           <summary>Bagaimana jika saya tidak yakin dengan ukuran kasur?</summary>

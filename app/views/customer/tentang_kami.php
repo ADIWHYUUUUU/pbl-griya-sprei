@@ -60,7 +60,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
           <h2 class="about-title">Cerita kami</h2>
           <p class="about-text">
             Griya Sprei berdiri di Malang pada 2010 dan berawal dari usaha rumahan.
-            Kami memproduksi sprei, bed cover, sarung bantal, dan sarung guling
+            Kami memproduksi sprei, bed cover, sarung bantal, dan guling
             ukuran standar dan custom sesuai kebutuhan customer.
           </p>
         </div>
@@ -113,7 +113,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
               </a>
             </dd>
             <dt>Jam layanan</dt>
-            <dd>Hubungi kami lewat WhatsApp sebelum berkunjung agar kami bisa melayani anda.</dd>
+            <dd>Hubungi kami lewat WhatsApp sebelum berkunjung agar kami bisa melayani Anda.</dd>
             <dt>Kontak</dt>
             <dd>
               <a href="https://wa.me/+62111122223333" target="_blank" rel="noopener">WhatsApp +62 1111-2222-3333</a>
