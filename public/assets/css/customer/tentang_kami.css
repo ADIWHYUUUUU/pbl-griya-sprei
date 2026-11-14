@@ -2,10 +2,9 @@
    TENTANG_KAMI.CSS - khusus halaman Tentang Kami
    ========================================= */
 
-/* 1. HERO (latar hijau selebar layar) */
+/* 1. HERO */
 .about-hero {
-  background: #e6ebe2;
-  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 .about-hero__inner {
   display: grid;

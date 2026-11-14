@@ -7,13 +7,13 @@ $alamatToko = 'Jl. Kanjuruhan Asri No. 8, Tlogomas, Lowokwaru, Kota Malang';
 $petaUrl = 'https://www.google.com/maps?q=' . rawurlencode($alamatToko) . '&output=embed';
 $petaLink = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($alamatToko);
 
-// Foto toko / produksi: cukup simpan file bernama foto-toko.jpg (atau .jpeg/.png/.webp)
-// di folder public/uploads/tentang/. Selama file belum ada, kotaknya tampil kosong.
+// Utamakan gambar yang sudah tersedia; nama foto-toko.* tetap didukung sebagai alternatif.
 $fotoToko = '';
-foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
-    $lokasiFoto = __DIR__ . '/../../../public/uploads/tentang/foto-toko.' . $ekstensi;
+$namaFotoToko = ['tentang_kami_image.jpeg', 'foto-toko.jpg', 'foto-toko.jpeg', 'foto-toko.png', 'foto-toko.webp'];
+foreach ($namaFotoToko as $namaFoto) {
+    $lokasiFoto = __DIR__ . '/../../../public/uploads/tentang/' . $namaFoto;
     if (is_file($lokasiFoto)) {
-        $fotoToko = '/uploads/tentang/foto-toko.' . $ekstensi . '?v=' . filemtime($lokasiFoto);
+        $fotoToko = '/uploads/tentang/' . rawurlencode($namaFoto) . '?v=' . filemtime($lokasiFoto);
         break;
     }
 }
@@ -60,8 +60,8 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
           <h2 class="about-title">Cerita kami</h2>
           <p class="about-text">
             Griya Sprei berdiri di Malang pada 2010 dan berawal dari usaha rumahan.
-            Kami memproduksi sprei, bed cover, sarung bantal, dan guling
-            ukuran standar dan custom sesuai kebutuhan customer.
+            Kami memproduksi sprei, bed cover, sarung bantal dan guling
+            ukuran standar maupun custom sesuai kebutuhan customer.
           </p>
         </div>
         <div class="about-stat">
