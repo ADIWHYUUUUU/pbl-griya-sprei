@@ -60,8 +60,8 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
           <h2 class="about-title">Cerita kami</h2>
           <p class="about-text">
             Griya Sprei berdiri di Malang pada 2010 dan berawal dari usaha rumahan.
-            Kami menjahit sendiri sprei, bed cover, sarung bantal, dan sarung guling
-            agar setiap pesanan pas dengan ukuran kasur pelanggan.
+            Kami memproduksi sprei, bed cover, sarung bantal, dan sarung guling
+            ukuran standar dan custom sesuai kebutuhan customer.
           </p>
         </div>
         <div class="about-stat">
@@ -94,7 +94,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
       <section class="about-section">
         <h2 class="about-title">Kami melayani</h2>
         <ul class="about-card about-services">
-          <li>Custom segala ukuran kasur (single, double, king, ukuran tidak standar)</li>
+          <li>Custom segala ukuran kasur (single, double, king, ukuran custom)</li>
           <li>Pilihan bahan premium: Tencel, katun jepang &amp; katun lokal yang adem dan tidak luntur</li>
           <li>Motif aesthetic terbaru, cocok untuk kamar kost, homestay, dan rumah tangga</li>
           <li>Harga spesial grosir untuk kost, homestay, guesthouse, rumah sakit &amp; daycare</li>
@@ -113,7 +113,7 @@ foreach (['jpg', 'jpeg', 'png', 'webp'] as $ekstensi) {
               </a>
             </dd>
             <dt>Jam layanan</dt>
-            <dd>Hubungi kami lewat WhatsApp sebelum berkunjung agar kami bisa menyambut Anda.</dd>
+            <dd>Hubungi kami lewat WhatsApp sebelum berkunjung agar kami bisa melayani anda.</dd>
             <dt>Kontak</dt>
             <dd>
               <a href="https://wa.me/+62111122223333" target="_blank" rel="noopener">WhatsApp +62 1111-2222-3333</a>

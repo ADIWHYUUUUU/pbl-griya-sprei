@@ -174,11 +174,11 @@ if ($isLogin && $popupCustomerId > 0) {
         <article class="step">
           <div class="step__head">
             <span>1</span>
-            <h3>Pilih &amp; Konfigurasi</h3>
+            <h3>Pilih bahan &amp; motif</h3>
           </div>
           <p>
-            Tentukan model kain, ukuran,
-            dan ekstra sarban/sargul.
+            Tentukan bahan kain, ukuran, dan ekstra 
+            sarbangul dengan cara melihat katalog
           </p>
         </article>
         <article class="step">
@@ -194,11 +194,11 @@ if ($isLogin && $popupCustomerId > 0) {
         <article class="step">
           <div class="step__head">
             <span>3</span>
-            <h3>Admin Tinjau Harga</h3>
+            <h3>Menentukan Harga</h3>
           </div>
           <p>
-            Spesifikasi kasur dicek,
-            tagihan resmi akan diterbitkan.
+            Ukuran dan jenis kasur sedang diperiksa,
+            harga akan diberikan setelah pengecekan selesai.
           </p>
         </article>
         <article class="step">
@@ -214,7 +214,7 @@ if ($isLogin && $popupCustomerId > 0) {
         <article class="step">
           <div class="step__head">
             <span>5</span>
-            <h3>Jahit &amp; Pantau Status</h3>
+            <h3> Status </h3>
           </div>
           <p>
             Pantau status pengerjaan secara real-time.

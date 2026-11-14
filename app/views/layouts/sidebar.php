@@ -22,7 +22,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
             </a>
             <a class="nav-item <?= in_array($halamanAktif, ['admin-products', 'admin-add-product', 'admin-edit-product'], true) ? 'active' : '' ?>" href="/?page=admin-products" <?= in_array($halamanAktif, ['admin-products', 'admin-add-product', 'admin-edit-product'], true) ? 'aria-current="page"' : '' ?>>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M3 8v9l9 5 9-5V8M12 13v9"/></svg>
-                <span>CRUD Produk</span>
+                <span>Input Produk</span>
             </a>
             <a class="nav-item <?= in_array($halamanAktif, ['admin-orders', 'admin-order-verification'], true) ? 'active' : '' ?>" href="/?page=admin-orders" <?= in_array($halamanAktif, ['admin-orders', 'admin-order-verification'], true) ? 'aria-current="page"' : '' ?>>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 10h6M9 14h6M9 18h3"/></svg>
