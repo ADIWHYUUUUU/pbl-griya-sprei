@@ -46,7 +46,7 @@ if (in_array($kategori, ['SARUNG_BANTAL', 'SARUNG_GULING'], true)) {
     $kategori = 'SARUNG_BANTAL_GULING';
 }
 $gambar = !empty($product['gambar_produk'])
-    ? '/uploads/produk/' . rawurlencode(basename($product['gambar_produk']))
+    ? product_image_url($product['gambar_produk'])
     : null;
 $namaGambar = $product['gambar_produk'] ?? '';
 $presets = [

@@ -91,7 +91,7 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
         $produkPesanan[] = [
             'nama' => (string) $product['nama_produk'],
             'gambar' => !empty($product['gambar_produk'])
-                ? '/uploads/produk/' . rawurlencode(basename($product['gambar_produk']))
+                ? product_image_url($product['gambar_produk'])
                 : '',
             'jenis' => ($cartItem['mode'] ?? '') === 'custom' ? 'custom' : 'standar',
             'ukuran' => implode(' × ', $dimensions) . ' cm',

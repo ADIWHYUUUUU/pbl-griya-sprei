@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../helpers/storage.php';
 require_once __DIR__ . '/../models/PaymentModel.php';
 
 class AdminPaymentController
@@ -25,7 +26,11 @@ class AdminPaymentController
             return null;
         }
 
-        return $this->model->getAdminPayment($paymentId);
+        $payment = $this->model->getAdminPayment($paymentId);
+        if ($payment) {
+            $payment['bukti_url'] = payment_proof_url($payment['bukti_transfer']);
+        }
+        return $payment;
     }
 
     public function verifySave(): void

@@ -63,7 +63,7 @@ $deliveryDate = date('d F Y', strtotime((string) ($order['tanggal_pesan'] ?? 'no
 $item = $order['items'][0] ?? null;
 $image = $item['gambar_produk'] ?? '';
 if ($image !== '') {
-    $image = '/uploads/produk/' . rawurlencode(basename((string) $image));
+    $image = product_image_url($image);
 }
 $tracking = trim((string) ($order['nomor_resi'] ?? ''));
 $customerAddress = trim((string) ($order['alamat_pengiriman'] ?? ''));

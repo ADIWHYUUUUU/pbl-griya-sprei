@@ -29,7 +29,9 @@ if (!$payment) {
 $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $total = (float) $payment['total_tagihan'];
 $isWaiting = $payment['status_pembayaran'] === 'MENUNGGU_VERIFIKASI';
-$filePath = '/' . ltrim(str_replace('\\', '/', (string) $payment['bukti_transfer']), '/');
+$filePath = (string) $payment['bukti_url'];
+$proofFileName = $payment['bukti_nama_asli']
+    ?: basename((string) (parse_url($filePath, PHP_URL_PATH) ?: $filePath));
 $fileMime = (string) ($payment['bukti_mime'] ?? '');
 $fileType = match ($fileMime) {
     'image/png' => 'PNG',
@@ -108,7 +110,7 @@ $statusLabels = [
                 <h2>Bukti Transfer</h2>
                 <a class="proof-file" href="<?= $escape($filePath) ?>" target="_blank" rel="noopener noreferrer">
                     <span class="proof-file-icon" aria-hidden="true"><?= $isImage ? '&#128444;' : '&#128196;' ?></span>
-                    <span><strong><?= $escape($payment['bukti_nama_asli'] ?: basename($filePath)) ?></strong><small><?= $escape($fileSizeKb) ?> KB · Diunggah <?= $escape($uploadedLabel) ?></small></span>
+                    <span><strong><?= $escape($proofFileName) ?></strong><small><?= $escape($fileSizeKb) ?> KB · Diunggah <?= $escape($uploadedLabel) ?></small></span>
                     <b><?= $escape($fileType) ?></b>
                 </a>
                 <div class="proof-preview">

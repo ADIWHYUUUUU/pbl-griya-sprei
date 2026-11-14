@@ -63,8 +63,7 @@ $labelProduk = match ($produk['varian']) {
 // 9. GAMBAR PRODUK
 // ==========================================
 $gambarProduk = !empty($produk['gambar'])
-    ? '/uploads/produk/' .
-    rawurlencode(basename($produk['gambar']))
+    ? product_image_url($produk['gambar'])
     : '';
 
 // ==========================================

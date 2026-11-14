@@ -76,7 +76,7 @@ function e($value)
                             <td>
                                 <?php if (!empty($product['gambar_produk'])): ?>
                                     <img
-                                        src="/uploads/produk/<?= rawurlencode(basename($product['gambar_produk'])) ?>"
+                                        src="<?= e(product_image_url($product['gambar_produk'])) ?>"
                                         class="product-image"
                                         alt="<?= e($product['nama_produk']) ?>"
                                     >

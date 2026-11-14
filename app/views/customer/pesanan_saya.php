@@ -122,7 +122,7 @@ foreach ($orders as &$order) {
     $order['gambar'] = '';
     foreach ($order['produk'] as $product) {
         if ($product['gambar'] !== '') {
-            $order['gambar'] = '/uploads/produk/' . rawurlencode(basename($product['gambar']));
+            $order['gambar'] = product_image_url($product['gambar']);
             break;
         }
     }

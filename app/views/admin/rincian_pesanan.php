@@ -99,7 +99,7 @@ $formatCount = static function (int $count, string $label): string {
                 <?php foreach ($order['items'] as $item): ?>
                     <?php
                     $imageUrl = !empty($item['gambar_produk'])
-                        ? '/uploads/produk/' . rawurlencode(basename((string) $item['gambar_produk']))
+                        ? product_image_url($item['gambar_produk'])
                         : '';
                     $extras = [];
                     if ((int) $item['tambah_sarban'] > 0) {

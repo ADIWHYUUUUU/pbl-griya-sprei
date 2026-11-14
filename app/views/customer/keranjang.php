@@ -161,7 +161,7 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             }
                             $maxQuantity = min(50, max(0, $stock - $otherQuantity));
                             $image = trim((string) ($product['gambar_produk'] ?? $item['gambar_produk'] ?? ''));
-                            $imageUrl = $image !== '' ? '/uploads/produk/' . rawurlencode(basename($image)) : '';
+                            $imageUrl = $image !== '' ? product_image_url($image) : '';
                             $isCustom = ($item['mode'] ?? '') === 'custom';
                             $itemLength = (int) ($item['panjang'] ?? 0);
                             $itemWidth = (int) ($item['lebar'] ?? 0);

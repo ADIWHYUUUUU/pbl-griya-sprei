@@ -100,7 +100,7 @@ class PaymentController
         try {
             $upload = save_upload(
                 $file,
-                'bukti-transfer',
+                SupabaseStorageService::paymentBucket(),
                 8 * 1024 * 1024,
                 [
                     'image/jpeg' => 'jpg',
@@ -164,9 +164,10 @@ class PaymentController
 
     private function removeUpload(string $relativePath): void
     {
-        $path = dirname(__DIR__, 2) . '/public/' . ltrim(str_replace('\\', '/', $relativePath), '/');
-        if (is_file($path) && !unlink($path)) {
-            error_log('Gagal menghapus bukti transfer setelah transaksi database gagal.');
+        try {
+            delete_uploaded_file($relativePath, 'bukti-transfer');
+        } catch (Throwable $error) {
+            error_log('[payment-upload] Failed to remove uploaded proof after database failure: ' . $error->getMessage());
         }
     }
 

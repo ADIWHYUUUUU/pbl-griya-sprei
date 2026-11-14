@@ -49,3 +49,16 @@ Atau buka file `database/migrations/15_user_password_reset_columns.sql` di pgAdm
 7. Login kembali dari halaman login menggunakan password baru. Hash yang disimpan kompatibel dengan `password_verify()` yang sudah dipakai.
 
 Pengiriman email nyata belum teruji sampai API key Brevo dan alamat pengirim terverifikasi diisi pada `.env`.
+
+## Supabase Storage
+
+Upload baru untuk gambar produk dan bukti pembayaran disimpan di Supabase Storage. Buat bucket `produk` dengan akses **public** dan bucket `bukti-pembayaran` dengan akses **private** di dashboard Supabase. Konfigurasikan URL project dan secret key server-side di `.env`:
+
+```dotenv
+SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_SECRET_KEY=
+SUPABASE_PRODUCT_BUCKET=produk
+SUPABASE_PAYMENT_BUCKET=bukti-pembayaran
+```
+
+Jangan masukkan secret key ke kode browser atau commit ke Git. Bukti pembayaran private ditampilkan ke Admin melalui signed URL yang berlaku lima menit. Nilai gambar yang sudah tersimpan lokal tetap didukung; upload baru memakai Supabase.

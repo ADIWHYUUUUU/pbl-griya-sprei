@@ -46,7 +46,7 @@ $catalogProducts = array_map(static function ($product) {
         'stock' => (int) ($product['stok'] ?? 0),
         // GAMBAR HASIL UPLOAD ADMIN
         'image' => $imageName !== ''
-            ? '/uploads/produk/' . rawurlencode(basename($imageName))
+            ? product_image_url($imageName)
             : '',
     ];
 }, $productController->getAllProducts());

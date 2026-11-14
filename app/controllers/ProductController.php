@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../helpers/upload.php';
 require_once __DIR__ . '/../models/ProductModel.php';
 
 class ProductController
@@ -150,52 +151,35 @@ class ProductController
             exit('Ukuran gambar maksimal 2 MB.');
         }
 
-        if (!is_uploaded_file($file['tmp_name'])) {
-            http_response_code(400);
-            exit('File upload tidak valid.');
-        }
-
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($file['tmp_name']);
-
         $allowedMime = [
             'image/jpeg' => 'jpg',
             'image/png'  => 'png',
         ];
-
-        if (!isset($allowedMime[$mime])) {
-            http_response_code(400);
-            exit('Format gambar tidak didukung.');
-        }
 
         if (@getimagesize($file['tmp_name']) === false) {
             http_response_code(400);
             exit('File bukan gambar yang valid.');
         }
 
-        // Folder penyimpanan gambar
-        $uploadDir = dirname(__DIR__, 2)
-            . '/public/uploads/produk/';
-
-        if (
-            !is_dir($uploadDir) &&
-            !mkdir($uploadDir, 0755, true)
-        ) {
-            http_response_code(500);
-            exit('Folder upload gagal dibuat.');
+        try {
+            $upload = save_upload(
+                $file,
+                SupabaseStorageService::productBucket(),
+                2 * 1024 * 1024,
+                $allowedMime
+            );
+        } catch (InvalidArgumentException $error) {
+            http_response_code(400);
+            exit($error->getMessage());
+        } catch (Throwable $error) {
+            error_log('[CREATE PRODUCT IMAGE UPLOAD] ' . $error->getMessage());
+            http_response_code(502);
+            exit(
+                'Gambar gagal diunggah ke Supabase Storage. Detail: '
+                . htmlspecialchars($error->getMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+            );
         }
-
-        // Buat nama gambar acak
-        $gambarName = bin2hex(random_bytes(16))
-            . '.'
-            . $allowedMime[$mime];
-
-        $destination = $uploadDir . $gambarName;
-
-        if (!move_uploaded_file($file['tmp_name'], $destination)) {
-            http_response_code(500);
-            exit('Gambar gagal diunggah.');
-        }
+        $gambarName = $upload['path'];
 
         // Data untuk PostgreSQL
         $data = [
@@ -219,9 +203,10 @@ class ProductController
             }
         } catch (Throwable $e) {
 
-            // Jika database gagal, hapus gambar yang baru diupload
-            if (is_file($destination)) {
-                unlink($destination);
+            try {
+                delete_uploaded_file($gambarName, 'produk');
+            } catch (Throwable $cleanupError) {
+                error_log('[CREATE PRODUCT IMAGE CLEANUP] ' . $cleanupError->getMessage());
             }
 
             error_log('[CREATE PRODUCT] ' . $e->getMessage());
@@ -336,8 +321,7 @@ class ProductController
         // Secara default, gunakan gambar lama
         $gambarName = $product['gambar_produk'];
 
-        // Lokasi file baru, untuk cleanup jika UPDATE gagal
-        $destination = null;
+        $newUploadPath = null;
 
         // Jika admin mengunggah gambar baru
         if (isset($_FILES['gambar_produk'])) {
@@ -350,61 +334,42 @@ class ProductController
                     http_response_code(400);
                     exit('Gambar gagal diunggah.');
                 }
-
-                // Validasi ukuran maksimal 2 MB
                 if ($file['size'] > 2 * 1024 * 1024) {
                     http_response_code(400);
                     exit('Ukuran gambar maksimal 2 MB.');
                 }
-
-                if (!is_uploaded_file($file['tmp_name'])) {
-                    http_response_code(400);
-                    exit('File upload tidak valid.');
-                }
-
-                // Validasi MIME berdasarkan isi file
-                $finfo = new finfo(FILEINFO_MIME_TYPE);
-                $mime = $finfo->file($file['tmp_name']);
 
                 $allowedMime = [
                     'image/jpeg' => 'jpg',
                     'image/png'  => 'png',
                 ];
 
-                if (!isset($allowedMime[$mime])) {
-                    http_response_code(400);
-                    exit('Format gambar tidak didukung.');
-                }
-
                 if (@getimagesize($file['tmp_name']) === false) {
                     http_response_code(400);
                     exit('File bukan gambar yang valid.');
                 }
 
-                // Folder penyimpanan gambar
-                $uploadDir = dirname(__DIR__, 2)
-                    . '/public/uploads/produk/';
-
-                if (
-                    !is_dir($uploadDir) &&
-                    !mkdir($uploadDir, 0755, true)
-                ) {
-                    http_response_code(500);
-                    exit('Folder upload gagal dibuat.');
+                try {
+                    $upload = save_upload(
+                        $file,
+                        SupabaseStorageService::productBucket(),
+                        2 * 1024 * 1024,
+                        $allowedMime
+                    );
+                } catch (InvalidArgumentException $error) {
+                    http_response_code(400);
+                    exit($error->getMessage());
+                } catch (Throwable $error) {
+                    error_log('[UPDATE PRODUCT IMAGE UPLOAD] ' . $error->getMessage());
+                    http_response_code(502);
+                    exit(
+                        'Gambar gagal diunggah ke Supabase Storage. Detail: '
+                        . htmlspecialchars($error->getMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+                    );
                 }
 
-                // Buat nama gambar baru
-                $gambarName = bin2hex(random_bytes(16))
-                    . '.'
-                    . $allowedMime[$mime];
-
-                $destination = $uploadDir . $gambarName;
-
-                // Upload gambar baru
-                if (!move_uploaded_file($file['tmp_name'], $destination)) {
-                    http_response_code(500);
-                    exit('Gambar baru gagal disimpan.');
-                }
+                $gambarName = $upload['path'];
+                $newUploadPath = $upload['path'];
             }
         }
 
@@ -442,8 +407,12 @@ class ProductController
         } catch (Throwable $e) {
 
             // Hapus gambar baru jika database gagal diperbarui
-            if ($destination !== null && is_file($destination)) {
-                unlink($destination);
+            if ($newUploadPath !== null) {
+                try {
+                    delete_uploaded_file($newUploadPath, 'produk');
+                } catch (Throwable $cleanupError) {
+                    error_log('[UPDATE PRODUCT IMAGE CLEANUP] ' . $cleanupError->getMessage());
+                }
             }
 
             error_log('[UPDATE PRODUCT] ' . $e->getMessage());
@@ -500,11 +469,10 @@ class ProductController
             exit('Produk gagal dihapus.');
         }
 
-        $imagePath = dirname(__DIR__, 2)
-            . '/public/uploads/produk/'
-            . basename((string) ($product['gambar_produk'] ?? ''));
-        if (is_file($imagePath) && !unlink($imagePath)) {
-            error_log('[DELETE PRODUCT] Gambar produk gagal dihapus: ' . $imagePath);
+        try {
+            delete_uploaded_file((string) ($product['gambar_produk'] ?? ''), 'produk');
+        } catch (Throwable $cleanupError) {
+            error_log('[DELETE PRODUCT IMAGE CLEANUP] ' . $cleanupError->getMessage());
         }
 
         header('Location: /?page=admin-products&success=deleted', true, 303);
