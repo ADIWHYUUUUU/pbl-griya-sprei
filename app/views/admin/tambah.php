@@ -84,6 +84,11 @@ $product = is_array($product ?? null) ? $product : [];
                     </select>
                 </label>
 
+                <label class="product-form-field" for="motif">
+                    <span>Motif <small>(Opsional)</small></span>
+                    <input type="text" id="motif" name="motif" placeholder="Contoh: Bunga kecil">
+                </label>
+
                 <fieldset class="product-form-field product-form-field--full product-size-field">
                     <legend>Ukuran Kasur (cm) <b>*</b></legend>
                     <div class="product-size-grid">

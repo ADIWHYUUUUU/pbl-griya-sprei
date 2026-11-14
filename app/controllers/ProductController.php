@@ -92,6 +92,12 @@ class ProductController
             trim($_POST['kategori_produk'] ?? '')
         );
         $jenisKain = trim($_POST['jenis_kain'] ?? '');
+        $motifInput = $_POST['motif'] ?? '';
+        if (!is_string($motifInput)) {
+            http_response_code(400);
+            exit('Motif produk tidak valid.');
+        }
+        $motif = trim($motifInput);
         $deskripsi = trim($_POST['deskripsi'] ?? '');
 
         $panjang = filter_var(
@@ -186,6 +192,7 @@ class ProductController
             'nama_produk'     => $nama,
             'kategori_produk' => $kategori,
             'jenis_kain'      => $jenisKain,
+            'motif'           => $motif,
             'panjang_standar' => $panjang,
             'lebar_standar'   => $lebar,
             'tinggi_standar'  => $tinggi,
@@ -268,6 +275,12 @@ class ProductController
             trim($_POST['kategori_produk'] ?? '')
         );
         $jenisKain = trim($_POST['jenis_kain'] ?? '');
+        $motifInput = $_POST['motif'] ?? '';
+        if (!is_string($motifInput)) {
+            http_response_code(400);
+            exit('Motif produk tidak valid.');
+        }
+        $motif = trim($motifInput);
         $deskripsi = trim($_POST['deskripsi'] ?? '');
 
         $panjang = filter_var(
@@ -381,6 +394,7 @@ class ProductController
             'nama_produk'     => $nama,
             'kategori_produk' => $kategori,
             'jenis_kain'      => $jenisKain,
+            'motif'           => $motif,
             'panjang_standar' => $panjang,
             'lebar_standar'   => $lebar,
             'tinggi_standar'  => $tinggi,

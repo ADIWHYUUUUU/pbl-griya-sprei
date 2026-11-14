@@ -61,6 +61,11 @@
   color: var(--text);
   font-weight: 600;
 }
+.product-motif {
+  margin: -10px 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
 .stock-note {
   margin: -12px 0 18px;
   font-size: 12px;

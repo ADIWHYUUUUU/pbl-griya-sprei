@@ -137,6 +137,11 @@ $presets = [
                             <option value="MICROTEX" <?= ($product['jenis_kain'] ?? '') === 'MICROTEX' ? 'selected' : '' ?>>Microtex</option>
                         </select>
                     </div>
+
+                    <div class="edit-field">
+                        <label for="motif">Motif <span class="edit-optional">(Opsional)</span></label>
+                        <input class="edit-input" type="text" id="motif" name="motif" value="<?= $escape($product['motif'] ?? '') ?>" placeholder="Contoh: Bunga kecil">
+                    </div>
                 </section>
 
                 <section class="edit-section" aria-labelledby="editSizeTitle">

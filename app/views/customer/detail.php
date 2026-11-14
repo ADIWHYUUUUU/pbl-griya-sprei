@@ -42,6 +42,7 @@ $produk = [
     'nama' => $dataProduk['nama_produk'],
     'varian' => $dataProduk['kategori_produk'],
     'gambar' => $dataProduk['gambar_produk'],
+    'motif' => $dataProduk['motif'] ?? '',
     'panjang' => (float) $dataProduk['panjang_standar'],
     'lebar' => (float) $dataProduk['lebar_standar'],
     'tinggi' => (float) $dataProduk['tinggi_standar'],
@@ -256,6 +257,10 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                         </strong>
 
                     </p>
+
+                    <?php if (trim((string) $produk['motif']) !== ''): ?>
+                        <p class="product-motif">Motif: <?= aman($produk['motif']) ?></p>
+                    <?php endif; ?>
 
                     <p
                         class="stock-note"
