@@ -27,13 +27,7 @@ if (!$payment) {
 }
 
 $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$config = require __DIR__ . '/../../config/payment.php';
-$account = $config['accounts'][$payment['metode_pembayaran']]['account'] ?? '-';
-$methodLabel = $config['accounts'][$payment['metode_pembayaran']]['label'] ?? $payment['metode_pembayaran'];
 $total = (float) $payment['total_tagihan'];
-$transfer = (float) $payment['nominal_transfer'];
-$difference = abs($transfer - $total);
-$isMatching = abs($transfer - $total) < 0.005;
 $isWaiting = $payment['status_pembayaran'] === 'MENUNGGU_VERIFIKASI';
 $filePath = '/' . ltrim(str_replace('\\', '/', (string) $payment['bukti_transfer']), '/');
 $fileMime = (string) ($payment['bukti_mime'] ?? '');
@@ -65,7 +59,7 @@ $statusLabels = [
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
     <link rel="stylesheet" href="/assets/css/admin/cek_pembayaran.css">
 </head>
-<body class="admin-dashboard admin-payment-page">
+<body class="admin-dashboard admin-payment-page admin-payment-verification-page">
 <div class="admin-layout">
     <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
     <main class="dashboard-main payment-main">
@@ -80,7 +74,7 @@ $statusLabels = [
 
         <div class="payment-detail-grid">
             <section class="payment-card payment-order-card">
-                <h2><span aria-hidden="true">&#128438;</span> Detail Pesanan &amp; Pelanggan</h2>
+                <h2>Detail Pesanan &amp; Pelanggan</h2>
                 <dl class="payment-customer-grid">
                     <div><dt>Nama Pelanggan</dt><dd><?= $escape($payment['nama_pelanggan']) ?></dd></div>
                     <div><dt>No. Telp / WhatsApp</dt><dd><?php if ($waPhone !== ''): ?><a href="https://wa.me/<?= $escape($waPhone) ?>" target="_blank" rel="noopener noreferrer"><?= $escape($payment['telepon']) ?></a><?php else: ?>-<?php endif; ?></dd></div>
@@ -111,51 +105,69 @@ $statusLabels = [
             </section>
 
             <section class="payment-card payment-proof-card">
-                <h2><span aria-hidden="true">&#128179;</span> Bukti Transfer</h2>
+                <h2>Bukti Transfer</h2>
                 <a class="proof-file" href="<?= $escape($filePath) ?>" target="_blank" rel="noopener noreferrer">
                     <span class="proof-file-icon" aria-hidden="true"><?= $isImage ? '&#128444;' : '&#128196;' ?></span>
                     <span><strong><?= $escape($payment['bukti_nama_asli'] ?: basename($filePath)) ?></strong><small><?= $escape($fileSizeKb) ?> KB · Diunggah <?= $escape($uploadedLabel) ?></small></span>
                     <b><?= $escape($fileType) ?></b>
                 </a>
-                <?php if ($isImage): ?>
-                    <a class="proof-preview" href="<?= $escape($filePath) ?>" target="_blank" rel="noopener noreferrer"><img src="<?= $escape($filePath) ?>" alt="Pratinjau bukti transfer"></a>
-                <?php else: ?>
-                    <a class="proof-pdf-link" href="<?= $escape($filePath) ?>" target="_blank" rel="noopener noreferrer">Buka bukti transfer PDF</a>
-                <?php endif; ?>
-                <div class="proof-amount">
-                    <span>NOMINAL BUKTI TRANSFER</span>
-                    <strong><?= $escape('Rp ' . number_format($transfer, 0, ',', '.')) ?></strong>
-                    <small><?= $escape($methodLabel) ?> ke <?= $escape($account) ?></small>
-                    <?php if ($isMatching): ?>
-                        <em class="proof-match">&#10003; Nominal Sesuai dengan Tagihan</em>
-                    <?php else: ?>
-                        <em class="proof-mismatch">! Nominal berbeda dari tagihan (selisih <?= $escape('Rp ' . number_format($difference, 0, ',', '.')) ?>)</em>
-                    <?php endif; ?>
+                <div class="proof-preview">
+                    <a class="proof-preview-media" href="<?= $escape($filePath) ?>" target="_blank" rel="noopener noreferrer">
+                        <?php if ($isImage): ?>
+                            <img src="<?= $escape($filePath) ?>" alt="Pratinjau bukti transfer">
+                        <?php else: ?>
+                            <span><?= $escape($fileType) ?> · Buka bukti transfer</span>
+                        <?php endif; ?>
+                    </a>
+                    <a class="proof-preview-open" href="<?= $escape($filePath) ?>" target="_blank" rel="noopener noreferrer">Buka ukuran penuh</a>
                 </div>
                 <dl class="sender-transfer-details">
                     <div><dt>Nama pemilik rekening pengirim</dt><dd><?= $escape($payment['nama_pemilik_pengirim'] ?: '-') ?></dd></div>
                     <div><dt>Nomor rekening pengirim</dt><dd><?= $escape($payment['nomor_rekening_pengirim'] ?: '-') ?></dd></div>
                 </dl>
-                <?php if ($isWaiting): ?>
-                    <form class="payment-verification-form" action="/?action=admin-payment-verify-save" method="POST" id="paymentVerificationForm">
-                        <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']) ?>">
-                        <input type="hidden" name="id_pembayaran" value="<?= (int) $payment['id_pembayaran'] ?>">
-                        <input type="hidden" name="decision" id="paymentDecision" value="">
-                        <div class="payment-actions">
-                            <button class="payment-reject-button" type="button" id="rejectPaymentButton">Tolak Bukti</button>
-                            <button class="payment-verify-button" type="submit" data-decision="verify">Verifikasi</button>
-                        </div>
-                        <div class="reject-dialog" id="rejectDialog" hidden>
-                            <label for="adminNote">Alasan penolakan</label>
-                            <textarea id="adminNote" name="catatan_admin" rows="3" maxlength="1000"></textarea>
-                            <div><button type="button" id="cancelRejectButton">Batal</button><button type="button" id="confirmRejectButton">Tolak Bukti</button></div>
-                        </div>
-                    </form>
-                <?php else: ?>
-                    <div class="payment-final-status">Status: <strong><?= $escape($statusLabels[$payment['status_pembayaran']] ?? $payment['status_pembayaran']) ?></strong></div>
-                <?php endif; ?>
             </section>
         </div>
+        <?php if ($isWaiting): ?>
+            <form class="payment-verification-form" action="/?action=admin-payment-verify-save" method="POST" id="paymentVerificationForm">
+                <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']) ?>">
+                <input type="hidden" name="id_pembayaran" value="<?= (int) $payment['id_pembayaran'] ?>">
+                <input type="hidden" name="decision" id="paymentDecision" value="">
+                <div class="reject-dialog-backdrop" id="rejectDialog" hidden>
+                    <section class="reject-dialog" role="dialog" aria-modal="true" aria-labelledby="rejectDialogTitle" aria-describedby="rejectDialogDescription" tabindex="-1">
+                        <button class="reject-dialog-close" type="button" id="closeRejectButton" aria-label="Tutup dialog">&times;</button>
+                        <h2 id="rejectDialogTitle">Tolak Bukti Pembayaran</h2>
+                        <span class="reject-dialog-invoice"><?= $escape($payment['no_invoice'] ?: 'ORD-' . $payment['id_pesanan']) ?></span>
+                        <p class="reject-dialog-description" id="rejectDialogDescription">Tulis alasan agar pelanggan tahu apa yang perlu diperbaiki.</p>
+                        <div class="reject-reasons">
+                            <strong>Pilih alasan cepat</strong>
+                            <div>
+                                <button type="button" class="reject-reason-chip" data-reason="Nominal tidak sesuai">Nominal tidak sesuai</button>
+                                <button type="button" class="reject-reason-chip" data-reason="Bukti buram atau tidak terbaca">Bukti buram atau tidak terbaca</button>
+                                <button type="button" class="reject-reason-chip" data-reason="Rekening tujuan salah">Rekening tujuan salah</button>
+                                <button type="button" class="reject-reason-chip" data-reason="Tanggal transfer tidak sesuai">Tanggal transfer tidak sesuai</button>
+                                <button type="button" class="reject-reason-chip" data-reason="Bukan bukti transfer">Bukan bukti transfer</button>
+                            </div>
+                        </div>
+                        <label class="reject-note-label" for="adminNote">Alasan penolakan <span>(wajib diisi)</span></label>
+                        <textarea id="adminNote" name="catatan_admin" form="paymentVerificationForm" rows="4" maxlength="300" aria-required="true" aria-describedby="adminNoteError adminNoteCounter" placeholder="Contoh: Nominal transfer kurang dari total tagihan."></textarea>
+                        <div class="reject-note-meta">
+                            <span id="adminNoteError" role="alert">Alasan penolakan wajib diisi.</span>
+                            <span id="adminNoteCounter" aria-live="polite">0/300</span>
+                        </div>
+                        <div class="reject-dialog-actions">
+                            <button type="button" id="cancelRejectButton">Batal</button>
+                            <button type="button" id="confirmRejectButton" disabled>Tolak Bukti</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="payment-actions">
+                    <button class="payment-reject-button" type="button" id="rejectPaymentButton">Tolak Bukti</button>
+                    <button class="payment-verify-button" type="submit" data-decision="verify">Verifikasi</button>
+                </div>
+            </form>
+        <?php else: ?>
+            <div class="payment-final-status">Status: <strong><?= $escape($statusLabels[$payment['status_pembayaran']] ?? $payment['status_pembayaran']) ?></strong></div>
+        <?php endif; ?>
     </main>
 </div>
 <script src="/assets/js/admin/sidebar.js"></script>
