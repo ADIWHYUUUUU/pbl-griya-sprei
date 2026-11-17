@@ -7,6 +7,13 @@ $homepage = is_file($homepagePath)
   ? json_decode(file_get_contents($homepagePath), true)
   : [];
 $homepage = is_array($homepage) ? $homepage : [];
+require_once __DIR__ . '/../../controllers/ProductController.php';
+$featuredProducts = (new ProductController())->getFeaturedProducts();
+$homepage['featured'] = array_map(static function (array $product): array {
+  $image = (string) ($product['image'] ?? '');
+  $product['image'] = $image !== '' ? product_image_url($image) : '';
+  return $product;
+}, $featuredProducts);
 $homepageValue = static function (string $key, string $fallback = '') use ($homepage): string {
   return htmlspecialchars((string) ($homepage[$key] ?? $fallback), ENT_QUOTES, 'UTF-8');
 };

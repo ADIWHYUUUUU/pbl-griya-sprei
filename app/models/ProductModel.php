@@ -24,6 +24,17 @@ class ProductModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getFeaturedProducts()
+    {
+        $stmt = $this->pdo->query(
+            "SELECT urutan, tag, id_produk, name, price, image, description
+             FROM public.v_produk_pilihan
+             ORDER BY urutan"
+        );
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // =========================================
     // READ - AMBIL PRODUK BERDASARKAN ID
     // =========================================

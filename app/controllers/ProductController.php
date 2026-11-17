@@ -63,6 +63,11 @@ class ProductController
         return $this->model->getAllProducts();
     }
 
+    public function getFeaturedProducts()
+    {
+        return $this->model->getFeaturedProducts();
+    }
+
     // =========================================
     // READ - PRODUK BERDASARKAN ID
     // =========================================
