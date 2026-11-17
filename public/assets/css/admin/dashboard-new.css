@@ -247,6 +247,57 @@ main {
     background: #fff;
 }
 
+.chart-report-filter {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 16px;
+    padding: 12px;
+    border: 1px solid #edf0f3;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.chart-filter-field {
+    display: grid;
+    gap: 5px;
+}
+
+.chart-filter-field[hidden] {
+    display: none;
+}
+
+.chart-filter-field label {
+    color: #475467;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.chart-filter-field select,
+.chart-filter-field input {
+    min-height: 36px;
+    padding: 7px 9px;
+    border: 1px solid var(--garis);
+    border-radius: 6px;
+    background: #fff;
+    color: #344054;
+    font: inherit;
+    font-size: 13px;
+}
+
+.chart-report-filter > .btn {
+    min-height: 36px;
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
+.chart-filter-error {
+    margin: -7px 0 14px;
+    color: #b42318;
+    font-size: 13px;
+}
+
 .daily-line-chart svg {
     display: block;
     width: auto;
@@ -1737,6 +1788,22 @@ body.admin-dashboard #modalLaporan .modal-body {
     padding: 16px 18px 20px;
 }
 
+body.admin-dashboard #modalLaporan .report-export-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+body.admin-dashboard #modalLaporan .report-export-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+}
+
 body.admin-dashboard #modalLaporan .report-summary {
     gap: 10px;
     margin-bottom: 10px;
@@ -1871,6 +1938,18 @@ body.admin-dashboard #modalLaporan .pagination-controls a[aria-disabled="true"] 
 }
 
 @media (max-width: 700px) {
+    .chart-report-filter {
+        align-items: stretch;
+    }
+
+    .chart-filter-field {
+        flex: 1 1 140px;
+    }
+
+    .chart-report-filter > .btn {
+        width: 100%;
+    }
+
     body.admin-dashboard #modalLaporan .report-modal-header {
         align-items: flex-start;
         flex-direction: column;

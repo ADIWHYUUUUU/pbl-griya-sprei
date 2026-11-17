@@ -77,7 +77,15 @@ class DashboardModel
     public function getOrdersForMonth(int $month, int $year): array
     {
         $start = new DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month));
-        $end = $start->modify('+1 month');
+        $end = $start->modify('+1 month')->modify('-1 day');
+
+        return $this->getOrdersForDateRange($start->format('Y-m-d'), $end->format('Y-m-d'));
+    }
+
+    public function getOrdersForDateRange(string $startDate, string $endDate): array
+    {
+        $start = new DateTimeImmutable($startDate);
+        $end = (new DateTimeImmutable($endDate))->modify('+1 day');
 
         return $this->fetchOrders(
             'p.tanggal_pesan >= :start_date AND p.tanggal_pesan < :end_date',

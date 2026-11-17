@@ -123,4 +123,21 @@
     if (hashModal && hashModal.classList.contains('modal-overlay')) {
         bukaModal(hashModal);
     }
+
+    var filterPeriode = document.getElementById('filterPeriode');
+    if (filterPeriode) {
+        function sesuaikanFilterPeriode() {
+            document.querySelectorAll('[data-periode-group]').forEach(function (field) {
+                var periodeTersedia = field.dataset.periodeGroup.split(' ');
+                var tampil = periodeTersedia.indexOf(filterPeriode.value) !== -1;
+                field.hidden = !tampil;
+                field.querySelectorAll('select, input').forEach(function (input) {
+                    input.disabled = !tampil;
+                });
+            });
+        }
+
+        filterPeriode.addEventListener('change', sesuaikanFilterPeriode);
+        sesuaikanFilterPeriode();
+    }
 })();
