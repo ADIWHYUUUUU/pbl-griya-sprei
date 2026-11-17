@@ -617,59 +617,7 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
-            <button type="button" class="stock-add-link" data-modal="modalTambahStok">
-                <span aria-hidden="true">+</span> Tambah Stok Sprei
-            </button>
         </div>
-    </section>
-</div>
-
-<!-- POPUP: TAMBAH / RESTOCK STOK -->
-<div class="modal-overlay" id="modalTambahStok" role="dialog" aria-modal="true" aria-labelledby="judulTambahStok" aria-hidden="true">
-    <section class="modal-container stock-form-modal">
-        <form class="modal-form" id="formStok" novalidate>
-            <header class="modal-header">
-                <div class="stock-form-heading">
-                    <span class="stock-form-icon" aria-hidden="true">+</span>
-                    <h3 id="judulTambahStok">Tambah / Restock Stok Sprei</h3>
-                </div>
-                <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
-            </header>
-
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="selectProduk">PILIH VARIAN SPREI READY</label>
-                    <select class="form-control" id="selectProduk"></select>
-                </div>
-
-                <div class="stock-status-panel">
-                    <div>
-                        <small>Stok Saat Ini</small>
-                        <strong id="infoStok">-</strong>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="inputJumlah">JUMLAH TAMBAHAN STOK (SET)</label>
-                    <div class="stepper stock-stepper">
-                        <button type="button" class="step-btn" data-step="-1" aria-label="Kurangi">&minus;</button>
-                        <input class="form-control" type="number" id="inputJumlah" min="1" max="10000" value="1">
-                        <button type="button" class="step-btn" data-step="1" aria-label="Tambah">+</button>
-                    </div>
-                </div>
-
-                <div class="form-group stock-source-group">
-                    <label for="selectSumber">SUMBER MASUK / KETERANGAN (OPSIONAL)</label>
-                    <select class="form-control" id="selectSumber"></select>
-                    <input class="form-control" type="text" id="inputKeterangan" maxlength="255" placeholder="Catatan tambahan (misal: Selesai jahit Mbak Siti).">
-                </div>
-            </div>
-
-            <footer class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-close>Batal</button>
-                <button type="submit" class="btn btn-primary"><span aria-hidden="true">&#10003;</span> Simpan Tambah Stok</button>
-            </footer>
-        </form>
     </section>
 </div>
 
