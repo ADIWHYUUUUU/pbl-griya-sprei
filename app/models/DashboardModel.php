@@ -30,6 +30,31 @@ class DashboardModel
         return $this->fetchOrders('', [], $limit);
     }
 
+    public function getOrderStatusCounts(): array
+    {
+        $counts = [
+            'MENUNGGU_VERIFIKASI' => 0,
+            'MENUNGGU_PEMBAYARAN' => 0,
+            'DIPROSES' => 0,
+            'DIKIRIM' => 0,
+            'SELESAI' => 0,
+            'DIBATALKAN' => 0,
+        ];
+        $statement = $this->pdo->query(
+            'SELECT status_pesanan::text AS status_pesanan, COUNT(*) AS jumlah
+             FROM pesanan
+             GROUP BY status_pesanan'
+        );
+
+        foreach ($statement->fetchAll() as $row) {
+            if (array_key_exists($row['status_pesanan'], $counts)) {
+                $counts[$row['status_pesanan']] = (int) $row['jumlah'];
+            }
+        }
+
+        return $counts;
+    }
+
     public function getOrdersForShipping(int $limit = 100): array
     {
         return $this->fetchOrders(

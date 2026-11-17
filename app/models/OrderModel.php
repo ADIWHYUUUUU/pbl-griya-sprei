@@ -278,6 +278,65 @@ class OrderModel
         return $statement->rowCount() === 1;
     }
 
+    public function changeAdminOrderStatus(int $orderId, string $newStatus): void
+    {
+        $transitions = [
+            'MENUNGGU_VERIFIKASI' => ['MENUNGGU_PEMBAYARAN', 'DIBATALKAN'],
+            'MENUNGGU_PEMBAYARAN' => ['DIPROSES', 'DIBATALKAN'],
+            'DIPROSES' => ['DIKIRIM', 'DIBATALKAN'],
+            'DIKIRIM' => ['SELESAI'],
+            'SELESAI' => [],
+            'DIBATALKAN' => [],
+        ];
+        $workflowMessages = [
+            'MENUNGGU_PEMBAYARAN' => 'Gunakan alur Verifikasi untuk menetapkan tagihan dan melanjutkan pesanan.',
+            'DIPROSES' => 'Status Diproses diperbarui melalui verifikasi pembayaran.',
+            'DIKIRIM' => 'Gunakan alur Nomor Resi untuk mencatat resi dan mengirim pesanan.',
+        ];
+
+        if (!array_key_exists($newStatus, $transitions)) {
+            throw new DomainException('Status tujuan tidak valid.');
+        }
+
+        $this->pdo->beginTransaction();
+        try {
+            $lock = $this->pdo->prepare(
+                'SELECT status_pesanan::text
+                 FROM pesanan
+                 WHERE id_pesanan = :order_id
+                 FOR UPDATE'
+            );
+            $lock->execute([':order_id' => $orderId]);
+            $currentStatus = $lock->fetchColumn();
+
+            if ($currentStatus === false) {
+                throw new DomainException('Pesanan tidak ditemukan.');
+            }
+            if (!in_array($newStatus, $transitions[$currentStatus] ?? [], true)) {
+                throw new DomainException('Perpindahan status tersebut tidak diizinkan.');
+            }
+            if (isset($workflowMessages[$newStatus])) {
+                throw new DomainException($workflowMessages[$newStatus]);
+            }
+
+            $update = $this->pdo->prepare(
+                'UPDATE pesanan
+                 SET status_pesanan = CAST(:new_status AS status_pesanan_enum)
+                 WHERE id_pesanan = :order_id'
+            );
+            $update->execute([
+                ':new_status' => $newStatus,
+                ':order_id' => $orderId,
+            ]);
+            $this->pdo->commit();
+        } catch (Throwable $error) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $error;
+        }
+    }
+
     public function verifyOrder(int $orderId, int $principal, int $shipping, int $discount): bool
     {
         $this->pdo->beginTransaction();

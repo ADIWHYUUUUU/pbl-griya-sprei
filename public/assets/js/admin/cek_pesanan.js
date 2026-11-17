@@ -3,10 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('orderSearch');
     const rows = Array.from(document.querySelectorAll('[data-order-row]'));
     const emptyState = document.getElementById('ordersEmpty');
-    const resultCount = document.getElementById('ordersResultCount');
     const statusInput = document.querySelector('.order-search input[name="status"]');
-
-    if (!rows.length && !emptyState) return;
 
     const activeTab = tabs.find(function (tab) {
         return tab.classList.contains('is-active');
@@ -14,16 +11,18 @@ document.addEventListener('DOMContentLoaded', function () {
     let activeFilter = activeTab ? activeTab.dataset.orderFilter : 'semua';
 
     function filterOrders() {
-        const keyword = searchInput ? searchInput.value.trim().toLocaleLowerCase('id') : '';
+        const keyword = searchInput
+            ? searchInput.value.trim().toLocaleLowerCase('id')
+            : '';
         let visibleCount = 0;
 
         rows.forEach(function (row) {
-            const matchesCategory =
+            const matchesStatus =
                 activeFilter === 'semua' || row.dataset.category === activeFilter;
-            const matchesSearch = row.textContent
+            const matchesSearch = (row.dataset.search || '')
                 .toLocaleLowerCase('id')
                 .includes(keyword);
-            const isVisible = matchesCategory && matchesSearch;
+            const isVisible = matchesStatus && matchesSearch;
 
             row.hidden = !isVisible;
             const detailRow = row.nextElementSibling;
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const toggle = row.querySelector('[data-toggle-details]');
                 if (toggle) {
                     toggle.setAttribute('aria-expanded', 'false');
-                    toggle.textContent = toggle.classList.contains('order-action--verify') ? 'Verifikasi' : 'Detail';
+                    toggle.textContent = 'Detail';
                 }
             }
             if (isVisible) visibleCount++;
@@ -41,12 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (emptyState) {
             emptyState.hidden = visibleCount > 0;
         }
-
-        if (resultCount) {
-            resultCount.textContent =
-                'Menampilkan ' + visibleCount + ' dari ' + rows.length + ' pesanan terbaru';
-        }
-
         if (statusInput) {
             statusInput.value = activeFilter;
         }
@@ -77,18 +70,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     rows.forEach(function (row) {
         const toggle = row.querySelector('[data-toggle-details]');
-        if (!toggle) return;
+        if (toggle) {
+            toggle.addEventListener('click', function () {
+                const detailRow = row.nextElementSibling;
+                if (!detailRow || !detailRow.matches('[data-order-details]')) return;
 
-        toggle.addEventListener('click', function () {
-            const detailRow = row.nextElementSibling;
-            if (!detailRow || !detailRow.matches('[data-order-details]')) return;
+                const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+                detailRow.hidden = isExpanded;
+                toggle.setAttribute('aria-expanded', String(!isExpanded));
+                toggle.textContent = isExpanded ? 'Detail' : 'Tutup';
+            });
+        }
+    });
 
-            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
-            detailRow.hidden = isExpanded;
-            toggle.setAttribute('aria-expanded', String(!isExpanded));
-            toggle.textContent = isExpanded
-                ? (toggle.classList.contains('order-action--verify') ? 'Verifikasi' : 'Detail')
-                : 'Tutup';
+    document.querySelectorAll('.status-change-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const select = form.querySelector('select[name="status_pesanan"]');
+            const targetOption = select && select.options[select.selectedIndex];
+            const target = targetOption ? targetOption.text : '';
+            const isCancellation = select && select.value === 'DIBATALKAN';
+            const message = isCancellation
+                ? 'Batalkan pesanan ini? Data dan riwayat pembayaran tidak dihapus.'
+                : 'Ubah status pesanan menjadi "' + target + '"?';
+            if (!target || !window.confirm(message)) {
+                event.preventDefault();
+            }
         });
     });
 

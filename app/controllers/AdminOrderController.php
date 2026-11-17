@@ -19,6 +19,64 @@ class AdminOrderController
         $this->verify();
     }
 
+    public function changeStatus(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'ADMIN') {
+            http_response_code(403);
+            exit('Akses ditolak.');
+        }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            header('Allow: POST');
+            exit('Metode request tidak diizinkan.');
+        }
+
+        $token = $_POST['csrf_token'] ?? '';
+        if (
+            !is_string($token)
+            || !isset($_SESSION['csrf_token'])
+            || !hash_equals((string) $_SESSION['csrf_token'], $token)
+        ) {
+            $_SESSION['admin_order_message'] = [
+                'type' => 'error',
+                'text' => 'Token keamanan tidak valid. Muat ulang halaman dan coba lagi.',
+            ];
+            header('Location: /?page=admin-orders', true, 303);
+            exit;
+        }
+
+        $orderId = $this->readInteger($_POST['id_pesanan'] ?? null);
+        $newStatus = $_POST['status_pesanan'] ?? null;
+        if ($orderId === null || $orderId < 1 || !is_string($newStatus)) {
+            $_SESSION['admin_order_message'] = [
+                'type' => 'error',
+                'text' => 'Data perubahan status tidak valid.',
+            ];
+            header('Location: /?page=admin-orders', true, 303);
+            exit;
+        }
+
+        try {
+            (new OrderModel($GLOBALS['pdo']))->changeAdminOrderStatus($orderId, $newStatus);
+            $_SESSION['admin_order_message'] = [
+                'type' => 'success',
+                'text' => 'Status pesanan berhasil diperbarui.',
+            ];
+        } catch (DomainException $error) {
+            $_SESSION['admin_order_message'] = [
+                'type' => 'error',
+                'text' => $error->getMessage(),
+            ];
+        }
+
+        header('Location: /?page=admin-orders', true, 303);
+        exit;
+    }
+
     public function saveResi(): void
     {
         if (session_status() === PHP_SESSION_NONE) {

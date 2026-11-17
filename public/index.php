@@ -36,7 +36,7 @@ if ($action !== '') {
 	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove', 'customer-checkout-start'], true);
 	$isOrderAction = $action === 'customer-order-create';
 	$isPaymentAction = $action === 'customer-payment-submit';
-	$adminOrderActions = ['admin-order-verify-save'];
+	$adminOrderActions = ['admin-order-verify-save', 'admin-order-status-save'];
 	$isAdminOrderAction = in_array($action, $adminOrderActions, true);
 	$isAdminResiAction = $action === 'admin-order-resi-save';
 	$adminPaymentActions = ['admin-payment-verify-save'];
@@ -71,7 +71,12 @@ if ($action !== '') {
 			(new AdminOrderController())->saveResi();
 		} elseif ($isAdminOrderAction) {
 			require_once __DIR__ . '/../app/controllers/AdminOrderController.php';
-			(new AdminOrderController())->verifySave();
+			$controller = new AdminOrderController();
+			if ($action === 'admin-order-status-save') {
+				$controller->changeStatus();
+			} else {
+				$controller->verifySave();
+			}
 		} elseif ($isCartAction || $isOrderAction) {
 			require_once __DIR__ . '/../app/controllers/OrderController.php';
 			$controller = new OrderController();
@@ -149,6 +154,12 @@ if ($action !== '') {
 				$query['page'] = 'admin-orders';
 			}
 			header('Location: /?' . http_build_query($query), true, 303);
+		} elseif ($action === 'admin-order-status-save') {
+			$_SESSION['admin_order_message'] = [
+				'type' => 'error',
+				'text' => 'Perubahan status pesanan gagal disimpan. Silakan coba lagi.',
+			];
+			header('Location: /?page=admin-orders', true, 303);
 		} elseif ($isAdminResiAction) {
 			$_SESSION['admin_order_message'] = [
 				'type' => 'error',
