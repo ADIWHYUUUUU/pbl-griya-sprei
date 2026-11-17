@@ -50,6 +50,18 @@ Atau buka file `database/migrations/15_user_password_reset_columns.sql` di pgAdm
 
 Pengiriman email nyata belum teruji sampai API key Brevo dan alamat pengirim terverifikasi diisi pada `.env`.
 
+## Auto-cancel pesanan kedaluwarsa
+
+Job `scripts/auto_cancel_orders.php` membatalkan pesanan yang berumur **lebih dari 48 jam** dan masih berstatus `MENUNGGU_VERIFIKASI` atau `MENUNGGU_PEMBAYARAN`. Waktu dihitung sejak `tanggal_pesan`. Pesanan dengan pembayaran yang sedang menunggu verifikasi atau sudah terverifikasi, serta pesanan yang sudah diproses/dikirim/selesai, tidak dibatalkan. Data pesanan dan riwayat pembayaran tidak dihapus.
+
+Atur cron job pada hosting untuk menjalankan script setiap lima menit. Contoh untuk cPanel (sesuaikan lokasi PHP, direktori aplikasi, dan lokasi log):
+
+```cron
+*/5 * * * * /usr/bin/php /home/USER/path-to-app/scripts/auto_cancel_orders.php >> /home/USER/auto-cancel-orders.log 2>&1
+```
+
+Pastikan job memakai konfigurasi database aplikasi (`.env` atau environment variables hosting) dan PHP CLI memiliki ekstensi PDO PostgreSQL. Karena job berjalan berkala, pembatalan dapat terjadi beberapa menit setelah batas 48 jam.
+
 ## Supabase Storage
 
 Upload baru untuk gambar produk dan bukti pembayaran disimpan di Supabase Storage. Buat bucket `produk` dengan akses **public** dan bucket `bukti-pembayaran` dengan akses **private** di dashboard Supabase. Konfigurasikan URL project dan secret key server-side di `.env`:
