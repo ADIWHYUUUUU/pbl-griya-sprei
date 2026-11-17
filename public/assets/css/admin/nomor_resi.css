@@ -540,3 +540,345 @@ body.resi-page {
         flex: 1 1 200px;
     }
 }
+
+body.resi-page {
+    --latar: #f7faf6;
+    --garis: #e2e8e1;
+    --teks-abu: #71806f;
+    background: var(--latar);
+    color: #344139;
+    font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
+}
+
+.resi-page .admin-layout {
+    background: var(--latar);
+}
+
+.resi-page .dashboard-main {
+    width: auto;
+    padding: 0 24px 40px;
+    background: var(--latar);
+}
+
+.resi-page .page-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 48px;
+    margin: 0 -24px;
+    padding: 0 24px;
+    border-bottom: 1px solid #e4e9e3;
+    color: #788276;
+    font-size: 13px;
+}
+
+.resi-page .page-breadcrumb strong {
+    color: #28342d;
+    font-weight: 600;
+}
+
+.resi-page .page-title {
+    margin: 24px 0 20px;
+    color: #26332c;
+    font-size: 23px;
+    letter-spacing: -0.035em;
+}
+
+.resi-page .flash-message {
+    margin-bottom: 16px;
+    padding: 12px 15px;
+    border-radius: 8px;
+}
+
+.resi-page .flash-message.success {
+    border-color: #b6d2b7;
+    background: #edf6ed;
+    color: #315b34;
+}
+
+.resi-page .flash-message.error {
+    border-color: #e6b8b8;
+    background: #fff1f1;
+    color: #923838;
+}
+
+.resi-page .order-table-wrap {
+    max-width: none;
+    border-color: #e1e7e0;
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+.resi-page .order-table-wrap table {
+    min-width: 860px;
+}
+
+.resi-page .order-table-wrap thead th {
+    height: 45px;
+    padding: 9px 14px;
+    border-bottom: 0;
+    background: #f0f3ef;
+    color: #687365;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    line-height: 1.25;
+}
+
+.resi-page .order-table-wrap tbody td {
+    padding: 14px 12px;
+    border-bottom: 0;
+    border-top: 1px solid #edf0ec;
+    color: #344139;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.resi-page .order-table-wrap tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.resi-page .invoice {
+    color: #26332c;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.resi-page .date,
+.resi-page .muted {
+    color: #71806f;
+    font-size: 12px;
+}
+
+.resi-page .customer-name {
+    margin-bottom: 2px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.resi-page .shipping-name {
+    max-width: 260px;
+    margin-top: 4px;
+    color: #71806f;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.resi-page .spec {
+    color: #334139;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.resi-page .courier-badge {
+    min-width: 0;
+    padding: 5px 9px;
+    border-color: #d5dfd3;
+    border-radius: 999px;
+    background: #f0f3ef;
+    color: #526351;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.resi-page .action-btn {
+    min-width: 86px;
+    min-height: 28px;
+    margin: 2px 3px 2px 0;
+    padding: 5px 9px;
+    border: 1px solid #405642;
+    border-radius: 5px;
+    background: #405642;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.resi-page .action-btn:hover {
+    transform: none;
+    border-color: #314633;
+    background: #314633;
+}
+
+.resi-page .action-btn.secondary {
+    border-color: #e3e8e1;
+    background: #fff;
+    color: #586655;
+}
+
+.resi-page .action-btn.secondary:hover {
+    border-color: #c3d0c0;
+    background: #f7faf6;
+}
+
+.resi-page .empty-state {
+    height: 90px;
+    padding: 24px !important;
+    color: #71806f !important;
+}
+
+.resi-page .order-footer {
+    justify-content: flex-start;
+    max-width: none;
+    margin-top: 12px;
+    padding: 0;
+}
+
+.resi-page .footer-note {
+    font-size: 13px;
+}
+
+.resi-page .resi-modal {
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.resi-page .resi-modal.show {
+    align-items: center;
+}
+
+.resi-page .resi-modal-backdrop {
+    background: rgba(31, 42, 34, 0.48);
+}
+
+.resi-page .resi-modal-panel {
+    width: min(790px, 100%);
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    border-color: #e2e8e1;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgba(34, 51, 35, 0.16);
+}
+
+.resi-page .resi-modal-header {
+    padding: 16px 20px;
+    border-bottom-color: #e2e8e1;
+    background: #f7faf6;
+}
+
+.resi-page .resi-modal-header h2 {
+    color: #26332c;
+    font-size: 18px;
+}
+
+.resi-page .resi-close-btn {
+    color: #59645a;
+    font-size: 26px;
+}
+
+.resi-page .resi-modal-body {
+    padding: 18px 20px 20px;
+}
+
+.resi-page .resi-modal-subtitle {
+    color: #71806f;
+    font-size: 13px;
+}
+
+.resi-page .resi-box,
+.resi-page .resi-info-row,
+.resi-page .resi-card {
+    border-color: #e2e8e1;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.resi-page .resi-box {
+    background: #f8faf7;
+}
+
+.resi-page .resi-box-label,
+.resi-page .resi-info-label,
+.resi-page .resi-card-title {
+    color: #71806f;
+    font-size: 11px;
+}
+
+.resi-page .resi-box-number,
+.resi-page .resi-info-value,
+.resi-page .resi-card-name,
+.resi-page .resi-product-name {
+    color: #344139;
+}
+
+.resi-page .resi-copy-btn,
+.resi-page .resi-product-note {
+    border: 1px solid #e2e8e1;
+    border-radius: 6px;
+    background: #f8faf7;
+    color: #526351;
+}
+
+.resi-page .resi-card-phone,
+.resi-page .resi-product-meta,
+.resi-page .resi-card-address,
+.resi-page .resi-info-subvalue {
+    color: #59645a;
+}
+
+.resi-page .resi-modal-footer {
+    margin-top: 16px;
+    border-top: 1px solid #edf1ec;
+}
+
+.resi-page .resi-secondary-btn,
+.resi-page .resi-primary-btn {
+    min-height: 34px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.resi-page .resi-secondary-btn {
+    border-color: #dce5da;
+    background: #fff;
+    color: #59645a;
+}
+
+.resi-page .resi-primary-btn,
+.resi-page .resi-primary-btn.fill {
+    border-color: #405642;
+    background: #405642;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .resi-page .dashboard-main {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .resi-page .page-breadcrumb {
+        margin-right: -16px;
+        margin-left: -16px;
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .resi-page .page-title {
+        margin: 20px 0 16px;
+        font-size: 20px;
+    }
+
+    .resi-page .order-table-wrap table {
+        min-width: 820px;
+    }
+
+    .resi-page .resi-modal {
+        padding: 10px;
+    }
+
+    .resi-page .resi-modal-panel {
+        max-height: calc(100vh - 20px);
+        margin-top: 0;
+    }
+
+    .resi-page .resi-modal-header,
+    .resi-page .resi-modal-body {
+        padding-right: 14px;
+        padding-left: 14px;
+    }
+}
