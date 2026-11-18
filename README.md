@@ -1,6 +1,6 @@
 # Reset Password Customer
 
-Fitur reset password customer memakai OTP 6 digit melalui Brevo. Seluruh informasi OTP/reset disimpan sebagai kolom tambahan pada tabel `"user"`; tidak ada tabel baru. Pembatasan IP disimpan di file lokal `storage/password-reset-<hash>.json` (tanpa alamat IP mentah).
+Fitur reset password customer memakai OTP 6 digit melalui Brevo. Informasi OTP/reset disimpan pada tabel `password_reset_state`, terpisah dari tabel `"user"`. Pembatasan IP disimpan di file lokal `storage/password-reset-<hash>.json` (tanpa alamat IP mentah).
 
 ## Konfigurasi Brevo
 
@@ -23,13 +23,13 @@ Salin hasilnya ke `PASSWORD_RESET_OTP_SECRET`. Aktifkan ekstensi PHP cURL. Aplik
 
 ## Migration PostgreSQL
 
-Jalankan dari root proyek, sesuaikan koneksi agar sama dengan `.env`:
+Untuk database baru, jalankan migration 15 terlebih dahulu, lalu migration 21. Untuk database yang sebelumnya sudah menjalankan migration 15, jalankan migration 21. Migration 21 memindahkan kolom OTP/reset yang ditambahkan migration 15 ke tabel `password_reset_state`, lalu menghapus kolom-kolom tersebut dari `"user"`.
 
 ```powershell
-psql -h localhost -p 5432 -U postgres -d pbl_siprei -f database/migrations/15_user_password_reset_columns.sql
+psql -h localhost -p 5432 -U postgres -d pbl_siprei -f database/migrations/21_password_reset_state_table.sql
 ```
 
-Atau buka file `database/migrations/15_user_password_reset_columns.sql` di pgAdmin Query Tool pada database aplikasi dan jalankan. Migration menambahkan kolom OTP, masa berlaku, jumlah percobaan, waktu pengiriman, izin reset, dan penghitung batas akun ke tabel `"user"` yang sudah ada.
+Atau buka file `database/migrations/21_password_reset_state_table.sql` di pgAdmin Query Tool pada database aplikasi dan jalankan.
 
 ## Uji di Laragon
 
@@ -39,9 +39,11 @@ Atau buka file `database/migrations/15_user_password_reset_columns.sql` di pgAdm
 4. Untuk menguji kedaluwarsa tanpa menunggu, setelah meminta kode jalankan di pgAdmin:
 
    ```sql
-   UPDATE "user"
+   UPDATE password_reset_state AS reset
    SET password_reset_otp_expires_at = CURRENT_TIMESTAMP - INTERVAL '1 minute'
-   WHERE email = 'email-customer-anda';
+   FROM "user" AS account
+   WHERE account.id_user = reset.id_user
+     AND account.email = 'email-customer-anda';
    ```
 
 5. Untuk menguji kode lama, tunggu minimal 60 detik hingga tombol **Kirim ulang kode** aktif, minta kode baru, lalu pastikan kode lama ditolak dan kode terbaru diterima.

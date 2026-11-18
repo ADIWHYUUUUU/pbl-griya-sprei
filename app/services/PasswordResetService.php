@@ -57,12 +57,14 @@ class PasswordResetService
         $this->pdo->beginTransaction();
         try {
             $stmt = $this->pdo->prepare(
-                'SELECT password_reset_otp_digest AS otp_digest,
-                        password_reset_attempt_count AS attempts,
-                        password_reset_flow_digest AS flow_digest,
-                        password_reset_otp_expires_at > CURRENT_TIMESTAMP AS not_expired
-                 FROM "user" WHERE id_user = :id_user AND role = \'CUSTOMER\'
-                 FOR UPDATE'
+                'SELECT reset.password_reset_otp_digest AS otp_digest,
+                        reset.password_reset_attempt_count AS attempts,
+                        reset.password_reset_flow_digest AS flow_digest,
+                        reset.password_reset_otp_expires_at > CURRENT_TIMESTAMP AS not_expired
+                 FROM public.password_reset_state AS reset
+                 JOIN public."user" AS account ON account.id_user = reset.id_user
+                 WHERE reset.id_user = :id_user AND account.role = \'CUSTOMER\'
+                 FOR UPDATE OF reset'
             );
             $stmt->execute([':id_user' => $userId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -79,7 +81,8 @@ class PasswordResetService
             }
             if (!$this->dbBoolean($row['not_expired'])) {
                 $clear = $this->pdo->prepare(
-                    'UPDATE "user" SET password_reset_otp_digest = NULL WHERE id_user = :id_user'
+                    'UPDATE public.password_reset_state
+                     SET password_reset_otp_digest = NULL WHERE id_user = :id_user'
                 );
                 $clear->execute([':id_user' => $userId]);
                 $this->pdo->commit();
@@ -87,7 +90,7 @@ class PasswordResetService
             }
             if (!hash_equals($row['otp_digest'], $this->digest('otp', $code, $userId))) {
                 $update = $this->pdo->prepare(
-                    'UPDATE "user"
+                    'UPDATE public.password_reset_state
                      SET password_reset_attempt_count = password_reset_attempt_count + 1,
                          password_reset_otp_digest = CASE
                              WHEN password_reset_attempt_count + 1 >= 5 THEN NULL
@@ -101,7 +104,7 @@ class PasswordResetService
 
             $grant = bin2hex(random_bytes(32));
             $update = $this->pdo->prepare(
-                'UPDATE "user"
+                'UPDATE public.password_reset_state
                  SET password_reset_otp_digest = NULL,
                      password_reset_verified_at = CURRENT_TIMESTAMP,
                      password_reset_grant_digest = :digest,
@@ -128,9 +131,11 @@ class PasswordResetService
             return false;
         }
         $stmt = $this->pdo->prepare(
-            'SELECT password_reset_grant_digest AS digest,
-                    password_reset_grant_expires_at > CURRENT_TIMESTAMP AS not_expired
-             FROM "user" WHERE id_user = :id_user AND role = \'CUSTOMER\''
+            'SELECT reset.password_reset_grant_digest AS digest,
+                    reset.password_reset_grant_expires_at > CURRENT_TIMESTAMP AS not_expired
+             FROM public.password_reset_state AS reset
+             JOIN public."user" AS account ON account.id_user = reset.id_user
+             WHERE reset.id_user = :id_user AND account.role = \'CUSTOMER\''
         );
         $stmt->execute([':id_user' => $userId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -147,10 +152,12 @@ class PasswordResetService
         $this->pdo->beginTransaction();
         try {
             $stmt = $this->pdo->prepare(
-                'SELECT password_reset_grant_digest AS digest,
-                        password_reset_grant_expires_at > CURRENT_TIMESTAMP AS not_expired
-                 FROM "user" WHERE id_user = :id_user AND role = \'CUSTOMER\'
-                 FOR UPDATE'
+                'SELECT reset.password_reset_grant_digest AS digest,
+                        reset.password_reset_grant_expires_at > CURRENT_TIMESTAMP AS not_expired
+                 FROM public.password_reset_state AS reset
+                 JOIN public."user" AS account ON account.id_user = reset.id_user
+                 WHERE reset.id_user = :id_user AND account.role = \'CUSTOMER\'
+                 FOR UPDATE OF reset'
             );
             $stmt->execute([':id_user' => $userId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -163,11 +170,7 @@ class PasswordResetService
                 return false;
             }
             $update = $this->pdo->prepare(
-                'UPDATE "user" SET password = :password,
-                    password_reset_otp_digest = NULL,
-                    password_reset_flow_digest = NULL,
-                    password_reset_grant_digest = NULL,
-                    password_reset_grant_expires_at = NULL
+                'UPDATE public."user" SET password = :password
                  WHERE id_user = :id_user AND role = \'CUSTOMER\''
             );
             $update->execute([':password' => $passwordHash, ':id_user' => $userId]);
@@ -175,6 +178,15 @@ class PasswordResetService
                 $this->pdo->rollBack();
                 return false;
             }
+            $clear = $this->pdo->prepare(
+                'UPDATE public.password_reset_state
+                 SET password_reset_otp_digest = NULL,
+                     password_reset_flow_digest = NULL,
+                     password_reset_grant_digest = NULL,
+                     password_reset_grant_expires_at = NULL
+                 WHERE id_user = :id_user'
+            );
+            $clear->execute([':id_user' => $userId]);
             $this->pdo->commit();
             return true;
         } catch (Throwable $error) {
@@ -193,6 +205,12 @@ class PasswordResetService
         $userId = (int) $user['id_user'];
         $this->pdo->beginTransaction();
         try {
+            $initialize = $this->pdo->prepare(
+                'INSERT INTO public.password_reset_state (id_user)
+                 VALUES (:id_user)
+                 ON CONFLICT (id_user) DO NOTHING'
+            );
+            $initialize->execute([':id_user' => $userId]);
             $stmt = $this->pdo->prepare(
                 'SELECT password_reset_last_sent_at AS last_sent,
                         password_reset_request_count AS request_count,
@@ -200,7 +218,7 @@ class PasswordResetService
                         password_reset_request_window_started_at > CURRENT_TIMESTAMP - INTERVAL \'1 hour\' AS request_window_active,
                         password_reset_last_sent_at > CURRENT_TIMESTAMP - INTERVAL \'10 minutes\' AS code_recent,
                         password_reset_last_sent_at > CURRENT_TIMESTAMP - INTERVAL \'60 seconds\' AS cooling
-                 FROM "user" WHERE id_user = :id_user FOR UPDATE'
+                 FROM public.password_reset_state WHERE id_user = :id_user FOR UPDATE'
             );
             $stmt->execute([':id_user' => $userId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -211,7 +229,8 @@ class PasswordResetService
 
             if ($this->dbBoolean($row['code_recent'])) {
                 $rebind = $this->pdo->prepare(
-                    'UPDATE "user" SET password_reset_flow_digest = :flow WHERE id_user = :id_user'
+                    'UPDATE public.password_reset_state
+                     SET password_reset_flow_digest = :flow WHERE id_user = :id_user'
                 );
                 $rebind->execute([
                     ':flow' => $this->digest('flow', $flow, $userId),
@@ -235,7 +254,7 @@ class PasswordResetService
             $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $digest = $this->digest('otp', $code, $userId);
             $update = $this->pdo->prepare(
-                'UPDATE "user" SET
+                'UPDATE public.password_reset_state SET
                     password_reset_otp_digest = :digest,
                     password_reset_otp_expires_at = CURRENT_TIMESTAMP + INTERVAL \'10 minutes\',
                     password_reset_attempt_count = 0,
@@ -267,7 +286,7 @@ class PasswordResetService
 
         if (!$this->sendBrevoEmail($user['email'], $user['nama'], $code)) {
             $invalidate = $this->pdo->prepare(
-                'UPDATE "user" SET password_reset_otp_digest = NULL
+                'UPDATE public.password_reset_state SET password_reset_otp_digest = NULL
                  WHERE id_user = :id_user AND password_reset_otp_digest = :digest'
             );
             $invalidate->execute([':id_user' => $userId, ':digest' => $digest]);
