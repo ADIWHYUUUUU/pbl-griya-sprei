@@ -78,3 +78,9 @@ Jangan masukkan secret key ke kode browser atau commit ke Git. Bukti pembayaran 
 ## Alamat Default Checkout
 
 Alamat pengiriman pada checkout disimpan sebagai alamat default akun setelah pesanan berhasil dibuat. Untuk database yang sudah ada, jalankan `database/migrations/18_user_shipping_address.sql` satu kali melalui pgAdmin atau `psql`.
+
+## Harga Kain dan Ukuran
+
+Harga ukuran standar untuk Sprei dan Bed Cover ditampilkan berdasarkan tabel harga kain di `app/helpers/product_pricing.php`. Katalog menampilkan harga paling rendah dari semua kombinasi kain dan ukuran. Ukuran custom tetap dikonfirmasi Admin.
+
+Untuk database yang sudah ada, jalankan `database/migrations/19_enum_jenis_kain_dan_tipe_ukuran.sql` satu kali. Migration ini memastikan `produk.jenis_kain` dan `detail_pesanan.tipe_ukuran` memakai enum yang sudah dipakai aplikasi; tidak menambah kolom dan tidak mengubah dimensi angka.

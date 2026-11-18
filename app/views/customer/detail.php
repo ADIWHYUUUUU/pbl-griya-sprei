@@ -26,6 +26,7 @@ if ($id === false || $id === null) {
 }
 
 require_once __DIR__ . '/../../controllers/ProductController.php';
+require_once __DIR__ . '/../../helpers/product_pricing.php';
 $productController = new ProductController();
 $dataProduk = $productController->getProductById($id);
 
@@ -42,7 +43,6 @@ $produk = [
     'nama' => $dataProduk['nama_produk'],
     'varian' => $dataProduk['kategori_produk'],
     'gambar' => $dataProduk['gambar_produk'],
-    'motif' => $dataProduk['motif'] ?? '',
     'panjang' => (float) $dataProduk['panjang_standar'],
     'lebar' => (float) $dataProduk['lebar_standar'],
     'tinggi' => (float) $dataProduk['tinggi_standar'],
@@ -51,6 +51,15 @@ $produk = [
     'deskripsi' => $dataProduk['deskripsi']
 ];
 $bolehTambahSarung = $produk['varian'] === 'SPREI';
+$pilihanHarga = product_pricing_options($produk['varian']);
+$kainTerpilih = isset($pilihanHarga[$dataProduk['jenis_kain'] ?? ''])
+    ? $dataProduk['jenis_kain']
+    : (array_key_first($pilihanHarga) ?? '');
+$ukuranTerpilih = isset($pilihanHarga[$kainTerpilih]['prices'][$produk['lebar'] ?? 0])
+    ? (int) $produk['lebar']
+    : 90;
+$hargaTerpilih = product_price_for($produk['varian'], $kainTerpilih, $ukuranTerpilih)
+    ?? (int) $produk['harga'];
 $labelProduk = match ($produk['varian']) {
     'SPREI' => 'Sprei',
     'BED_COVER' => 'Bed Cover',
@@ -186,7 +195,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
 
             <span>/</span>
 
-            <strong id="crumbName">
+            <strong>
                 <?= aman($produk['nama']) ?>
             </strong>
 
@@ -213,9 +222,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 <!-- FOTO -->
                 <div class="panel panel--image">
 
-                    <div
-                        class="product-image media"
-                        id="productImage">
+                    <div class="product-image media">
 
                         <?php if ($gambarProduk !== ''): ?>
 
@@ -238,15 +245,13 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 <!-- INFORMASI -->
                 <div class="panel panel--info">
 
-                    <h2
-                        class="product-title"
-                        id="productTitle">
+                    <h2 class="product-title">
                         <?= aman($produk['nama']) ?>
                     </h2>
 
                     <p class="product-size">
 
-                        Ukuran Standar Kasur:
+                        Ukuran Terpilih:
 
                         <strong id="standardSizeText">
                             <?= aman(
@@ -258,24 +263,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
 
                     </p>
 
-                    <?php if (trim((string) $produk['motif']) !== ''): ?>
-                        <p class="product-motif">Motif: <?= aman($produk['motif']) ?></p>
-                    <?php endif; ?>
-
-                    <p
-                        class="stock-note"
-                        id="stockStatus">
-
-                        <?= $produk['stok'] > 0
-                            ? 'Stok tersedia: ' .
-                            (int) $produk['stok'] . ' set'
-                            : 'Produk sedang habis.' ?>
-
-                    </p>
-
-                    <p
-                        class="product-desc"
-                        id="productDesc">
+                    <p class="product-desc">
                         <?= aman($produk['deskripsi']) ?>
                     </p>
 
@@ -323,7 +311,10 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 method="POST"
                 data-stock="<?= (int) $produk['stok'] ?>"
                 data-price="<?= aman($produk['harga']) ?>"
-                data-category="<?= aman($produk['varian']) ?>"
+                data-pricing="<?= aman(json_encode(
+                    $pilihanHarga,
+                    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+                )) ?>"
                 novalidate>
 
                 <!-- ID PRODUK -->
@@ -364,16 +355,53 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                     id="qtyGulingInput"
                     value="0">
 
-                <h2 class="form__title">
-                    Konfigurasi Ukuran &amp; Spesifikasi
-                </h2>
+                <div class="form-heading">
+                    <div>
+                        <h2 class="form__title">Konfigurasi Ukuran &amp; Spesifikasi</h2>
+                        <p>Sesuaikan bahan, dimensi kasur, dan aksesoris</p>
+                    </div>
+                    <div class="price-card" aria-live="polite">
+                        <span>HARGA OTOMATIS</span>
+                        <strong id="pricePreview">Rp <?= number_format($hargaTerpilih, 0, ',', '.') ?></strong>
+                        <small id="customPriceNote" hidden>Harga custom dikonfirmasi Admin</small>
+                        <small id="standardPriceNote">Estimasi harga ukuran standar</small>
+                    </div>
+                </div>
+
+                <?php if ($pilihanHarga !== []): ?>
+                    <fieldset class="configuration-section fabric-section">
+                        <legend class="form__label"><span class="step-number">1</span> PILIH JENIS KAIN / BAHAN <span class="required-mark">*</span></legend>
+                        <div class="fabric-options">
+                            <?php foreach ($pilihanHarga as $fabric => $option): ?>
+                                <label class="fabric-option">
+                                    <input
+                                        type="radio"
+                                        name="jenis_kain"
+                                        value="<?= aman($fabric) ?>"
+                                        required
+                                        <?= $fabric === $kainTerpilih ? 'checked' : '' ?>>
+                                    <span class="fabric-option__content">
+                                        <strong><?= aman($option['label']) ?></strong>
+                                        <small><?= aman(match ($fabric) {
+                                            'MICROTEX' => 'Lembut, sejuk, dan mudah dirawat',
+                                            'MICROTENCEL' => 'Halus, adem, dan nyaman digunakan',
+                                            'KATUN_LOKAL' => 'Motif menarik dengan tekstur lembut',
+                                            'TENCEL' => 'Serat alami yang lembut dan sejuk',
+                                            'KATUN_JEPANG' => 'Lembut, nyaman, dan warna tahan lama',
+                                            default => 'Pilih bahan sesuai kebutuhan',
+                                        }) ?></small>
+                                        <span class="fabric-option__price">Mulai Rp <?= number_format(min($option['prices']), 0, ',', '.') ?></span>
+                                    </span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </fieldset>
+                <?php endif; ?>
 
                 <!-- ==================================
                  PILIH TIPE UKURAN
             =================================== -->
-                <p class="form__label">
-                    Pilih Tipe Ukuran
-                </p>
+                <p class="form__label size-type-label"><span class="step-number">2</span> PILIH TIPE UKURAN KASUR</p>
 
                 <div class="segmented" role="tablist">
 
@@ -397,14 +425,46 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
 
                 </div>
 
+                <?php if ($pilihanHarga !== []): ?>
+                    <fieldset class="configuration-section size-selection">
+                        <legend class="form__label">Pilih ukuran matras standar / rumah:</legend>
+                        <div class="size-options">
+                            <?php foreach ($pilihanHarga[$kainTerpilih]['prices'] as $width => $price): ?>
+                                <?php
+                                $sizeName = match ((int) $width) {
+                                    90 => 'Single',
+                                    100 => 'Single',
+                                    120 => 'Super Single',
+                                    140 => 'Queen',
+                                    160 => 'Queen',
+                                    180 => 'King',
+                                    200 => 'Super King',
+                                };
+                                ?>
+                                <label class="size-option">
+                                    <input
+                                        type="radio"
+                                        name="ukuran_standar"
+                                        value="<?= (int) $width ?>"
+                                        required
+                                        <?= (int) $width === $ukuranTerpilih ? 'checked' : '' ?>>
+                                    <span class="size-option__content">
+                                        <strong><?= aman($sizeName) ?> (<?= (int) $width ?>)</strong>
+                                        <small><?= (int) $width ?> × 200 × <?= (int) $pilihanHarga[$kainTerpilih]['height'] ?> cm</small>
+                                        <b>Rp <?= number_format((int) $price, 0, ',', '.') ?></b>
+                                    </span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </fieldset>
+                <?php endif; ?>
+
                 <!-- ==================================
                  DIMENSI KASUR
             =================================== -->
                 <fieldset class="dimension">
 
-                    <legend class="dimension__title">
-                        Dimensi Kasur (cm)
-                    </legend>
+                    <legend class="dimension__title"><span class="step-number">3</span> DIMENSI KASUR (CM)</legend>
 
                     <div class="dimension__grid">
 
@@ -457,7 +517,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                         <h3>Jumlah <?= aman($labelProduk) ?></h3>
 
                         <?php if ($bolehTambahSarung): ?>
-                            <p>Set standar termasuk 2 sarung bantal + 2 sarung guling</p>
+                            <p>Termasuk sarung sesuai ukuran yang dipilih.</p>
                         <?php else: ?>
                             <p>Tentukan jumlah produk yang ingin dipesan.</p>
                         <?php endif; ?>
@@ -487,11 +547,8 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 </div>
 
                 <?php if ($bolehTambahSarung): ?>
-                    <!-- ==================================
-                     TAMBAHAN SARUNG
-                    =================================== -->
                     <p class="form__label">
-                        Tambahan Sarung Bantal &amp; Guling
+                        TAMBAHAN SARUNG BANTAL &amp; GULING
                     </p>
 
                     <div class="extras">
@@ -511,8 +568,6 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                             </div>
 
                             <div class="extra__row">
-
-                                <span>Jumlah:</span>
 
                                 <div
                                     class="stepper stepper--sm"
@@ -543,6 +598,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                     <?php endforeach; ?>
 
                     </div>
+                    <p class="extras-note">Harga tambahan akan dikonfirmasi Admin sesuai kain.</p>
                 <?php endif; ?>
 
                 <!-- ==================================
@@ -551,7 +607,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 <label
                     class="form__label"
                     for="note">
-                    Catatan:
+                    CATATAN:
                 </label>
 
                 <textarea
@@ -568,26 +624,18 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                     role="alert"
                     hidden></p>
 
-                <!-- ==================================
-                 TOMBOL TAMBAH KERANJANG
-            =================================== -->
+                <div class="order-subtotal">
+                    <span>Subtotal Pesanan</span>
+                    <strong id="orderSubtotal">Rp <?= number_format($hargaTerpilih, 0, ',', '.') ?></strong>
+                </div>
                 <button
                     type="submit"
                     class="btn-cart"
                     <?= $produk['stok'] <= 0 ? 'disabled' : '' ?>>
-
                     Tambahkan ke Keranjang
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        width="18"
-                        height="18"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                         <path d="M5 12h14m-5-6 6 6-6 6" />
                     </svg>
-
                 </button>
 
             </form>

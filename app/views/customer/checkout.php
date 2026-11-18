@@ -12,6 +12,8 @@ function checkoutEscape($value): string
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+require_once __DIR__ . '/../../helpers/product_pricing.php';
+
 if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     $pesananBaru = $_SESSION['pesanan_terakhir'];
 } else {
@@ -89,14 +91,23 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
             (int) ($cartItem['lebar'] ?? $product['lebar_standar']),
             (int) ($cartItem['tinggi'] ?? $product['tinggi_standar']),
         ];
+        $isCustom = ($cartItem['mode'] ?? '') === 'custom';
         $produkPesanan[] = [
             'nama' => (string) $product['nama_produk'],
             'gambar' => !empty($product['gambar_produk'])
                 ? product_image_url($product['gambar_produk'])
                 : '',
-            'jenis' => ($cartItem['mode'] ?? '') === 'custom' ? 'custom' : 'standar',
+            'jenis' => $isCustom ? 'custom' : 'standar',
+            'kain' => product_fabric_label((string) ($cartItem['jenis_kain'] ?? $product['jenis_kain'] ?? '')),
             'ukuran' => implode(' × ', $dimensions) . ' cm',
             'jumlah' => (int) ($cartItem['qtySprei'] ?? 0),
+            'harga_satuan' => $isCustom
+                ? null
+                : (product_price_for(
+                    (string) $product['kategori_produk'],
+                    (string) ($cartItem['jenis_kain'] ?? $product['jenis_kain'] ?? ''),
+                    (int) $dimensions[1]
+                ) ?? (float) $product['harga_dasar']),
             'tambahan' => $extras === [] ? '-' : implode(' + ', $extras),
             'catatan' => (string) ($cartItem['catatan'] ?? ''),
         ];
@@ -239,7 +250,9 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
                         <?= checkoutEscape($produk['nama']) ?>
                         <span class="label label-<?= checkoutEscape($produk['jenis']) ?>"><?= strtoupper(checkoutEscape($produk['jenis'])) ?></span>
                     </h3>
+                    <p><small>Jenis kain:</small> <?= checkoutEscape($produk['kain']) ?></p>
                     <p><small>Ukuran:</small> <?= checkoutEscape($produk['ukuran']) ?> &nbsp;&nbsp; <small>Jumlah:</small> <?= (int) $produk['jumlah'] ?> pcs</p>
+                    <p><small>Harga satuan:</small> <?= $produk['harga_satuan'] === null ? 'Dikonfirmasi Admin' : 'Rp ' . number_format($produk['harga_satuan'], 0, ',', '.') ?></p>
                     <p><small>Tambahan:</small> <?= checkoutEscape($produk['tambahan']) ?></p>
                     <p class="catatan-produk"><b>Catatan:</b> <?= checkoutEscape($produk['catatan'] ?: '-') ?></p>
                 </div>
