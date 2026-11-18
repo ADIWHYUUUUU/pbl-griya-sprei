@@ -48,6 +48,7 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     }
 
     require_once __DIR__ . '/../../controllers/ProductController.php';
+    require_once __DIR__ . '/../../models/UserModel.php';
     $productController = new ProductController();
     $formValues = $_SESSION['checkout_form'] ?? [];
     $formValues = is_array($formValues) ? $formValues : [];
@@ -106,7 +107,15 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
         'telepon' => (string) ($_SESSION['no_hp'] ?? ''),
         'email' => (string) ($_SESSION['email'] ?? ''),
     ];
-    $alamatAwal = (string) ($formValues['alamat'] ?? '');
+    $customerId = filter_var($_SESSION['id_user'] ?? null, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1],
+    ]);
+    if ($customerId === false || $customerId === null) {
+        http_response_code(403);
+        exit('Akun customer tidak valid.');
+    }
+    $alamatDefault = (new UserModel($GLOBALS['pdo']))->getShippingAddress($customerId);
+    $alamatAwal = (string) ($formValues['alamat'] ?? $alamatDefault);
     $catatanAwal = (string) ($formValues['catatan_alamat'] ?? '');
     $infoReguler = 'Pengiriman reguler ke seluruh area di Indonesia.';
     $metodeKirim = [
@@ -116,7 +125,6 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     ];
 }
 
-$ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -183,7 +191,7 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
                     <h2>Data &amp; Alamat Pengiriman</h2>
                     <small>Informasi pemesan dan tujuan pengiriman</small>
                 </div>
-                <button type="button" class="tombol-kecil" data-buka-modal="modalAlamat">
+                <button type="button" class="tombol-kecil" id="tombolUbahAlamat" aria-controls="inputAlamat">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m14 5 5 5-10 10H4v-5z"/></svg>
                     Ubah Alamat
                 </button>
@@ -197,9 +205,12 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
                     <p class="baris-ikon">✉️ <?= checkoutEscape($pemesan['email']) ?></p>
                 </div>
                 <div class="kotak-alamat">
-                    <small class="judul-kecil">ALAMAT PENGIRIMAN LENGKAP</small>
-                    <p id="teksAlamat"><?= checkoutEscape($alamatAwal) ?></p>
-                    <p class="catatan-alamat" id="kotakCatatanAlamat">ⓘ <b>Catatan alamat:</b> <span id="teksCatatanAlamat"><?= checkoutEscape($catatanAwal) ?></span></p>
+                    <label class="isian">Alamat Pengiriman Lengkap
+                        <textarea name="alamat" id="inputAlamat" rows="3" maxlength="2000" required placeholder="Masukkan nama jalan, nomor rumah, kelurahan, kecamatan, kota, dan kode pos"><?= checkoutEscape($alamatAwal) ?></textarea>
+                    </label>
+                    <label class="isian">Catatan Khusus Pengiriman <small>(Opsional)</small>
+                        <input type="text" name="catatan_alamat" id="inputCatatanAlamat" maxlength="1000" value="<?= checkoutEscape($catatanAwal) ?>" placeholder="Contoh: patokan rumah atau warna pagar">
+                    </label>
                 </div>
             </div>
         </section>
@@ -299,38 +310,6 @@ $ikonCentang = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stro
         </div>
 
 
-        <!-- ================= MODAL: UBAH ALAMAT PENGIRIMAN ================= -->
-        <div class="modal-latar" id="modalAlamat">
-            <div class="modal modal-alamat" role="dialog" aria-modal="true" aria-labelledby="judulModalAlamat">
-                <div class="modal-kepala">
-                    <h2 id="judulModalAlamat">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><path d="m9 10 2 2 4-4"/></svg>
-                        Ubah Alamat Pengiriman
-                    </h2>
-                    <button type="button" class="tutup-modal" data-tutup-modal aria-label="Tutup">×</button>
-                </div>
-
-                <div class="modal-isi">
-                    <label class="isian">Nama Penerima
-                        <input type="text" value="<?= checkoutEscape($pemesan['nama']) ?>" readonly>
-                    </label>
-                    <label class="isian">Nomor WhatsApp
-                        <input type="tel" value="<?= checkoutEscape($pemesan['telepon']) ?>" readonly>
-                    </label>
-                    <label class="isian">Alamat Lengkap &amp; Kota
-                        <textarea name="alamat" id="inputAlamat" rows="3" maxlength="2000"><?= checkoutEscape($alamatAwal) ?></textarea>
-                    </label>
-                    <label class="isian">Catatan Khusus Pengiriman <small>(Opsional)</small>
-                        <input type="text" name="catatan_alamat" id="inputCatatanAlamat" maxlength="1000" value="<?= checkoutEscape($catatanAwal) ?>">
-                    </label>
-                </div>
-
-                <div class="modal-kaki">
-                    <button type="button" class="tombol tombol-abu" data-tutup-modal>Batal</button>
-                    <button type="button" class="tombol" id="simpanAlamat"><?= $ikonCentang ?> Simpan Perubahan</button>
-                </div>
-            </div>
-        </div>
     </form>
 
 <?php } ?>

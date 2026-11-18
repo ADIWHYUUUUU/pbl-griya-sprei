@@ -470,6 +470,16 @@ class OrderModel
                 ]);
             }
 
+            $addressStatement = $this->pdo->prepare(
+                'UPDATE "user"
+                 SET alamat_pengiriman = :alamat_pengiriman
+                 WHERE id_user = :id_user'
+            );
+            $addressStatement->execute([
+                ':alamat_pengiriman' => $order['alamat_pengiriman'],
+                ':id_user' => $order['id_user'],
+            ]);
+
             $this->pdo->commit();
             return [
                 'id_pesanan' => $orderId,

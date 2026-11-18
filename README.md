@@ -74,3 +74,7 @@ SUPABASE_PAYMENT_BUCKET=bukti-pembayaran
 ```
 
 Jangan masukkan secret key ke kode browser atau commit ke Git. Bukti pembayaran private ditampilkan ke Admin melalui signed URL yang berlaku lima menit. Nilai gambar yang sudah tersimpan lokal tetap didukung; upload baru memakai Supabase.
+
+## Alamat Default Checkout
+
+Alamat pengiriman pada checkout disimpan sebagai alamat default akun setelah pesanan berhasil dibuat. Untuk database yang sudah ada, jalankan `database/migrations/18_user_shipping_address.sql` satu kali melalui pgAdmin atau `psql`.

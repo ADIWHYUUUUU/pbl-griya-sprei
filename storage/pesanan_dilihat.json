@@ -1,12 +1,14 @@
 {
     "19": {
-        "51": "DIPROSES|1|",
-        "49": "MENUNGGU_VERIFIKASI|0|",
+        "54": "MENUNGGU_VERIFIKASI|0|",
+        "53": "MENUNGGU_PEMBAYARAN|0|",
+        "51": "DIBATALKAN|1|",
+        "49": "DIBATALKAN|0|",
         "31": "DIKIRIM|1|GJK123456789",
-        "29": "MENUNGGU_PEMBAYARAN|0|",
-        "26": "MENUNGGU_PEMBAYARAN|0|",
+        "29": "DIPROSES|1|",
+        "26": "DIBATALKAN|0|",
         "25": "SELESAI|0|",
-        "24": "MENUNGGU_PEMBAYARAN|0|",
+        "24": "DIBATALKAN|0|",
         "16": "DIPROSES|0|"
     },
     "14": {
