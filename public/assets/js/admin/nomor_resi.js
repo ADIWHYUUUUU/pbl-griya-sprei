@@ -37,11 +37,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         activeResi = detail.resi;
 
-        modalTitle.textContent = 'Detail Nomor Resi & Pengiriman';
+        modalTitle.textContent = detail.courierKey === 'INSTANT_GOJEK'
+            ? 'Detail Nomor Telepon & Pengiriman'
+            : 'Detail Nomor Resi & Pengiriman';
         resiNumberValue.textContent = detail.resi;
+        document.getElementById('resiLabelValue').textContent = detail.resiLabel || 'NOMOR RESI PENGIRIMAN';
         resiModalSubtitle.textContent = 'No. Pesanan: ' + detail.invoice + ' • ' + detail.courier;
         resiCourierValue.textContent = detail.courier;
         resiCourierService.textContent = detail.courierKey === 'INSTANT_GOJEK' ? 'Pengiriman instan' : 'Layanan ekspedisi';
+        if (copyResiBtn) {
+            copyResiBtn.textContent = detail.courierKey === 'INSTANT_GOJEK'
+                ? 'Salin Telepon'
+                : 'Salin Resi';
+        }
         resiCustomerName.textContent = detail.customer || 'Pelanggan';
         resiCustomerPhone.textContent = detail.phone || '-';
         resiCustomerAddress.textContent = detail.address || 'Alamat belum tersedia';

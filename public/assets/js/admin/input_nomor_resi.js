@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const trackingInput = form.querySelector('#nomor_resi');
     const confirmBox = form.querySelector('#konfirmasi');
+    const isGojek = trackingInput && trackingInput.getAttribute('type') === 'tel';
 
     form.addEventListener('submit', function (event) {
         if (trackingInput) {
@@ -13,7 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!trackingInput.value) {
                 event.preventDefault();
                 trackingInput.focus();
-                trackingInput.setCustomValidity('Nomor resi wajib diisi.');
+                trackingInput.setCustomValidity(isGojek ? 'Nomor telepon kurir Gojek wajib diisi.' : 'Nomor resi pengiriman wajib diisi.');
+                trackingInput.reportValidity();
+                return;
+            }
+            if (isGojek && !/^\+?[0-9][0-9\s\-]{7,49}$/.test(trackingInput.value)) {
+                event.preventDefault();
+                trackingInput.focus();
+                trackingInput.setCustomValidity('Masukkan nomor telepon kurir Gojek yang valid.');
                 trackingInput.reportValidity();
                 return;
             }

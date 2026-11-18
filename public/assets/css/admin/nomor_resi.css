@@ -611,6 +611,34 @@ body.resi-page {
 
 .resi-page .order-table-wrap table {
     min-width: 860px;
+    table-layout: fixed;
+}
+
+.resi-page .order-table-wrap thead th:nth-child(1),
+.resi-page .order-table-wrap tbody td:nth-child(1) {
+    width: 16%;
+}
+
+.resi-page .order-table-wrap thead th:nth-child(2),
+.resi-page .order-table-wrap tbody td:nth-child(2) {
+    width: 20%;
+}
+
+.resi-page .order-table-wrap thead th:nth-child(3),
+.resi-page .order-table-wrap tbody td:nth-child(3) {
+    width: 24%;
+}
+
+.resi-page .order-table-wrap thead th:nth-child(4),
+.resi-page .order-table-wrap tbody td:nth-child(4) {
+    width: 17%;
+    text-align: center;
+}
+
+.resi-page .order-table-wrap thead th:nth-child(5),
+.resi-page .order-table-wrap tbody td:nth-child(5) {
+    width: 23%;
+    text-align: right;
 }
 
 .resi-page .order-table-wrap thead th {
@@ -625,12 +653,14 @@ body.resi-page {
 }
 
 .resi-page .order-table-wrap tbody td {
-    padding: 14px 12px;
+    height: 88px;
+    padding: 12px;
     border-bottom: 0;
     border-top: 1px solid #edf0ec;
     color: #344139;
     font-size: 13px;
     line-height: 1.45;
+    vertical-align: middle;
 }
 
 .resi-page .order-table-wrap tbody tr:last-child td {
@@ -657,11 +687,12 @@ body.resi-page {
 }
 
 .resi-page .shipping-name {
-    max-width: 260px;
+    max-width: 220px;
     margin-top: 4px;
     color: #71806f;
     font-size: 12px;
     line-height: 1.45;
+    overflow-wrap: anywhere;
 }
 
 .resi-page .spec {
@@ -710,6 +741,17 @@ body.resi-page {
 .resi-page .action-btn.secondary:hover {
     border-color: #c3d0c0;
     background: #f7faf6;
+}
+
+.resi-page .resi-action-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.resi-page .resi-action-group .action-btn {
+    margin: 0;
 }
 
 .resi-page .empty-state {

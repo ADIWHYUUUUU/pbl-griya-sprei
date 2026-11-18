@@ -23,6 +23,7 @@ class OrderModel
                 p.metode_pengiriman::text AS metode_pengiriman,
                 p.catatan_pengiriman,
                 p.nomor_resi,
+                p.nomor_telepon_kurir,
                 p.tagihan_pokok,
                 p.ongkir,
                 p.diskon,
@@ -78,6 +79,7 @@ class OrderModel
                     'metode_pengiriman' => (string) $row['metode_pengiriman'],
                     'catatan_pengiriman' => (string) ($row['catatan_pengiriman'] ?? ''),
                     'nomor_resi' => (string) ($row['nomor_resi'] ?? ''),
+                    'nomor_telepon_kurir' => (string) ($row['nomor_telepon_kurir'] ?? ''),
                     'tagihan_pokok' => $row['tagihan_pokok'] === null
                         ? null
                         : (float) $row['tagihan_pokok'],
@@ -223,6 +225,7 @@ class OrderModel
                 p.metode_pengiriman::text AS metode_pengiriman,
                 p.catatan_pengiriman,
                 p.nomor_resi,
+                p.nomor_telepon_kurir,
                 u.nama AS nama_pelanggan,
                 u.no_hp AS telepon
              FROM pesanan p
@@ -259,18 +262,26 @@ class OrderModel
         return $order;
     }
 
-    public function saveShipmentDetails(int $orderId, string $tracking, string $shippingNote): bool
+    public function saveShipmentDetails(int $orderId, string $shippingValue, string $shippingNote, bool $isGojek): bool
     {
-        $statement = $this->pdo->prepare(
-            "UPDATE pesanan
-             SET nomor_resi = :nomor_resi,
-                 catatan_pengiriman = :catatan_pengiriman,
-                 status_pesanan = 'DIKIRIM'
-             WHERE id_pesanan = :order_id
-               AND status_pesanan::text IN ('DIPROSES', 'DIKIRIM')"
-        );
+        $sql = $isGojek
+            ? "UPDATE pesanan
+               SET nomor_resi = NULL,
+                   nomor_telepon_kurir = :shipping_value,
+                   catatan_pengiriman = :catatan_pengiriman,
+                   status_pesanan = 'DIKIRIM'
+               WHERE id_pesanan = :order_id
+                 AND status_pesanan::text IN ('DIPROSES', 'DIKIRIM')"
+            : "UPDATE pesanan
+               SET nomor_resi = :shipping_value,
+                   nomor_telepon_kurir = NULL,
+                   catatan_pengiriman = :catatan_pengiriman,
+                   status_pesanan = 'DIKIRIM'
+               WHERE id_pesanan = :order_id
+                 AND status_pesanan::text IN ('DIPROSES', 'DIKIRIM')";
+        $statement = $this->pdo->prepare($sql);
         $statement->execute([
-            ':nomor_resi' => $tracking,
+            ':shipping_value' => $shippingValue,
             ':catatan_pengiriman' => $shippingNote,
             ':order_id' => $orderId,
         ]);

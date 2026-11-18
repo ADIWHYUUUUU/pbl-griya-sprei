@@ -65,16 +65,24 @@ $image = $item['gambar_produk'] ?? '';
 if ($image !== '') {
     $image = product_image_url($image);
 }
-$tracking = trim((string) ($order['nomor_resi'] ?? ''));
+$isGojek = ($order['metode_pengiriman'] ?? '') === 'INSTANT_GOJEK';
+$tracking = trim((string) ($isGojek
+    ? ($order['nomor_telepon_kurir'] ?? '')
+    : ($order['nomor_resi'] ?? '')));
 $customerAddress = trim((string) ($order['alamat_pengiriman'] ?? ''));
 $customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_alamat'] ?? '')) !== '' ? '\n' . trim((string) ($order['catatan_alamat'] ?? '')) : '';
+$trackingLabel = $isGojek ? 'Nomor Telepon Kurir Gojek' : 'Nomor Resi Pengiriman';
+$trackingPlaceholder = $isGojek ? 'Contoh: 081234567890' : 'Contoh: JNE882910481290';
+$trackingHint = $isGojek
+    ? 'Masukkan nomor telepon kurir Gojek.'
+    : 'Masukkan nomor resi dari ekspedisi J&T atau JNE.';
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Nomor Resi - Griya Sprei</title>
+    <title>Input Nomor Pengiriman - Griya Sprei</title>
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
     <link rel="stylesheet" href="/assets/css/admin/input_nomor_resi.css">
@@ -89,18 +97,19 @@ $customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_al
                     <span aria-hidden="true">›</span>
                     <a href="/?page=admin-resi-list">Nomor Resi</a>
                     <span aria-hidden="true">›</span>
-                    <strong aria-current="page">Input Nomor Resi</strong>
+                    <strong aria-current="page"><?= $isGojek ? 'Input Nomor Telepon Kurir' : 'Input Nomor Resi' ?></strong>
                 </nav>
 
-                <a class="resi-back-link" href="/?page=admin-resi-list">&larr; Kembali ke daftar</a>
+                <div class="page-heading">
+                    <h1 class="page-title"><?= $isGojek ? 'Input Nomor Telepon Kurir Gojek' : 'Input Nomor Resi Pengiriman' ?></h1>
+                    <a class="resi-back-link" href="/?page=admin-resi-list">&larr; Kembali ke daftar</a>
+                </div>
 
                 <?php if (is_array($flash) && isset($flash['text'])): ?>
                     <div class="flash-message <?= $escape($flash['type'] ?? 'error') ?>" role="status">
                         <?= $escape($flash['text']) ?>
                     </div>
                 <?php endif; ?>
-
-                <h1 class="page-title">Input Nomor Resi Pengiriman</h1>
 
                 <div class="form-card">
                     <div class="order-meta">
@@ -142,12 +151,20 @@ $customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_al
                         <div class="section-content">
                             <div class="form-grid">
                                 <div class="field field-wide">
-                                    <label for="nomor_resi">Nomor Resi Pengiriman</label>
-                                    <input id="nomor_resi" name="nomor_resi" type="text" value="<?= $escape($tracking) ?>" placeholder="Contoh: JNE882910481290" maxlength="50" required>
+                                    <label for="nomor_resi"><?= $escape($trackingLabel) ?></label>
+                                    <input id="nomor_resi" name="nomor_pengiriman"
+                                        type="<?= $isGojek ? 'tel' : 'text' ?>"
+                                        value="<?= $escape($tracking) ?>"
+                                        placeholder="<?= $escape($trackingPlaceholder) ?>"
+                                        maxlength="50"
+                                        <?= $isGojek ? 'inputmode="tel" autocomplete="tel"' : '' ?>
+                                        aria-describedby="trackingHint"
+                                        required>
+                                    <small class="field-hint" id="trackingHint"><?= $escape($trackingHint) ?></small>
                                 </div>
                             </div>
 
-                            <div class="field">
+                            <div class="field field-note">
                                 <label for="catatan_pengiriman">Catatan Pengiriman <span class="optional-label">(opsional)</span></label>
                                 <textarea id="catatan_pengiriman" name="catatan_pengiriman" placeholder="Masukkan catatan pengiriman"><?= $escape((string) ($order['catatan_pengiriman'] ?? '')) ?></textarea>
                             </div>
@@ -160,7 +177,7 @@ $customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_al
 
                         <div class="footer-actions">
                             <a class="button secondary" href="/?page=admin-resi-list">Batal</a>
-                            <button type="submit" class="button primary">Simpan Nomor Resi</button>
+                            <button type="submit" class="button primary"><?= $isGojek ? 'Simpan Nomor Telepon' : 'Simpan Nomor Resi' ?></button>
                         </div>
                     </form>
                 </div>

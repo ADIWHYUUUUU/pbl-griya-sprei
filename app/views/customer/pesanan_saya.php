@@ -139,7 +139,12 @@ foreach ($orders as &$order) {
         'catatan_alamat' => $order['catatan_alamat'],
         'pengiriman' => $shippingLabels[$order['metode_pengiriman']] ?? $order['metode_pengiriman'],
         'catatan_pengiriman' => $order['catatan_pengiriman'],
-        'resi' => $order['nomor_resi'],
+        'resi' => $order['metode_pengiriman'] === 'INSTANT_GOJEK'
+            ? ($order['nomor_telepon_kurir'] ?? '')
+            : ($order['nomor_resi'] ?? ''),
+        'resi_label' => $order['metode_pengiriman'] === 'INSTANT_GOJEK'
+            ? 'Nomor telepon kurir'
+            : 'Nomor resi',
         'status_pembayaran' => match ($order['status_pembayaran']) {
             'MENUNGGU_VERIFIKASI' => 'Menunggu verifikasi pembayaran',
             'TERVERIFIKASI' => 'Terverifikasi',
@@ -237,8 +242,13 @@ unset($order);
                             <?php if ($order['tambahan'] !== '-'): ?>
                                 <p><small>Kelengkapan:</small> <?= e($order['tambahan']) ?></p>
                             <?php endif; ?>
-                            <?php if ($order['nomor_resi'] !== ''): ?>
-                                <p><small>Resi:</small> <?= e($order['nomor_resi']) ?></p>
+                            <?php
+                                $shippingTracking = $order['metode_pengiriman'] === 'INSTANT_GOJEK'
+                                    ? ($order['nomor_telepon_kurir'] ?? '')
+                                    : ($order['nomor_resi'] ?? '');
+                            ?>
+                            <?php if ($shippingTracking !== ''): ?>
+                                <p><small><?= $order['metode_pengiriman'] === 'INSTANT_GOJEK' ? 'Telepon kurir:' : 'Resi:' ?></small> <?= e($shippingTracking) ?></p>
                             <?php endif; ?>
                         </div>
 
@@ -323,7 +333,7 @@ unset($order);
                     <p><small>Alamat:</small> <span data-isi="alamat"></span></p>
                     <p><small>Catatan alamat:</small> <span data-isi="catatan_alamat"></span></p>
                     <p><small>Catatan pengiriman:</small> <span data-isi="catatan_pengiriman"></span></p>
-                    <p><small>Nomor resi:</small> <span data-isi="resi"></span></p>
+                    <p><small data-isi="resi_label"></small> <span data-isi="resi"></span></p>
                     <p><small>Status pembayaran:</small> <span data-isi="status_pembayaran"></span></p>
                     <p><small>Metode pembayaran:</small> <span data-isi="metode_pembayaran"></span></p>
                     <p><small>Nominal transfer:</small> <span data-isi="nominal_transfer"></span></p>
