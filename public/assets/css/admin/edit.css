@@ -161,6 +161,14 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.admin-edit-product .edit-grid-3.without-height {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-edit-product #tinggi_standar_field[hidden] {
+  display: none !important;
+}
+
 .admin-edit-product .edit-grid-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

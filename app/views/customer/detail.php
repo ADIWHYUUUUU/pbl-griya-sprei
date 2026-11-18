@@ -45,11 +45,14 @@ $produk = [
     'gambar' => $dataProduk['gambar_produk'],
     'panjang' => (float) $dataProduk['panjang_standar'],
     'lebar' => (float) $dataProduk['lebar_standar'],
-    'tinggi' => (float) $dataProduk['tinggi_standar'],
+    'tinggi' => $dataProduk['tinggi_standar'] === null
+        ? null
+        : (float) $dataProduk['tinggi_standar'],
     'harga' => (float) $dataProduk['harga_dasar'],
     'stok' => (int) $dataProduk['stok'],
     'deskripsi' => $dataProduk['deskripsi']
 ];
+$ukuranStandarSaja = product_is_pillow_bolster_category((string) $produk['varian']);
 $bolehTambahSarung = $produk['varian'] === 'SPREI';
 $jenisKainProduk = (string) ($dataProduk['jenis_kain'] ?? '');
 $semuaPilihanHarga = product_pricing_options($produk['varian']);
@@ -93,12 +96,14 @@ $dimensi = [
         'label' => 'Lebar',
         'nilai' => $produk['lebar']
     ],
-    [
+];
+if (!$ukuranStandarSaja) {
+    $dimensi[] = [
         'id' => 'height',
         'label' => 'Tinggi',
         'nilai' => $produk['tinggi']
-    ]
-];
+    ];
+}
 
 // ==========================================
 // 11. TAMBAHAN SARUNG
@@ -257,11 +262,8 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                         Ukuran Terpilih:
 
                         <strong id="standardSizeText">
-                            <?= aman(
-                                $produk['panjang'] . ' × ' .
-                                    $produk['lebar'] . ' × ' .
-                                    $produk['tinggi']
-                            ) ?> cm
+                            <?= aman($produk['panjang'] . ' × ' . $produk['lebar']) ?>
+                            <?= $ukuranStandarSaja ? 'cm' : '× ' . aman($produk['tinggi']) . ' cm' ?>
                         </strong>
 
                     </p>
@@ -317,6 +319,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 data-catalog-length="<?= aman($produk['panjang']) ?>"
                 data-catalog-width="<?= aman($produk['lebar']) ?>"
                 data-catalog-height="<?= aman($produk['tinggi']) ?>"
+                data-standard-only="<?= $ukuranStandarSaja ? 'true' : 'false' ?>"
                 data-pricing="<?= aman(json_encode(
                     $pilihanHarga,
                     JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
@@ -369,7 +372,7 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 <div class="form-heading">
                     <div>
                         <h2 class="form__title">Konfigurasi Ukuran &amp; Spesifikasi</h2>
-                        <p>Sesuaikan dimensi kasur dan aksesoris</p>
+                        <p><?= $ukuranStandarSaja ? 'Ukuran standar produk' : 'Sesuaikan dimensi kasur dan aksesoris' ?></p>
                     </div>
                     <div class="price-card" aria-live="polite">
                         <span>HARGA OTOMATIS</span>
@@ -382,29 +385,31 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
                 <!-- ==================================
                  PILIH TIPE UKURAN
             =================================== -->
-                <p class="form__label size-type-label"><span class="step-number">1</span> PILIH TIPE UKURAN KASUR</p>
+                <p class="form__label size-type-label"><span class="step-number">1</span> <?= $ukuranStandarSaja ? 'UKURAN PRODUK' : 'PILIH TIPE UKURAN KASUR' ?></p>
 
-                <div class="segmented" role="tablist">
+                <?php if ($ukuranStandarSaja): ?>
+                    <p class="standard-only-note">Produk ini tersedia dalam ukuran standar.</p>
+                <?php else: ?>
+                    <div class="segmented" role="tablist">
+                        <button
+                            type="button"
+                            class="segmented__btn segmented__btn--active"
+                            data-mode="standard"
+                            role="tab"
+                            aria-selected="true">
+                            Standar
+                        </button>
 
-                    <button
-                        type="button"
-                        class="segmented__btn segmented__btn--active"
-                        data-mode="standard"
-                        role="tab"
-                        aria-selected="true">
-                        Standar
-                    </button>
-
-                    <button
-                        type="button"
-                        class="segmented__btn"
-                        data-mode="custom"
-                        role="tab"
-                        aria-selected="false">
-                        Custom Ukuran
-                    </button>
-
-                </div>
+                        <button
+                            type="button"
+                            class="segmented__btn"
+                            data-mode="custom"
+                            role="tab"
+                            aria-selected="false">
+                            Custom Ukuran
+                        </button>
+                    </div>
+                <?php endif; ?>
 
                 <?php if ($pilihanHarga !== []): ?>
                     <fieldset class="configuration-section size-selection">
@@ -451,9 +456,9 @@ unset($_SESSION['cart_message'], $_SESSION['cart_message_type']);
             =================================== -->
                 <fieldset class="dimension">
 
-                    <legend class="dimension__title"><span class="step-number">2</span> DIMENSI KASUR (CM)</legend>
+                    <legend class="dimension__title"><span class="step-number">2</span> <?= $ukuranStandarSaja ? 'UKURAN STANDAR (CM)' : 'DIMENSI KASUR (CM)' ?></legend>
 
-                    <div class="dimension__grid">
+                    <div class="dimension__grid <?= $ukuranStandarSaja ? 'dimension__grid--two' : '' ?>">
 
                         <?php foreach ($dimensi as $d): ?>
 

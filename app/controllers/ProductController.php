@@ -115,10 +115,10 @@ class ProductController
             FILTER_VALIDATE_INT
         );
 
-        $tinggi = filter_var(
-            $_POST['tinggi_standar'] ?? null,
-            FILTER_VALIDATE_INT
-        );
+        $isPillowBolster = $kategori === 'SARUNG_BANTAL_GULING';
+        $tinggi = $isPillowBolster
+            ? null
+            : filter_var($_POST['tinggi_standar'] ?? null, FILTER_VALIDATE_INT);
 
         $harga = filter_var(
             $_POST['harga_dasar'] ?? null,
@@ -138,7 +138,7 @@ class ProductController
             !in_array($jenisKain, ['TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'], true) ||
             $panjang === false || $panjang <= 0 ||
             $lebar === false || $lebar <= 0 ||
-            $tinggi === false || $tinggi <= 0 ||
+            (!$isPillowBolster && ($tinggi === false || $tinggi <= 0)) ||
             $harga === false || !is_finite($harga) || $harga <= 0 ||
             $stok === false || $stok < 0
         ) {
@@ -298,10 +298,10 @@ class ProductController
             FILTER_VALIDATE_INT
         );
 
-        $tinggi = filter_var(
-            $_POST['tinggi_standar'] ?? null,
-            FILTER_VALIDATE_INT
-        );
+        $isPillowBolster = $kategori === 'SARUNG_BANTAL_GULING';
+        $tinggi = $isPillowBolster
+            ? null
+            : filter_var($_POST['tinggi_standar'] ?? null, FILTER_VALIDATE_INT);
 
         $harga = filter_var(
             $_POST['harga_dasar'] ?? null,
@@ -324,7 +324,7 @@ class ProductController
             !in_array($jenisKain, ['TENCEL', 'KATUN_JEPANG', 'KATUN_LOKAL', 'MICROTENCEL', 'MICROTEX'], true) ||
             $panjang === false || $panjang <= 0 ||
             $lebar === false || $lebar <= 0 ||
-            $tinggi === false || $tinggi <= 0 ||
+            (!$isPillowBolster && ($tinggi === false || $tinggi <= 0)) ||
             $harga === false || !is_finite($harga) || $harga <= 0 ||
             $stok === false || $stok < 0
         ) {

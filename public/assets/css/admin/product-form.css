@@ -149,6 +149,14 @@
   gap: 10px;
 }
 
+.admin-product-form-page .product-size-grid.without-height {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-product-form-page .product-size-grid #tinggi_standar_field[hidden] {
+  display: none !important;
+}
+
 .admin-product-form-page .product-input-suffix {
   display: flex;
   align-items: center;

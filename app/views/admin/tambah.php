@@ -102,7 +102,7 @@ $product = is_array($product ?? null) ? $product : [];
                             <input type="number" id="lebar_standar" name="lebar_standar" min="1" step="1" placeholder="Lebar" required>
                             <span aria-hidden="true">L</span>
                         </label>
-                        <label class="product-input-suffix">
+                        <label class="product-input-suffix" id="tinggi_standar_field" hidden>
                             <span class="visually-hidden">Tinggi</span>
                             <input type="number" id="tinggi_standar" name="tinggi_standar" min="1" step="1" placeholder="Tinggi" required>
                             <span aria-hidden="true">T (Karet)</span>
@@ -159,6 +159,7 @@ $product = is_array($product ?? null) ? $product : [];
     </main>
 </div>
 <script src="/assets/js/admin/sidebar.js"></script>
+<script src="/assets/js/admin/product-category-height.js"></script>
 <script src="/assets/js/admin/product-form.js"></script>
 </body>
 </html>

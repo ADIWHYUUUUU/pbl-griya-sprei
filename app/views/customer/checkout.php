@@ -86,12 +86,15 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
         if ($quantityBolster > 0) {
             $extras[] = $quantityBolster . ' sarung guling';
         }
+        $isPillowBolster = product_is_pillow_bolster_category((string) $product['kategori_produk']);
         $dimensions = [
-            (int) ($cartItem['panjang'] ?? $product['panjang_standar']),
-            (int) ($cartItem['lebar'] ?? $product['lebar_standar']),
-            (int) ($cartItem['tinggi'] ?? $product['tinggi_standar']),
+            (int) ($isPillowBolster ? $product['panjang_standar'] : ($cartItem['panjang'] ?? $product['panjang_standar'])),
+            (int) ($isPillowBolster ? $product['lebar_standar'] : ($cartItem['lebar'] ?? $product['lebar_standar'])),
         ];
-        $isCustom = ($cartItem['mode'] ?? '') === 'custom';
+        if (!$isPillowBolster) {
+            $dimensions[] = (int) ($cartItem['tinggi'] ?? $product['tinggi_standar']);
+        }
+        $isCustom = !$isPillowBolster && ($cartItem['mode'] ?? '') === 'custom';
         $produkPesanan[] = [
             'nama' => (string) $product['nama_produk'],
             'gambar' => !empty($product['gambar_produk'])

@@ -91,12 +91,13 @@ foreach ($orders as &$order) {
     $itemNotes = [];
     foreach ($order['produk'] as $product) {
         $productNames[] = $product['nama'];
+        $size = $product['tinggi'] === null
+            ? sprintf('%d × %d cm', $product['panjang'], $product['lebar'])
+            : sprintf('%d × %d × %d cm', $product['panjang'], $product['lebar'], $product['tinggi']);
         $productSpecs[] = sprintf(
-            '%s: %d × %d × %d cm · %d pcs',
+            '%s: %s · %d pcs',
             $product['tipe_ukuran'] === 'CUSTOM' ? 'Custom' : 'Standar',
-            $product['panjang'],
-            $product['lebar'],
-            $product['tinggi'],
+            $size,
             $product['jumlah']
         );
         if ($product['tambah_sarban'] > 0) {
@@ -235,7 +236,7 @@ unset($order);
                             <?php foreach ($order['produk'] as $product): ?>
                                 <p>
                                     <small><?= e($product['tipe_ukuran'] === 'CUSTOM' ? 'Custom' : 'Standar') ?>:</small>
-                                    <?= (int) $product['panjang'] ?> × <?= (int) $product['lebar'] ?> × <?= (int) $product['tinggi'] ?> cm
+                                    <?= (int) $product['panjang'] ?> × <?= (int) $product['lebar'] ?><?= $product['tinggi'] === null ? '' : ' × ' . (int) $product['tinggi'] ?> cm
                                     · <?= (int) $product['jumlah'] ?> pcs
                                 </p>
                             <?php endforeach; ?>

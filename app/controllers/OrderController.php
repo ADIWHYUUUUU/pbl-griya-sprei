@@ -83,7 +83,8 @@ class OrderController
                 $this->checkoutError('Produk atau jumlah pesanan tidak valid. Periksa kembali keranjang Anda.');
             }
 
-            $mode = $item['mode'] ?? '';
+            $isPillowBolster = product_is_pillow_bolster_category((string) $product['kategori_produk']);
+            $mode = $isPillowBolster ? 'standard' : ($item['mode'] ?? '');
             if (!in_array($mode, ['standard', 'custom'], true)) {
                 $this->checkoutError('Tipe ukuran tidak valid. Periksa kembali keranjang Anda.');
             }
@@ -91,12 +92,12 @@ class OrderController
             $dimensions = [
                 'panjang' => (int) $product['panjang_standar'],
                 'lebar' => (int) $product['lebar_standar'],
-                'tinggi' => (int) $product['tinggi_standar'],
+                'tinggi' => $isPillowBolster ? null : (int) $product['tinggi_standar'],
             ];
             $fabric = is_string($item['jenis_kain'] ?? null)
                 ? $item['jenis_kain']
                 : (string) ($product['jenis_kain'] ?? '');
-            if ($mode === 'custom') {
+            if ($mode === 'custom' && !$isPillowBolster) {
                 foreach (array_keys($dimensions) as $field) {
                     $value = $this->readInteger($item[$field] ?? null);
                     if ($value === null || $value < 1 || $value > 1000) {
@@ -265,7 +266,8 @@ class OrderController
 
         $stock = (int) $product['stok'];
         $quantity = $this->readInteger($_POST['qtySprei'] ?? null);
-        $mode = $_POST['mode'] ?? '';
+        $isPillowBolster = product_is_pillow_bolster_category((string) $product['kategori_produk']);
+        $mode = $isPillowBolster ? 'standard' : ($_POST['mode'] ?? '');
 
         if ($stock < 1 || $quantity === null || $quantity < 1 || $quantity > min(50, $stock)) {
             $this->setCartMessage('Jumlah produk melebihi stok yang tersedia.', 'error');
@@ -280,7 +282,7 @@ class OrderController
         $dimensions = [
             'length' => (int) $product['panjang_standar'],
             'width' => (int) $product['lebar_standar'],
-            'height' => (int) $product['tinggi_standar'],
+            'height' => $isPillowBolster ? null : (int) $product['tinggi_standar'],
         ];
         $pricingOptions = product_pricing_options((string) $product['kategori_produk']);
         $fabric = (string) ($product['jenis_kain'] ?? '');
@@ -309,7 +311,7 @@ class OrderController
             }
         }
 
-        if ($mode === 'custom') {
+        if ($mode === 'custom' && !$isPillowBolster) {
             foreach (['length', 'width', 'height'] as $field) {
                 $value = $this->readInteger($_POST[$field] ?? null);
                 if ($value === null || $value < 1) {
@@ -456,7 +458,8 @@ class OrderController
         }
 
         if (($_POST['edit_cart'] ?? '') === '1') {
-            $mode = $_POST['mode'] ?? '';
+            $isPillowBolster = product_is_pillow_bolster_category((string) $product['kategori_produk']);
+            $mode = $isPillowBolster ? 'standard' : ($_POST['mode'] ?? '');
             if (!in_array($mode, ['standard', 'custom'], true)) {
                 $this->setCartMessage('Tipe ukuran tidak valid.', 'error');
                 $this->redirect('/?page=customer-cart');
@@ -464,11 +467,17 @@ class OrderController
 
             $keepStandardSize = ($cart[$itemId]['mode'] ?? 'standard') === 'standard';
             $dimensions = [
-                'panjang' => (int) ($keepStandardSize ? ($cart[$itemId]['panjang'] ?? $product['panjang_standar']) : $product['panjang_standar']),
-                'lebar' => (int) ($keepStandardSize ? ($cart[$itemId]['lebar'] ?? $product['lebar_standar']) : $product['lebar_standar']),
-                'tinggi' => (int) ($keepStandardSize ? ($cart[$itemId]['tinggi'] ?? $product['tinggi_standar']) : $product['tinggi_standar']),
+                'panjang' => (int) ($isPillowBolster
+                    ? $product['panjang_standar']
+                    : ($keepStandardSize ? ($cart[$itemId]['panjang'] ?? $product['panjang_standar']) : $product['panjang_standar'])),
+                'lebar' => (int) ($isPillowBolster
+                    ? $product['lebar_standar']
+                    : ($keepStandardSize ? ($cart[$itemId]['lebar'] ?? $product['lebar_standar']) : $product['lebar_standar'])),
+                'tinggi' => $isPillowBolster
+                    ? null
+                    : (int) ($keepStandardSize ? ($cart[$itemId]['tinggi'] ?? $product['tinggi_standar']) : $product['tinggi_standar']),
             ];
-            if ($mode === 'custom') {
+            if ($mode === 'custom' && !$isPillowBolster) {
                 foreach (['panjang', 'lebar', 'tinggi'] as $field) {
                     $value = $this->readInteger($_POST[$field] ?? null);
                     if ($value === null || $value < 1) {

@@ -329,6 +329,16 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
+
+.dimension__grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.standard-only-note {
+  margin: 0 0 14px;
+  color: var(--teks-abu, #6c757d);
+  font-size: 0.9rem;
+}
 .dim {
   min-width: 0;
   padding: 8px;
@@ -685,6 +695,9 @@ textarea:focus {
   }
   .dimension__grid {
     grid-template-columns: 1fr;
+  }
+  .dimension__grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .extras {
     grid-template-columns: 1fr;

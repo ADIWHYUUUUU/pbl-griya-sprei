@@ -126,7 +126,7 @@ $total = max(0, $principal + $order['ongkir'] - $order['diskon']);
                                 <div>
                                     <dt>Ukuran Kasur</dt>
                                     <dd><?= $escape($product['tipe_ukuran'] === 'CUSTOM' ? 'Custom' : 'Standar') ?>:
-                                        <strong><?= (int) $product['panjang'] ?> × <?= (int) $product['lebar'] ?> × <?= (int) $product['tinggi'] ?> cm</strong>
+                                        <strong><?= (int) $product['panjang'] ?> × <?= (int) $product['lebar'] ?><?= $product['tinggi'] === null ? '' : ' × ' . (int) $product['tinggi'] ?> cm</strong>
                                     </dd>
                                 </div>
                                 <div>

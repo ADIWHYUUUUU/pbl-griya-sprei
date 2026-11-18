@@ -163,10 +163,16 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             $maxQuantity = min(50, max(0, $stock - $otherQuantity));
                             $image = trim((string) ($product['gambar_produk'] ?? $item['gambar_produk'] ?? ''));
                             $imageUrl = $image !== '' ? product_image_url($image) : '';
-                            $isCustom = ($item['mode'] ?? '') === 'custom';
-                            $itemLength = (int) ($item['panjang'] ?? 0);
-                            $itemWidth = (int) ($item['lebar'] ?? 0);
-                            $itemHeight = (int) ($item['tinggi'] ?? 0);
+                            $isPillowBolster = $product
+                                && product_is_pillow_bolster_category((string) $product['kategori_produk']);
+                            $isCustom = !$isPillowBolster && ($item['mode'] ?? '') === 'custom';
+                            $itemLength = (int) ($isPillowBolster
+                                ? ($product['panjang_standar'] ?? 0)
+                                : ($item['panjang'] ?? 0));
+                            $itemWidth = (int) ($isPillowBolster
+                                ? ($product['lebar_standar'] ?? 0)
+                                : ($item['lebar'] ?? 0));
+                            $itemHeight = $isPillowBolster ? null : ($item['tinggi'] ?? null);
                             $itemFabric = (string) ($item['jenis_kain'] ?? $product['jenis_kain'] ?? '');
                             $itemFabricLabel = product_fabric_label($itemFabric);
                             $itemPrice = (float) (product_price_for(
@@ -236,12 +242,14 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                             <legend>Tipe ukuran</legend>
                                                             <div class="edit-cart__segments" aria-label="Tipe ukuran pesanan">
                                                                 <button type="button" class="<?= !$isCustom ? 'is-active' : '' ?>" data-edit-mode="standard" aria-pressed="<?= !$isCustom ? 'true' : 'false' ?>">Standar</button>
-                                                                <button type="button" class="<?= $isCustom ? 'is-active' : '' ?>" data-edit-mode="custom" aria-pressed="<?= $isCustom ? 'true' : 'false' ?>">Custom</button>
+                                                                <?php if (!$isPillowBolster): ?>
+                                                                    <button type="button" class="<?= $isCustom ? 'is-active' : '' ?>" data-edit-mode="custom" aria-pressed="<?= $isCustom ? 'true' : 'false' ?>">Custom</button>
+                                                                <?php endif; ?>
                                                             </div>
                                                         </fieldset>
 
                                                         <fieldset class="edit-cart__section">
-                                                            <legend>Dimensi kasur</legend>
+                                                            <legend><?= $isPillowBolster ? 'Ukuran produk' : 'Dimensi kasur' ?></legend>
                                                             <div class="edit-cart__dimensions">
                                                                 <label class="edit-cart__field">Panjang
                                                                     <span class="edit-cart__input-wrap"><input type="number" name="panjang" min="1" step="1" value="<?= $itemLength ?>" data-standard="<?= aman($product['panjang_standar']) ?>" <?= !$isCustom ? 'disabled' : '' ?> required><span>cm</span></span>
@@ -249,9 +257,11 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                                 <label class="edit-cart__field">Lebar
                                                                     <span class="edit-cart__input-wrap"><input type="number" name="lebar" min="1" step="1" value="<?= $itemWidth ?>" data-standard="<?= aman($product['lebar_standar']) ?>" <?= !$isCustom ? 'disabled' : '' ?> required><span>cm</span></span>
                                                                 </label>
-                                                                <label class="edit-cart__field">Tinggi kasur
-                                                                    <span class="edit-cart__input-wrap"><input type="number" name="tinggi" min="1" step="1" value="<?= $itemHeight ?>" data-standard="<?= aman($product['tinggi_standar']) ?>" <?= !$isCustom ? 'disabled' : '' ?> required><span>cm</span></span>
-                                                                </label>
+                                                                <?php if (!$isPillowBolster): ?>
+                                                                    <label class="edit-cart__field">Tinggi kasur
+                                                                        <span class="edit-cart__input-wrap"><input type="number" name="tinggi" min="1" step="1" value="<?= aman($itemHeight) ?>" data-standard="<?= aman($product['tinggi_standar']) ?>" <?= !$isCustom ? 'disabled' : '' ?> required><span>cm</span></span>
+                                                                    </label>
+                                                                <?php endif; ?>
                                                             </div>
                                                             <p class="edit-cart__hint" data-edit-dimension-hint>Dimensi standar produk. Ukuran standar tidak dapat diubah.</p>
                                                         </fieldset>
@@ -305,7 +315,7 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                     </div>
 
                                     <dl class="spesifikasi">
-                                        <div><dt>Ukuran (P × L × T)</dt><dd><strong><?= aman(formatUkuran($itemLength)) ?> × <?= aman(formatUkuran($itemWidth)) ?> × <?= aman(formatUkuran($itemHeight)) ?> cm</strong></dd></div>
+                                        <div><dt>Ukuran (<?= $isPillowBolster ? 'P × L' : 'P × L × T' ?>)</dt><dd><strong><?= aman(formatUkuran($itemLength)) ?> × <?= aman(formatUkuran($itemWidth)) ?><?= $isPillowBolster ? '' : ' × ' . aman(formatUkuran($itemHeight)) ?> cm</strong></dd></div>
                                         <div><dt>Harga satuan</dt><dd><strong><?= $isCustom ? 'Dikonfirmasi Admin' : 'Rp ' . number_format($itemPrice, 0, ',', '.') ?></strong></dd></div>
                                         <div><dt>Tambahan</dt><dd><strong><?= aman($extras === [] ? 'Tanpa tambahan' : implode(' + ', $extras)) ?></strong></dd></div>
                                         <div class="penuh"><dt>Catatan</dt><dd><?= aman(trim($itemNote) ?: 'Tidak ada catatan') ?></dd></div>

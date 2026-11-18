@@ -2,6 +2,7 @@ const orderForm = document.getElementById("orderForm");
 
 if (orderForm) {
   const modeInput = document.getElementById("modeInput");
+  const standardOnly = orderForm.dataset.standardOnly === "true";
   const modeButtons = [...orderForm.querySelectorAll("[data-mode]")];
   const dimensionInputs = [...orderForm.querySelectorAll(".dim__input input")];
   const message = document.getElementById("formMessage");
@@ -50,11 +51,13 @@ if (orderForm) {
     if (width === catalogWidth) {
       document.getElementById("length").value = orderForm.dataset.catalogLength;
       document.getElementById("width").value = orderForm.dataset.catalogWidth;
-      document.getElementById("height").value = orderForm.dataset.catalogHeight;
+      const heightInput = document.getElementById("height");
+      if (heightInput) heightInput.value = orderForm.dataset.catalogHeight;
     } else {
       document.getElementById("length").value = "200";
       document.getElementById("width").value = String(width);
-      document.getElementById("height").value = String(fabric.height);
+      const heightInput = document.getElementById("height");
+      if (heightInput) heightInput.value = String(fabric.height);
     }
   }
 
@@ -76,11 +79,12 @@ if (orderForm) {
         : `Rp ${money.format(price * quantity)}`;
     }
     if (standardSizeText) {
-      standardSizeText.textContent = `${dimensionInputs[0].value} × ${dimensionInputs[1].value} × ${dimensionInputs[2].value} cm`;
+      standardSizeText.textContent = `${dimensionInputs.map((input) => input.value).join(" × ")} cm`;
     }
   }
 
   function setMode(mode) {
+    if (standardOnly) mode = "standard";
     const isStandard = mode === "standard";
     modeInput.value = mode;
     orderForm.classList.toggle("is-standard", isStandard);

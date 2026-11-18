@@ -123,7 +123,7 @@ $formatCount = static function (int $count, string $label): string {
                             <div><h3><?= $escape($item['nama_produk']) ?></h3><span><?= $item['tipe_ukuran'] === 'CUSTOM' ? 'Custom Size' : 'Standar' ?></span></div>
                         </div>
                         <dl class="item-specs">
-                            <div><dt>Ukuran Kasur</dt><dd><?= (int) $item['panjang'] ?> × <?= (int) $item['lebar'] ?> × <?= (int) $item['tinggi'] ?> cm</dd></div>
+                            <div><dt>Ukuran</dt><dd><?= (int) $item['panjang'] ?> × <?= (int) $item['lebar'] ?><?= $item['tinggi'] === null ? '' : ' × ' . (int) $item['tinggi'] ?> cm</dd></div>
                             <div><dt>Kelengkapan</dt><dd><?= $formatCount((int) $item['jumlah'], 'Sprei') ?><?= (int) $item['tambah_sarban'] > 0 ? ' + ' . (int) $item['tambah_sarban'] . ' Sarban' : '' ?><?= (int) $item['tambah_sargul'] > 0 ? ' + ' . (int) $item['tambah_sargul'] . ' Sargul' : '' ?></dd></div>
                             <div><dt>Tambahan</dt><dd><?= $extras ? $escape(implode(', ', $extras)) : '-' ?></dd></div>
                         </dl>

@@ -1,5 +1,14 @@
 <?php
 
+function product_is_pillow_bolster_category(string $category): bool
+{
+    return in_array(strtoupper($category), [
+        'SARUNG_BANTAL',
+        'SARUNG_GULING',
+        'SARUNG_BANTAL_GULING',
+    ], true);
+}
+
 function product_pricing_options(string $category): array
 {
     $pricesByFabric = match (strtoupper(str_replace('_', '', $category))) {

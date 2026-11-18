@@ -126,7 +126,7 @@ $trackingHint = $isGojek
                         <?php endif; ?>
                         <div class="product-meta">
                             <strong><?= $escape($item['nama_produk'] ?? 'Produk') ?></strong>
-                            <span><?= $escape(($item['tipe_ukuran'] ?? 'STANDARD') === 'CUSTOM' ? 'Custom Size' : 'Ukuran Standar') ?> • <?= (int) ($item['panjang'] ?? 0) ?> × <?= (int) ($item['lebar'] ?? 0) ?> × <?= (int) ($item['tinggi'] ?? 0) ?> cm</span>
+                            <span><?= $escape(($item['tipe_ukuran'] ?? 'STANDARD') === 'CUSTOM' ? 'Custom Size' : 'Ukuran Standar') ?> • <?= (int) ($item['panjang'] ?? 0) ?> × <?= (int) ($item['lebar'] ?? 0) ?><?= ($item['tinggi'] ?? null) === null ? '' : ' × ' . (int) $item['tinggi'] ?> cm</span>
                         </div>
                     </div>
 
