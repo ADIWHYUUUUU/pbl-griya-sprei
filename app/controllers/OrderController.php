@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/ProductController.php';
 require_once __DIR__ . '/../models/CartModel.php';
+require_once __DIR__ . '/../helpers/product_pricing.php';
 
 class OrderController
 {
@@ -92,6 +93,9 @@ class OrderController
                 'lebar' => (int) $product['lebar_standar'],
                 'tinggi' => (int) $product['tinggi_standar'],
             ];
+            $fabric = is_string($item['jenis_kain'] ?? null)
+                ? $item['jenis_kain']
+                : (string) ($product['jenis_kain'] ?? '');
             if ($mode === 'custom') {
                 foreach (array_keys($dimensions) as $field) {
                     $value = $this->readInteger($item[$field] ?? null);
@@ -100,6 +104,20 @@ class OrderController
                     }
                     $dimensions[$field] = $value;
                 }
+            } elseif (($pricingOptions = product_pricing_options((string) $product['kategori_produk'])) !== []) {
+                $standardPrice = product_price_for(
+                    (string) $product['kategori_produk'],
+                    $fabric,
+                    (int) ($item['lebar'] ?? 0)
+                );
+                if (!isset($pricingOptions[$fabric]) || $standardPrice === null) {
+                    $this->checkoutError('Pilihan kain atau ukuran standar tidak valid. Pilih kembali dari halaman produk.');
+                }
+                $dimensions = [
+                    'panjang' => 200,
+                    'lebar' => (int) $item['lebar'],
+                    'tinggi' => (int) $pricingOptions[$fabric]['height'],
+                ];
             }
 
             $allowsExtras = ($product['kategori_produk'] ?? '') === 'SPREI';
@@ -128,7 +146,10 @@ class OrderController
                 'bantal' => $pillows,
                 'guling' => $bolsters,
                 'catatan' => trim($note),
-                'harga_satuan' => (float) $product['harga_dasar'],
+                'harga_satuan' => $mode === 'standard'
+                    ? (float) (product_price_for((string) $product['kategori_produk'], $fabric, $dimensions['lebar']) ?? $product['harga_dasar'])
+                    : (float) $product['harga_dasar'],
+                'jenis_kain' => $fabric !== '' ? $fabric : null,
             ];
         }
 
@@ -261,6 +282,32 @@ class OrderController
             'width' => (int) $product['lebar_standar'],
             'height' => (int) $product['tinggi_standar'],
         ];
+        $pricingOptions = product_pricing_options((string) $product['kategori_produk']);
+        $fabric = (string) ($product['jenis_kain'] ?? '');
+        if ($pricingOptions !== []) {
+            $width = $this->readInteger($_POST['width'] ?? null);
+            if (!isset($pricingOptions[$fabric])) {
+                $this->setCartMessage('Jenis kain produk belum memiliki pilihan harga.', 'error');
+                $this->redirect('/?page=customer-detail&id=' . $productId);
+            }
+            if ($mode === 'standard') {
+                if ($width === null || !isset($pricingOptions[$fabric]['prices'][$width])) {
+                    $this->setCartMessage('Pilih ukuran standar yang tersedia untuk produk ini.', 'error');
+                    $this->redirect('/?page=customer-detail&id=' . $productId);
+                }
+                $dimensions = $width === (int) $product['lebar_standar']
+                    ? [
+                        'length' => (int) $product['panjang_standar'],
+                        'width' => $width,
+                        'height' => (int) $product['tinggi_standar'],
+                    ]
+                    : [
+                        'length' => 200,
+                        'width' => $width,
+                        'height' => $pricingOptions[$fabric]['height'],
+                    ];
+            }
+        }
 
         if ($mode === 'custom') {
             foreach (['length', 'width', 'height'] as $field) {
@@ -321,6 +368,10 @@ class OrderController
             'nama_produk' => (string) $product['nama_produk'],
             'gambar_produk' => (string) ($product['gambar_produk'] ?? ''),
             'harga_dasar' => (float) $product['harga_dasar'],
+            'harga_satuan' => $mode === 'standard'
+                ? (float) (product_price_for((string) $product['kategori_produk'], $fabric, $dimensions['width']) ?? $product['harga_dasar'])
+                : (float) $product['harga_dasar'],
+            'jenis_kain' => $fabric !== '' ? $fabric : null,
             'mode' => $mode,
             'panjang' => $dimensions['length'],
             'lebar' => $dimensions['width'],
@@ -411,10 +462,11 @@ class OrderController
                 $this->redirect('/?page=customer-cart');
             }
 
+            $keepStandardSize = ($cart[$itemId]['mode'] ?? 'standard') === 'standard';
             $dimensions = [
-                'panjang' => (int) $product['panjang_standar'],
-                'lebar' => (int) $product['lebar_standar'],
-                'tinggi' => (int) $product['tinggi_standar'],
+                'panjang' => (int) ($keepStandardSize ? ($cart[$itemId]['panjang'] ?? $product['panjang_standar']) : $product['panjang_standar']),
+                'lebar' => (int) ($keepStandardSize ? ($cart[$itemId]['lebar'] ?? $product['lebar_standar']) : $product['lebar_standar']),
+                'tinggi' => (int) ($keepStandardSize ? ($cart[$itemId]['tinggi'] ?? $product['tinggi_standar']) : $product['tinggi_standar']),
             ];
             if ($mode === 'custom') {
                 foreach (['panjang', 'lebar', 'tinggi'] as $field) {
@@ -462,6 +514,13 @@ class OrderController
         }
 
         $cart[$itemId]['qtySprei'] = $quantity;
+        $cart[$itemId]['harga_satuan'] = ($cart[$itemId]['mode'] ?? 'standard') === 'standard'
+            ? (float) (product_price_for(
+                (string) $product['kategori_produk'],
+                (string) ($cart[$itemId]['jenis_kain'] ?? $product['jenis_kain'] ?? ''),
+                (int) ($cart[$itemId]['lebar'] ?? $product['lebar_standar'])
+            ) ?? $product['harga_dasar'])
+            : (float) $product['harga_dasar'];
         $this->persistCartItem($itemId, $cart[$itemId]);
         $_SESSION['cart'] = $cart;
         $this->setCartMessage(

@@ -31,6 +31,22 @@ class UserModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getShippingAddress(int $userId): string
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT COALESCE(alamat_pengiriman, \'\')
+             FROM "user"
+             WHERE id_user = :id_user'
+        );
+        $statement->execute([':id_user' => $userId]);
+        $address = $statement->fetchColumn();
+        if ($address === false) {
+            throw new UnexpectedValueException('Akun customer tidak ditemukan.');
+        }
+
+        return (string) $address;
+    }
+
 
     // =========================
     // TAMBAH USER

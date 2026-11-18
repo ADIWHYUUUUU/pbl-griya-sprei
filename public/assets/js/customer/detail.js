@@ -5,12 +5,22 @@ if (orderForm) {
   const modeButtons = [...orderForm.querySelectorAll("[data-mode]")];
   const dimensionInputs = [...orderForm.querySelectorAll(".dim__input input")];
   const message = document.getElementById("formMessage");
-  const stockStatus = document.getElementById("stockStatus");
+  const sizeSelection = orderForm.querySelector(".size-selection");
   const dimensionHints = {
     length: "Tentukan panjang",
     width: "Tentukan lebar",
     height: "Tentukan tebal kasur",
   };
+  const pricing = orderForm.dataset.pricing
+    ? JSON.parse(orderForm.dataset.pricing)
+    : {};
+  const pricePreview = document.getElementById("pricePreview");
+  const customPriceNote = document.getElementById("customPriceNote");
+  const standardPriceNote = document.getElementById("standardPriceNote");
+  const orderSubtotal = document.getElementById("orderSubtotal");
+  const standardSizeText = document.getElementById("standardSizeText");
+  const sizeOptions = orderForm.querySelector(".size-options");
+  const money = new Intl.NumberFormat("id-ID");
   const hiddenQuantities = {
     qtySprei: document.getElementById("qtySpreiInput"),
     qtyBantal: document.getElementById("qtyBantalInput"),
@@ -23,11 +33,58 @@ if (orderForm) {
     message.classList.add("form__message--error");
   }
 
+  function selectedFabric() {
+    return orderForm.querySelector('input[name="jenis_kain"]')?.value || "";
+  }
+
+  function selectedWidth() {
+    return Number(orderForm.querySelector('input[name="ukuran_standar"]:checked')?.value);
+  }
+
+  function updateStandardDimensions() {
+    const fabric = pricing[selectedFabric()];
+    const width = selectedWidth();
+    if (!fabric || !Number.isInteger(width)) return;
+
+    const catalogWidth = Number(orderForm.dataset.catalogWidth);
+    if (width === catalogWidth) {
+      document.getElementById("length").value = orderForm.dataset.catalogLength;
+      document.getElementById("width").value = orderForm.dataset.catalogWidth;
+      document.getElementById("height").value = orderForm.dataset.catalogHeight;
+    } else {
+      document.getElementById("length").value = "200";
+      document.getElementById("width").value = String(width);
+      document.getElementById("height").value = String(fabric.height);
+    }
+  }
+
+  function updatePrice() {
+    const isCustom = modeInput.value === "custom";
+    const fabric = pricing[selectedFabric()];
+    const price = Number(fabric?.prices?.[selectedWidth()] ?? orderForm.dataset.price);
+    if (pricePreview) {
+      pricePreview.textContent = isCustom
+        ? "Konfirmasi Admin"
+        : `Rp ${money.format(price)}`;
+    }
+    if (customPriceNote) customPriceNote.hidden = !isCustom;
+    if (standardPriceNote) standardPriceNote.hidden = isCustom;
+    if (orderSubtotal) {
+      const quantity = Number(hiddenQuantities.qtySprei.value);
+      orderSubtotal.textContent = isCustom
+        ? "Dikonfirmasi Admin"
+        : `Rp ${money.format(price * quantity)}`;
+    }
+    if (standardSizeText) {
+      standardSizeText.textContent = `${dimensionInputs[0].value} × ${dimensionInputs[1].value} × ${dimensionInputs[2].value} cm`;
+    }
+  }
+
   function setMode(mode) {
     const isStandard = mode === "standard";
     modeInput.value = mode;
     orderForm.classList.toggle("is-standard", isStandard);
-    stockStatus.hidden = !isStandard;
+    if (sizeSelection) sizeSelection.hidden = !isStandard;
 
     modeButtons.forEach((button) => {
       const selected = button.dataset.mode === mode;
@@ -37,13 +94,23 @@ if (orderForm) {
 
     dimensionInputs.forEach((input) => {
       input.readOnly = isStandard;
-      if (isStandard) input.value = input.dataset.standard;
       input.closest(".dim").classList.remove("dim--error");
       const hint = document.getElementById(`${input.id}Hint`);
       hint.textContent = isStandard
         ? "Standar katalog"
         : dimensionHints[input.id];
     });
+
+    if (isStandard) {
+      if (Object.keys(pricing).length > 0) {
+        updateStandardDimensions();
+      } else {
+        dimensionInputs.forEach((input) => {
+          input.value = input.dataset.standard;
+        });
+      }
+    }
+    updatePrice();
   }
 
   function updateStepper(stepper) {
@@ -74,12 +141,20 @@ if (orderForm) {
       const nextValue = Number(output.textContent.trim()) + Number(button.dataset.step);
       output.textContent = String(Math.max(minimum, Math.min(maximum, nextValue)));
       updateStepper(stepper);
+      updatePrice();
     });
     updateStepper(stepper);
   });
 
   modeButtons.forEach((button) => {
     button.addEventListener("click", () => setMode(button.dataset.mode));
+  });
+
+  sizeOptions?.addEventListener("change", (event) => {
+    if (event.target.matches('input[name="ukuran_standar"]')) {
+      if (modeInput.value === "standard") updateStandardDimensions();
+      updatePrice();
+    }
   });
 
   orderForm.addEventListener("submit", (event) => {
@@ -113,6 +188,7 @@ if (orderForm) {
   dimensionInputs.forEach((input) => {
     input.addEventListener("input", () => {
       input.closest(".dim").classList.remove("dim--error");
+      updatePrice();
     });
   });
 

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../controllers/ProductController.php';
+require_once __DIR__ . '/../../helpers/product_pricing.php';
 $productController = new ProductController();
 $catalogProducts = array_map(static function ($product) {
     $dimensions = array_filter([
@@ -21,14 +22,9 @@ $catalogProducts = array_map(static function ($product) {
       default => 'sprei',
     };
     $fabric = (string) ($product['jenis_kain'] ?? '');
-    $fabricLabel = match ($fabric) {
-      'TENCEL' => 'Tencel',
-      'KATUN_JEPANG' => 'Katun Jepang',
-      'KATUN_LOKAL' => 'Katun lokal',
-      'MICROTENCEL' => 'Microtencel',
-      'MICROTEX' => 'Microtex',
-      default => 'Belum diatur',
-    };
+    $fabricLabel = product_fabric_label($fabric);
+    $price = product_minimum_price($category)
+      ?? (int) ($product['harga_dasar'] ?? 0);
     $imageName = (string) ($product['gambar_produk'] ?? '');
     return [
         // ID ASLI DATABASE
@@ -40,7 +36,7 @@ $catalogProducts = array_map(static function ($product) {
         'fabric' => $fabric,
         'fabricLabel' => $fabricLabel,
         'size' => implode(' × ', $dimensions),
-        'price' => (float) ($product['harga_dasar'] ?? 0),
+        'price' => $price,
         'color' => '#e8e4d8',
         'desc' => $product['deskripsi'] ?? '',
         'stock' => (int) ($product['stok'] ?? 0),

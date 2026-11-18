@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../../controllers/ProductController.php';
+require_once __DIR__ . '/../../helpers/product_pricing.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -166,6 +167,13 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             $itemLength = (int) ($item['panjang'] ?? 0);
                             $itemWidth = (int) ($item['lebar'] ?? 0);
                             $itemHeight = (int) ($item['tinggi'] ?? 0);
+                            $itemFabric = (string) ($item['jenis_kain'] ?? $product['jenis_kain'] ?? '');
+                            $itemFabricLabel = product_fabric_label($itemFabric);
+                            $itemPrice = (float) (product_price_for(
+                                    (string) ($product['kategori_produk'] ?? ''),
+                                    $itemFabric,
+                                    $itemWidth
+                                ) ?? $item['harga_satuan'] ?? $product['harga_dasar'] ?? 0);
                             $bolehTambahSarung = ($product['kategori_produk'] ?? '') === 'SPREI';
                             $itemPillows = $bolehTambahSarung ? (int) ($item['qtyBantal'] ?? 0) : 0;
                             $itemBolsters = $bolehTambahSarung ? (int) ($item['qtyGuling'] ?? 0) : 0;
@@ -198,6 +206,7 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                 <div class="detail">
                                     <h2><?= aman($entry['name']) ?></h2>
                                     <span class="label <?= $isCustom ? 'label-custom' : 'label-standar' ?>">Tipe: <?= $isCustom ? 'Custom' : 'Standar' ?></span>
+                                    <p class="cart-fabric">Jenis kain: <strong><?= aman($itemFabricLabel) ?></strong></p>
 
                                     <div class="aksi-produk">
                                         <?php if ($product && $maxQuantity > 0): ?>
@@ -297,6 +306,7 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
 
                                     <dl class="spesifikasi">
                                         <div><dt>Ukuran (P × L × T)</dt><dd><strong><?= aman(formatUkuran($itemLength)) ?> × <?= aman(formatUkuran($itemWidth)) ?> × <?= aman(formatUkuran($itemHeight)) ?> cm</strong></dd></div>
+                                        <div><dt>Harga satuan</dt><dd><strong><?= $isCustom ? 'Dikonfirmasi Admin' : 'Rp ' . number_format($itemPrice, 0, ',', '.') ?></strong></dd></div>
                                         <div><dt>Tambahan</dt><dd><strong><?= aman($extras === [] ? 'Tanpa tambahan' : implode(' + ', $extras)) ?></strong></dd></div>
                                         <div class="penuh"><dt>Catatan</dt><dd><?= aman(trim($itemNote) ?: 'Tidak ada catatan') ?></dd></div>
                                     </dl>
@@ -313,7 +323,7 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                                                     <button type="submit" name="qtySprei" value="<?= $entry['quantity'] + 1 ?>" aria-label="Tambah jumlah" <?= $entry['quantity'] >= $maxQuantity ? 'disabled' : '' ?>>+</button>
                                                 </form>
                                             </div>
-                                            <small class="catatan-harga">Harga dihitung admin sesuai ukuran</small>
+                                            <small class="catatan-harga">Estimasi harga; tagihan final dikonfirmasi Admin.</small>
                                         <?php else: ?>
                                             <span class="cart-error">Item tidak tersedia; hapus dari keranjang untuk melanjutkan.</span>
                                         <?php endif; ?>

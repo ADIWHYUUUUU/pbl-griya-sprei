@@ -23,6 +23,15 @@ small {
   font-size: 11px;
 }
 
+.cart-fabric {
+  margin: 4px 0;
+  color: var(--teks-abu);
+  font-size: 12px;
+}
+.cart-fabric strong {
+  color: var(--teks);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
