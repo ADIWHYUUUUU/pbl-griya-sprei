@@ -285,22 +285,27 @@ class OrderController
         $pricingOptions = product_pricing_options((string) $product['kategori_produk']);
         $fabric = (string) ($product['jenis_kain'] ?? '');
         if ($pricingOptions !== []) {
-            $fabric = $_POST['jenis_kain'] ?? '';
             $width = $this->readInteger($_POST['width'] ?? null);
-            if (!is_string($fabric) || !isset($pricingOptions[$fabric])) {
-                $this->setCartMessage('Pilih jenis kain dan ukuran standar yang tersedia.', 'error');
+            if (!isset($pricingOptions[$fabric])) {
+                $this->setCartMessage('Jenis kain produk belum memiliki pilihan harga.', 'error');
                 $this->redirect('/?page=customer-detail&id=' . $productId);
             }
             if ($mode === 'standard') {
                 if ($width === null || !isset($pricingOptions[$fabric]['prices'][$width])) {
-                    $this->setCartMessage('Pilih jenis kain dan ukuran standar yang tersedia.', 'error');
+                    $this->setCartMessage('Pilih ukuran standar yang tersedia untuk produk ini.', 'error');
                     $this->redirect('/?page=customer-detail&id=' . $productId);
                 }
-                $dimensions = [
-                    'length' => 200,
-                    'width' => $width,
-                    'height' => $pricingOptions[$fabric]['height'],
-                ];
+                $dimensions = $width === (int) $product['lebar_standar']
+                    ? [
+                        'length' => (int) $product['panjang_standar'],
+                        'width' => $width,
+                        'height' => (int) $product['tinggi_standar'],
+                    ]
+                    : [
+                        'length' => 200,
+                        'width' => $width,
+                        'height' => $pricingOptions[$fabric]['height'],
+                    ];
             }
         }
 

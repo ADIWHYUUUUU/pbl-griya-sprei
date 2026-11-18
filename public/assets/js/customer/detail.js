@@ -14,7 +14,6 @@ if (orderForm) {
   const pricing = orderForm.dataset.pricing
     ? JSON.parse(orderForm.dataset.pricing)
     : {};
-  const fabricInputs = [...orderForm.querySelectorAll('input[name="jenis_kain"]')];
   const pricePreview = document.getElementById("pricePreview");
   const customPriceNote = document.getElementById("customPriceNote");
   const standardPriceNote = document.getElementById("standardPriceNote");
@@ -35,7 +34,7 @@ if (orderForm) {
   }
 
   function selectedFabric() {
-    return orderForm.querySelector('input[name="jenis_kain"]:checked')?.value || "";
+    return orderForm.querySelector('input[name="jenis_kain"]')?.value || "";
   }
 
   function selectedWidth() {
@@ -47,41 +46,15 @@ if (orderForm) {
     const width = selectedWidth();
     if (!fabric || !Number.isInteger(width)) return;
 
-    document.getElementById("length").value = "200";
-    document.getElementById("width").value = String(width);
-    document.getElementById("height").value = String(fabric.height);
-  }
-
-  function renderSizes() {
-    if (!sizeOptions) return;
-    const fabric = pricing[selectedFabric()];
-    if (!fabric) return;
-
-    const previousWidth = selectedWidth();
-    const sizeNames = {
-      90: "Single",
-      100: "Single",
-      120: "Super Single",
-      140: "Queen",
-      160: "Queen",
-      180: "King",
-      200: "Super King",
-    };
-    sizeOptions.innerHTML = Object.entries(fabric.prices)
-      .map(([width, price]) => `
-        <label class="size-option">
-          <input type="radio" name="ukuran_standar" value="${Number(width)}" required ${Number(width) === previousWidth ? "checked" : ""}>
-          <span class="size-option__content">
-            <strong>${sizeNames[Number(width)]} (${Number(width)})</strong>
-            <small>${Number(width)} × 200 × ${Number(fabric.height)} cm</small>
-            <b>Rp ${money.format(Number(price))}</b>
-          </span>
-        </label>
-      `)
-      .join("");
-
-    if (!sizeOptions.querySelector('input[name="ukuran_standar"]:checked')) {
-      sizeOptions.querySelector('input[name="ukuran_standar"]').checked = true;
+    const catalogWidth = Number(orderForm.dataset.catalogWidth);
+    if (width === catalogWidth) {
+      document.getElementById("length").value = orderForm.dataset.catalogLength;
+      document.getElementById("width").value = orderForm.dataset.catalogWidth;
+      document.getElementById("height").value = orderForm.dataset.catalogHeight;
+    } else {
+      document.getElementById("length").value = "200";
+      document.getElementById("width").value = String(width);
+      document.getElementById("height").value = String(fabric.height);
     }
   }
 
@@ -175,14 +148,6 @@ if (orderForm) {
 
   modeButtons.forEach((button) => {
     button.addEventListener("click", () => setMode(button.dataset.mode));
-  });
-
-  fabricInputs.forEach((input) => {
-    input.addEventListener("change", () => {
-      renderSizes();
-      if (modeInput.value === "standard") updateStandardDimensions();
-      updatePrice();
-    });
   });
 
   sizeOptions?.addEventListener("change", (event) => {
