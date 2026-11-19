@@ -106,19 +106,27 @@ class OrderController
                     $dimensions[$field] = $value;
                 }
             } elseif (($pricingOptions = product_pricing_options((string) $product['kategori_produk'])) !== []) {
+                $standardWidth = (int) ($item['lebar'] ?? 0);
+                $usesCatalogSize = $standardWidth === (int) $product['lebar_standar'];
                 $standardPrice = product_price_for(
                     (string) $product['kategori_produk'],
                     $fabric,
-                    (int) ($item['lebar'] ?? 0)
+                    $standardWidth
                 );
-                if (!isset($pricingOptions[$fabric]) || $standardPrice === null) {
+                if (!isset($pricingOptions[$fabric]) || ($standardPrice === null && !$usesCatalogSize)) {
                     $this->checkoutError('Pilihan kain atau ukuran standar tidak valid. Pilih kembali dari halaman produk.');
                 }
-                $dimensions = [
-                    'panjang' => 200,
-                    'lebar' => (int) $item['lebar'],
-                    'tinggi' => (int) $pricingOptions[$fabric]['height'],
-                ];
+                $dimensions = $usesCatalogSize
+                    ? [
+                        'panjang' => (int) $product['panjang_standar'],
+                        'lebar' => $standardWidth,
+                        'tinggi' => (int) $product['tinggi_standar'],
+                    ]
+                    : [
+                        'panjang' => 200,
+                        'lebar' => $standardWidth,
+                        'tinggi' => (int) $pricingOptions[$fabric]['height'],
+                    ];
             }
 
             $allowsExtras = ($product['kategori_produk'] ?? '') === 'SPREI';
@@ -293,7 +301,11 @@ class OrderController
                 $this->redirect('/?page=customer-detail&id=' . $productId);
             }
             if ($mode === 'standard') {
-                if ($width === null || !isset($pricingOptions[$fabric]['prices'][$width])) {
+                $usesCatalogSize = $width === (int) $product['lebar_standar'];
+                if (
+                    $width === null ||
+                    (!isset($pricingOptions[$fabric]['prices'][$width]) && !$usesCatalogSize)
+                ) {
                     $this->setCartMessage('Pilih ukuran standar yang tersedia untuk produk ini.', 'error');
                     $this->redirect('/?page=customer-detail&id=' . $productId);
                 }
