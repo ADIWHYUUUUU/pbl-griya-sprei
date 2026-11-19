@@ -118,7 +118,7 @@ function e($value)
                             <td class="product-nowrap">
                                 <?= e($product['panjang_standar']) ?> ×
                                 <?= e($product['lebar_standar']) ?> ×
-                                <?= e($product['tinggi_standar']) ?> cm
+                                <?= $product['tinggi_standar'] !== null ? e($product['tinggi_standar']) . ' cm' : '-' ?>
                             </td>
                             <td class="product-nowrap">Rp <?= number_format((float) $product['harga_dasar'], 0, ',', '.') ?></td>
                             <td><?= (int) $product['stok'] ?></td>

@@ -4,6 +4,18 @@ class ProductModel
 {
     private $pdo;
 
+    private function executeProductStatement(PDOStatement $statement, array $parameters): bool
+    {
+        foreach ($parameters as $name => $value) {
+            $type = $value === null
+                ? PDO::PARAM_NULL
+                : (is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            $statement->bindValue($name, $value, $type);
+        }
+
+        return $statement->execute();
+    }
+
     // =========================================
     // CONSTRUCTOR - KONEKSI DATABASE
     // =========================================
@@ -85,7 +97,7 @@ class ProductModel
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
+        return $this->executeProductStatement($stmt, [
             ':nama_produk'     => $data['nama_produk'],
             ':kategori_produk' => $data['kategori_produk'],
             ':jenis_kain'      => $data['jenis_kain'],
@@ -121,7 +133,7 @@ class ProductModel
 
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
+        return $this->executeProductStatement($stmt, [
             ':id_produk'       => $id,
             ':nama_produk'     => $data['nama_produk'],
             ':kategori_produk' => $data['kategori_produk'],

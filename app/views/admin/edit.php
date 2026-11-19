@@ -165,10 +165,10 @@ $presets = [
                                 <span>cm</span>
                             </div>
                         </div>
-                        <div class="edit-field">
+                        <div class="edit-field" id="tinggi_standar_field" <?= $kategori === 'SARUNG_BANTAL_GULING' ? 'hidden' : '' ?>>
                             <label for="tinggi_standar">Tinggi Karet</label>
                             <div class="edit-input-group">
-                                <input class="edit-input" type="number" min="1" step="1" id="tinggi_standar" name="tinggi_standar" value="<?= $escape($product['tinggi_standar']) ?>" required>
+                                <input class="edit-input" type="number" min="1" step="1" id="tinggi_standar" name="tinggi_standar" value="<?= $escape($product['tinggi_standar'] ?? '') ?>" <?= $kategori === 'SARUNG_BANTAL_GULING' ? '' : 'required' ?>>
                                 <span>cm</span>
                             </div>
                         </div>
@@ -246,6 +246,7 @@ $presets = [
     </main>
 </div>
 <script src="/assets/js/admin/sidebar.js"></script>
+<script src="/assets/js/admin/product-category-height.js"></script>
 <script>
     (function () {
         var photoInput = document.getElementById('gambar_produk');

@@ -163,7 +163,7 @@ if ($action !== '') {
 		} elseif ($isAdminResiAction) {
 			$_SESSION['admin_order_message'] = [
 				'type' => 'error',
-				'text' => 'Nomor resi gagal disimpan. Silakan coba lagi.',
+				'text' => 'Nomor pengiriman gagal disimpan. Silakan coba lagi.',
 			];
 			$query = ['page' => 'admin-resi-list'];
 			if (isset($_POST['id_pesanan']) && is_string($_POST['id_pesanan'])) {

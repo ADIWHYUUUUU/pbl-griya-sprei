@@ -17,6 +17,12 @@ body {
     color: var(--teks);
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body.resi-input-page {
     display: block;
     height: auto;
@@ -72,10 +78,22 @@ body.resi-input-page {
 
 .resi-back-link {
     display: inline-block;
-    margin-bottom: 10px;
+    margin: 0;
     color: var(--hijau-tua);
     font-size: 14px;
     text-decoration: none;
+}
+
+.page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.page-heading .page-title {
+    margin: 0;
 }
 
 .resi-back-link:hover {
@@ -93,11 +111,11 @@ body.resi-input-page {
 .form-card {
     width: min(820px, 100%);
     margin: 0 auto;
-    padding: 20px;
+    padding: 16px;
     border: 1px solid var(--garis);
     border-radius: 14px;
     background: var(--putih);
-    box-shadow: 0 2px 10px rgba(53, 79, 56, 0.03);
+    box-shadow: 0 6px 18px rgba(53, 79, 56, 0.06);
 }
 
 .order-meta {
@@ -106,7 +124,7 @@ body.resi-input-page {
     justify-content: space-between;
     gap: 10px;
     min-height: 54px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     margin-bottom: 14px;
     border: 1px solid var(--garis);
     border-radius: 10px;
@@ -248,6 +266,16 @@ body.resi-input-page {
     font-weight: 400;
 }
 
+.field-hint {
+    color: var(--teks-abu);
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.field-note {
+    margin-top: 4px;
+}
+
 .field-wide {
     width: 100%;
 }
@@ -262,7 +290,7 @@ body.resi-input-page {
 .field textarea {
     width: 100%;
     min-height: 44px;
-    padding: 10px 12px;
+    padding: 11px 12px;
     border: 1px solid #d1d7d3;
     border-radius: 8px;
     background: #fafbfa;
@@ -272,8 +300,13 @@ body.resi-input-page {
 }
 
 .field textarea {
-    min-height: 104px;
+    min-height: 92px;
     resize: vertical;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+    color: #98a09a;
 }
 
 .field input:focus,
@@ -286,16 +319,21 @@ body.resi-input-page {
 .note-row {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin-top: 4px;
+    gap: 10px;
+    margin-top: 2px;
+    padding: 12px;
+    border: 1px solid #e2e7e1;
+    border-radius: 8px;
+    background: #fafbfa;
     color: var(--teks-abu);
     font-size: 0.82rem;
     line-height: 1.5;
 }
 
 .checkbox {
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
+    flex: 0 0 17px;
     margin-top: 2px;
     accent-color: var(--hijau-tua);
 }
@@ -310,6 +348,9 @@ body.resi-input-page {
 }
 
 .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid #d1d6d1;
     border-radius: 8px;
     min-height: 42px;
@@ -358,8 +399,17 @@ body.resi-input-page {
     }
 
     .page-title {
-        margin-bottom: 18px;
+        margin: 0;
         font-size: 1.55rem;
+    }
+
+    .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-heading .page-title {
+        text-align: left;
     }
 
     .form-card {

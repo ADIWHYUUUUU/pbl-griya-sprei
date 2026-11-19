@@ -104,15 +104,20 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                             </tr>
                         <?php endif; ?>
                         <?php foreach ($orders as $order):
-                            $tracking = trim((string) ($order['nomor_resi'] ?? ''));
-                            $orderId = (int) ($order['id_pesanan'] ?? 0);
                             $courierKey = (string) ($order['metode_pengiriman'] ?? '');
+                            $tracking = trim((string) ($courierKey === 'INSTANT_GOJEK'
+                                ? ($order['nomor_telepon_kurir'] ?? '')
+                                : ($order['nomor_resi'] ?? '')));
+                            $orderId = (int) ($order['id_pesanan'] ?? 0);
                             $courierLabel = $couriers[$courierKey] ?? $courierKey ?: 'Ekspedisi';
                             $specLines = $normalizeSpecLines($order['daftar_spesifikasi'] ?? '');
                             $specDisplay = implode('<br>', array_map(static fn ($line) => htmlspecialchars((string) $line, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), array_slice($specLines, 0, 2)));
                             $detailData = [
                                 'invoice' => (string) ($order['kode'] ?? 'INV/000000'),
                                 'resi' => $tracking,
+                                'resiLabel' => $courierKey === 'INSTANT_GOJEK'
+                                    ? 'NOMOR TELEPON KURIR GOJEK'
+                                    : 'NOMOR RESI PENGIRIMAN',
                                 'courier' => $courierLabel,
                                 'courierKey' => $courierKey,
                                 'customer' => (string) ($order['nama_pelanggan'] ?? 'Pelanggan'),
@@ -141,12 +146,16 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                 </td>
                                 <td>
                                     <?php if ($tracking !== ''): ?>
-                                        <button type="button" class="action-btn secondary resi-detail-trigger" data-detail='<?= json_encode($detailData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>'>Lihat Resi</button>
-                                        <?php if (in_array($order['status_pesanan'] ?? '', ['DIPROSES', 'DIKIRIM'], true)): ?>
-                                            <a href="/?page=admin-resi-input&amp;id=<?= $orderId ?>" class="action-btn">Ubah Resi</a>
-                                        <?php endif; ?>
+                                        <div class="resi-action-group">
+                                            <button type="button" class="action-btn secondary resi-detail-trigger" data-detail='<?= json_encode($detailData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>'><?= $courierKey === 'INSTANT_GOJEK' ? 'Lihat Telepon' : 'Lihat Resi' ?></button>
+                                            <?php if (in_array($order['status_pesanan'] ?? '', ['DIPROSES', 'DIKIRIM'], true)): ?>
+                                                <a href="/?page=admin-resi-input&amp;id=<?= $orderId ?>" class="action-btn"><?= $courierKey === 'INSTANT_GOJEK' ? 'Ubah Telepon' : 'Ubah Resi' ?></a>
+                                            <?php endif; ?>
+                                        </div>
                                     <?php else: ?>
-                                        <a href="/?page=admin-resi-input&id=<?= (int) $orderId ?>" class="action-btn">Input Resi</a>
+                                        <div class="resi-action-group">
+                                            <a href="/?page=admin-resi-input&id=<?= (int) $orderId ?>" class="action-btn"><?= $courierKey === 'INSTANT_GOJEK' ? 'Input Telepon' : 'Input Resi' ?></a>
+                                        </div>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -174,7 +183,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
 
                 <div class="resi-box">
                     <div class="resi-box-main">
-                        <div class="resi-box-label">NOMOR RESI PENGIRIMAN</div>
+                        <div class="resi-box-label" id="resiLabelValue">NOMOR RESI / TELEPON KURIR</div>
                         <div class="resi-box-number" id="resiNumberValue">-</div>
                     </div>
                     <button type="button" class="resi-copy-btn" id="copyResiBtn">Salin Resi</button>

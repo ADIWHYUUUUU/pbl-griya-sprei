@@ -94,7 +94,7 @@ $statusLabels = [
                     }
                     ?>
                     <article class="payment-item">
-                        <strong><?= $escape($item['nama_produk']) ?> (<?= $item['tipe_ukuran'] === 'CUSTOM' ? 'Custom' : 'Standar' ?> <?= (int) $item['panjang'] ?> × <?= (int) $item['lebar'] ?> × <?= (int) $item['tinggi'] ?> cm)</strong>
+                        <strong><?= $escape($item['nama_produk']) ?> (<?= $item['tipe_ukuran'] === 'CUSTOM' ? 'Custom' : 'Standar' ?> <?= (int) $item['panjang'] ?> × <?= (int) $item['lebar'] ?><?= $item['tinggi'] === null ? '' : ' × ' . (int) $item['tinggi'] ?> cm)</strong>
                         <span><?= (int) $item['jumlah'] ?> Sprei<?= $extras ? ' · ' . $escape(implode(', ', $extras)) : '' ?></span>
                     </article>
                 <?php endforeach; ?>

@@ -112,32 +112,46 @@ class AdminOrderController
             exit;
         }
 
-        $tracking = $_POST['nomor_resi'] ?? null;
+        $tracking = $_POST['nomor_pengiriman'] ?? $_POST['nomor_resi'] ?? null;
         $shippingNote = $_POST['catatan_pengiriman'] ?? '';
+        $trackingValue = is_string($tracking) ? trim($tracking) : '';
+        $orderModel = new OrderModel($GLOBALS['pdo']);
+        $orderDetail = $orderId !== null && $orderId > 0
+            ? $orderModel->getAdminOrderDetail($orderId)
+            : null;
+        $isGojek = ($orderDetail['metode_pengiriman'] ?? '') === 'INSTANT_GOJEK';
+        $validTracking = $isGojek
+            ? preg_match('/^\+?[0-9][0-9\s\-]{7,49}$/', $trackingValue) === 1
+            : preg_match('/^[^\x00-\x1F\x7F]{1,50}$/u', $trackingValue) === 1;
         if (
             $orderId === null
             || $orderId < 1
             || ($_POST['konfirmasi'] ?? null) !== '1'
             || !is_string($tracking)
-            || trim($tracking) === ''
-            || preg_match('/^[^\x00-\x1F\x7F]{1,50}$/u', trim($tracking)) !== 1
+            || $trackingValue === ''
+            || !$validTracking
             || !is_string($shippingNote)
         ) {
             $_SESSION['admin_order_message'] = [
                 'type' => 'error',
-                'text' => 'Konfirmasi pengiriman diperlukan. Periksa nomor resi (maksimal 50 karakter) dan data pengiriman.',
+                'text' => $isGojek
+                    ? 'Konfirmasi pengiriman diperlukan. Masukkan nomor telepon kurir Gojek yang valid.'
+                    : 'Konfirmasi pengiriman diperlukan. Masukkan nomor resi J&T atau JNE (maksimal 50 karakter).',
             ];
             header('Location: ' . $redirect, true, 303);
             exit;
         }
 
-        $updated = (new OrderModel($GLOBALS['pdo']))->saveShipmentDetails(
+        $updated = $orderModel->saveShipmentDetails(
             $orderId,
             trim($tracking),
-            trim($shippingNote)
+            trim($shippingNote),
+            $isGojek
         );
         $_SESSION['admin_order_message'] = $updated
-            ? ['type' => 'success', 'text' => 'Nomor resi berhasil disimpan dan status pesanan diperbarui menjadi dikirim.']
+            ? ['type' => 'success', 'text' => $isGojek
+                ? 'Nomor telepon kurir Gojek berhasil disimpan dan status pesanan diperbarui menjadi dikirim.'
+                : 'Nomor resi berhasil disimpan dan status pesanan diperbarui menjadi dikirim.']
             : ['type' => 'error', 'text' => 'Pesanan tidak ditemukan atau belum siap untuk dikirim.'];
 
         header(

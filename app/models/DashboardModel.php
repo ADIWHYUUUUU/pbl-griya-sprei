@@ -59,7 +59,8 @@ class DashboardModel
     {
         return $this->fetchOrders(
             "(p.status_pesanan::text IN ('DIPROSES', 'DIKIRIM') OR
-              (p.status_pesanan::text = 'SELESAI' AND p.nomor_resi IS NOT NULL))",
+              (p.status_pesanan::text = 'SELESAI'
+               AND (p.nomor_resi IS NOT NULL OR p.nomor_telepon_kurir IS NOT NULL)))",
             [],
             $limit
         );
@@ -135,6 +136,7 @@ class DashboardModel
                     p.metode_pengiriman::text AS metode_pengiriman,
                     p.catatan_pengiriman,
                     p.nomor_resi,
+                    p.nomor_telepon_kurir,
                     p.tagihan_pokok,
                     p.ongkir,
                     COALESCE(p.tagihan_pokok, detail.subtotal, 0) + p.ongkir - p.diskon AS total,

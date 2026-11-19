@@ -115,7 +115,7 @@ $copyTotal = fmod($total, 1.0) === 0.0
                             <div class="order-product" role="cell">
                                 <strong><?= $escape($item['nama_produk']) ?></strong>
                                 <small>
-                                    <?= (int) $item['panjang'] ?> × <?= (int) $item['lebar'] ?> × <?= (int) $item['tinggi'] ?> cm
+                                    <?= (int) $item['panjang'] ?> × <?= (int) $item['lebar'] ?><?= $item['tinggi'] === null ? '' : ' × ' . (int) $item['tinggi'] ?> cm
                                     · <?= $escape(ucfirst(strtolower($item['tipe_ukuran']))) ?>
                                     <?php
                                     $extras = [];

@@ -1,15 +1,5 @@
 <?php
 
-/**
- * Notifikasi pembaruan pesanan untuk customer.
- *
- * Sebuah pesanan dianggap "ada update baru" bila kondisi yang diubah Admin
- * (status pesanan, jumlah pembayaran yang sudah diputuskan Admin, nomor resi)
- * berbeda dari kondisi terakhir yang sudah dilihat customer di halaman Pesanan Saya.
- * Kondisi yang sudah dilihat disimpan di storage/pesanan_dilihat.json, jadi tidak
- * perlu mengubah tabel database.
- */
-
 const ORDER_UPDATE_SEEN_FILE = __DIR__ . '/../../storage/pesanan_dilihat.json';
 // Tanda pesanan yang baru dibuat customer dan belum disentuh Admin.
 const ORDER_UPDATE_INITIAL_SIGNATURE = 'MENUNGGU_VERIFIKASI|0|';
@@ -46,6 +36,8 @@ function orderUpdateCurrentOrders(int $customerId): array
             COALESCE(p.no_invoice, 'ORD-' || p.id_pesanan::text) AS kode,
             p.status_pesanan::text AS status_pesanan,
             COALESCE(p.nomor_resi, '') AS nomor_resi,
+            COALESCE(p.nomor_telepon_kurir, '') AS nomor_telepon_kurir,
+            p.metode_pengiriman::text AS metode_pengiriman,
             (
                 SELECT COUNT(*)
                 FROM pembayaran b
@@ -73,7 +65,9 @@ function orderUpdateCurrentOrders(int $customerId): array
             'status_pesanan' => (string) $row['status_pesanan'],
             'status_pembayaran' => (string) ($row['status_pembayaran'] ?? ''),
             'nomor_resi' => (string) $row['nomor_resi'],
-            'signature' => $row['status_pesanan'] . '|' . (int) $row['pembayaran_diputuskan'] . '|' . $row['nomor_resi'],
+            'nomor_telepon_kurir' => (string) $row['nomor_telepon_kurir'],
+            'metode_pengiriman' => (string) $row['metode_pengiriman'],
+            'signature' => $row['status_pesanan'] . '|' . (int) $row['pembayaran_diputuskan'] . '|' . $row['nomor_resi'] . '|' . $row['nomor_telepon_kurir'],
         ];
     }
 
@@ -185,8 +179,12 @@ function orderUpdateInfo(array $order): array
         'DIKIRIM' => [
             'label' => 'Pesanan Dikirim',
             'tone' => 'ok',
-            'message' => $order['nomor_resi'] !== ''
-                ? 'Pesanan sudah dikirim. Nomor resi: ' . $order['nomor_resi'] . '.'
+            'message' => (($order['metode_pengiriman'] ?? '') === 'INSTANT_GOJEK'
+                    ? $order['nomor_telepon_kurir'] !== ''
+                    : $order['nomor_resi'] !== '')
+                ? (($order['metode_pengiriman'] ?? '') === 'INSTANT_GOJEK'
+                    ? 'Pesanan sudah dikirim. Nomor telepon kurir Gojek: ' . $order['nomor_telepon_kurir'] . '.'
+                    : 'Pesanan sudah dikirim. Nomor resi: ' . $order['nomor_resi'] . '.')
                 : 'Pesanan sudah dikirim.',
             'action_label' => '',
             'action_url' => $ordersUrl,
