@@ -1,3 +1,7 @@
 .env
+.env.*
+!.env.example
 .git
 node_modules
+storage/password-reset-*.json
+storage/logs/*
