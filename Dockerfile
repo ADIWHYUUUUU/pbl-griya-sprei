@@ -1,13 +1,11 @@
-FROM php:8.3-cli
-
-# Ekstensi untuk koneksi PostgreSQL (Supabase)
-RUN apt-get update \
-    && apt-get install -y libpq-dev \
-    && docker-php-ext-install pdo_pgsql \
-    && rm -rf /var/lib/apt/lists/*
+FROM dunglas/frankenphp:1-php8.3-bookworm
 
 WORKDIR /app
-COPY . .
+RUN install-php-extensions pdo_pgsql curl
 
-# Render menyediakan variabel PORT
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8000} -t public"]
+COPY . /app
+COPY Caddyfile /etc/caddy/Caddyfile
+
+ENV PORT=80
+
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

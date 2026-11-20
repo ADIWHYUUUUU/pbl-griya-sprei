@@ -86,3 +86,11 @@ Alamat pengiriman pada checkout disimpan sebagai alamat default akun setelah pes
 Harga ukuran standar untuk Sprei dan Bed Cover ditampilkan berdasarkan tabel harga kain di `app/helpers/product_pricing.php`. Katalog menampilkan harga paling rendah dari semua kombinasi kain dan ukuran. Ukuran custom tetap dikonfirmasi Admin.
 
 Untuk database yang sudah ada, jalankan `database/migrations/19_enum_jenis_kain_dan_tipe_ukuran.sql` satu kali. Migration ini memastikan `produk.jenis_kain` dan `detail_pesanan.tipe_ukuran` memakai enum yang sudah dipakai aplikasi; tidak menambah kolom dan tidak mengubah dimensi angka.
+
+## Deploy ke Vercel
+
+Aplikasi dijalankan sebagai Container Vercel menggunakan FrankenPHP. `Dockerfile` dan `Caddyfile` berada di root proyek; `vercel.json` tidak diperlukan. Pilih preset **Container** pada pengaturan proyek Vercel jika preset tidak terdeteksi otomatis.
+
+Tambahkan environment variables yang diperlukan aplikasi di **Vercel → Project Settings → Environment Variables**. Masukkan nilai `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`, dan konfigurasi Brevo/Supabase yang digunakan. Jangan commit `.env` atau secret ke Git. Setelah itu deploy ulang branch `main`.
+
+Filesystem container tidak persisten dan dapat berbeda antar-instance. Upload baru harus menggunakan Supabase Storage, bukan direktori lokal. Sesi PHP bawaan saat ini tersimpan sebagai file lokal; untuk penggunaan produksi yang dapat diskalakan, konfigurasi session store bersama (misalnya Redis) agar login dan keranjang tetap konsisten antar-instance.
