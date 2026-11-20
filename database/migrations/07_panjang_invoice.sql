@@ -1,0 +1,2 @@
+ALTER TABLE pesanan
+ALTER COLUMN no_invoice TYPE VARCHAR(40);

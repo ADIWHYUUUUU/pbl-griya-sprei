@@ -1,20 +1,4 @@
-
-# Environment
 .env
 .env.*
 !.env.example
-
-# Dependencies
-/vendor/
-/node_modules/
-
-# Logs
-*.log
-
-# Editor
-.vscode/
-.idea/
-
-# Sistem operasi
-.DS_Store
-Thumbs.db
+storage/password-reset-*.json

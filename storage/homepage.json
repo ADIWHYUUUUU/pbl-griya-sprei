@@ -1,0 +1,48 @@
+{
+    "hero_pill": "Griya Sprei Malang · Homemade sejak 2010",
+    "hero_title": "Griya Sprei adalah usaha bedding lokal yang fokus pada pembuatan sprei custom dengan kualitas jahitan rapi dan bahan berkualitas.",
+    "hero_description": "Pilih model kain, tentukan ukuran kasur presisi, dan nikmati tidur nyaman.",
+    "hero_image": "/uploads/beranda/9ba2c724fb5156499957564e.jpg",
+    "explore_title": "Jelajahi katalog",
+    "sprei_title": "Sprei",
+    "sprei_description": "Standar atau custom sesuai kasur.",
+    "sprei_image": "/uploads/beranda/fded1a4134d1faf93d3bdf84.jpg",
+    "bedcover_title": "Bed Cover",
+    "bedcover_description": "Pilih model dan ukuran.",
+    "bedcover_image": "/uploads/beranda/82d64f9deaa5fdf996f662c5.jpg",
+    "featured_title": "Produk Pilihan & Best Seller",
+    "featured": [
+        {
+            "name": "Sprei Katun Jepang Sakura",
+            "tag": "Sprei Premium",
+            "description": "Sprei berbahan katun Jepang dengan motif bunga sakura berwarna pink pastel di atas dasar putih. Memiliki tampilan lembut dan elegan yang cocok untuk kamar tidur bernuansa minimalis.",
+            "price": 185000,
+            "color": "#9bb87a",
+            "image": "/uploads/beranda/360a014286afe69fccf3b313.jpg"
+        },
+        {
+            "name": "Sprei Microtex Geometric Navy",
+            "tag": "Sprei Premium",
+            "description": "Sprei berbahan microtex dengan motif geometris kombinasi biru navy, abu-abu, dan putih. Desain modern yang memberikan kesan rapi dan sederhana pada kamar tidur.",
+            "price": 155000,
+            "color": "#9bb87a",
+            "image": "/uploads/beranda/5e88bbf2dba31e3028d70c97.jpg"
+        },
+        {
+            "name": "Bedcover Premium Rose Garden",
+            "tag": "Bedcover Premium",
+            "description": "Bedcover tebal dengan motif bunga mawar berwarna dusty pink dan krem. Memiliki tampilan elegan dengan nuansa romantis yang mempercantik kamar tidur.",
+            "price": 350000,
+            "color": "#9bb87a",
+            "image": "/uploads/beranda/53df9b95f1e65168d97709fb.jpg"
+        },
+        {
+            "name": "Bedcover Modern Geometric",
+            "tag": "Bedcover Premium",
+            "description": "Bedcover dengan motif geometris berbentuk garis dan segitiga berwarna navy serta abu-abu. Desain kontemporer yang cocok untuk kamar minimalis modern.",
+            "price": 325000,
+            "color": "#9bb87a",
+            "image": "/uploads/beranda/34951216c8eee04c0ade7cd5.jpg"
+        }
+    ]
+}

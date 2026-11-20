@@ -1,0 +1,716 @@
+/* =========================================
+   BERANDA.CSS - khusus halaman beranda
+   ========================================= */
+
+/* 1. HERO */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 545px;
+  gap: 60px;
+  align-items: center;
+  padding: 72px 0 90px;
+}
+.hero__pill {
+  display: inline-block;
+  padding: 5px 12px;
+  margin-bottom: 8px;
+  background: #e8ebe6;
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--green-dark);
+}
+.hero__title {
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+}
+.hero__desc {
+  max-width: 560px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.btn--lg {
+  height: 44px;
+  padding: 0 24px;
+  font-size: 14px;
+}
+.hero__image {
+  height: 356px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+/* 2. JUDUL SECTION */
+.section {
+  margin-bottom: 70px;
+}
+.section__title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 22px;
+}
+
+/* 3. KATEGORI PRODUK (3 kartu) */
+.explore {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.explore__card {
+  min-width: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.explore__image {
+  height: 192px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+.explore__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+.explore__row > div {
+  min-width: 0;
+}
+.explore__row .btn {
+  flex: none;
+}
+
+.explore__row h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.explore__row p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* 4. PRODUK PILIHAN */
+.featured {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.featured__card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.featured__image {
+  height: 190px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.featured__tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--price);
+}
+.featured__tag--sprei {
+  color: var(--muted);
+}
+.featured__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 6px 0;
+}
+.featured__desc {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  min-height: 34px;
+}
+.featured__price {
+  margin: 10px 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.featured__price strong {
+  font-size: 16px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* 5. CARA PEMESANAN */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+.step {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.step__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.step__head span {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.step__head h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.step p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.section__desc {
+  margin: -14px 0 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* 5b. TOMBOL HERO + POPUP CARA MENGUKUR KASUR */
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.btn--outline {
+  background: var(--white);
+  color: var(--text);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn--outline:hover {
+  background: #f1f2ee;
+}
+
+.guide-modal {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100% - 32px));
+  max-height: calc(100vh - 48px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--text);
+  overflow: hidden;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(31, 38, 30, 0.2);
+}
+.guide-modal[open] {
+  display: flex;
+}
+.guide-modal::backdrop {
+  background: rgba(31, 38, 30, 0.45);
+}
+.guide-modal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.guide-modal__head h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.guide-modal__head p {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.guide-modal__close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.guide-modal__close:hover {
+  background: #f1f2ee;
+  color: var(--text);
+}
+.guide-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+}
+.guide-modal__diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 4px 0 16px;
+}
+.guide-modal__steps {
+  margin: 0 0 16px;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.guide-modal__steps b {
+  font-weight: 600;
+}
+.guide-modal__sizes {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f6f5f1;
+}
+.guide-modal__sizes h3 {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.guide-modal__sizes dl {
+  margin: 0;
+}
+.guide-modal__sizes dl div {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 13px;
+}
+.guide-modal__sizes dt {
+  color: var(--muted);
+}
+.guide-modal__sizes dd {
+  margin: 0;
+  font-weight: 500;
+}
+.guide-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}
+.guide-modal__foot .btn {
+  height: 40px;
+  padding: 0 18px;
+}
+
+/* 5b-2. POPUP UPDATE PESANAN */
+.order-update-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.order-update {
+  --tone-bg: #e3ecf3;
+  --tone-text: #2d5575;
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--tone-text);
+  border-radius: 10px;
+  background: #f6f5f1;
+}
+.order-update--ok     { --tone-bg: #e1efe3; --tone-text: #2b5a33; }
+.order-update--warn   { --tone-bg: #fcefd2; --tone-text: #86600c; }
+.order-update--danger { --tone-bg: #f6dede; --tone-text: #8a2a2a; }
+.order-update__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px 10px;
+}
+.order-update__head b {
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-all;
+}
+.order-update__tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--tone-bg);
+  color: var(--tone-text);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.order-update p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.order-update__action {
+  justify-self: start;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tone-text);
+}
+.order-update__action:hover {
+  text-decoration: underline;
+}
+
+/* 5c. FAQ */
+.faq {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.faq__item + .faq__item {
+  border-top: 1px solid var(--border);
+}
+.faq__item summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+.faq__item summary::after {
+  content: "+";
+  flex: none;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.faq__item[open] summary::after {
+  content: "−";
+}
+.faq__item p {
+  padding: 0 20px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* 5d. CTA WHATSAPP */
+.cta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  background: var(--green-dark);
+  color: #fff;
+}
+.cta h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.cta p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+.cta .cta__btn {
+  flex: none;
+  background: #fff;
+  color: var(--green-dark);
+}
+.cta .cta__btn:hover {
+  background: #eef1eb;
+}
+
+/* =========================================
+   6. RESPONSIF
+   Laptop : > 900px (tampilan default di atas)
+   Tablet : <= 900px
+   HP     : <= 480px
+   ========================================= */
+
+/* ---------- TABLET (<= 900px) ---------- */
+@media (max-width: 900px) {
+  /* Hero: teks di atas, gambar di bawah */
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 36px 0 48px;
+  }
+  .hero__title {
+    font-size: 32px;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .hero__desc {
+    font-size: 15px;
+    margin-bottom: 22px;
+  }
+  .hero__image {
+    height: 300px;
+  }
+
+  .section {
+    margin-bottom: 48px;
+  }
+  .section__title {
+    font-size: 21px;
+    margin-bottom: 18px;
+  }
+
+  /* Kategori produk: 2 kolom, kartu ke-3 melebar penuh */
+  .explore {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .explore__card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .explore__card {
+    min-width: 0;
+    padding: 14px;
+  }
+  .explore__image {
+    height: 170px;
+  }
+  .explore__row {
+    gap: 12px;
+  }
+  .explore__row > div {
+    min-width: 0;
+  }
+
+  /* Produk pilihan: 2 kolom */
+  .featured {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .featured__card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+  }
+  .featured__image {
+    height: 200px;
+  }
+  .featured__card .btn {
+    margin-top: auto;
+  }
+
+  /* Cara pemesanan: kartu menyesuaikan lebar */
+  .steps {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .step {
+    padding: 16px;
+  }
+  .step__head {
+    margin-bottom: 12px;
+  }
+
+  .cta {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
+  }
+}
+
+/* ---------- HP (<= 480px) ---------- */
+@media (max-width: 480px) {
+  .hero {
+    gap: 18px;
+    padding: 24px 0 32px;
+  }
+  .hero__pill {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+  .hero__title {
+    font-size: 24px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .hero__desc {
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+  }
+  .btn--lg {
+    width: 100%;
+    height: 42px;
+    font-size: 14px;
+  }
+  .hero__image {
+    height: 200px;
+    border-radius: 12px;
+  }
+
+  .section {
+    margin-bottom: 36px;
+  }
+  .section__title {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  /* Jelajahi katalog: tetap 2 kolom, isi kartu disusun ke bawah */
+  .explore {
+    gap: 12px;
+  }
+  .explore__card {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .explore__image {
+    height: 120px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+  .explore__row {
+    flex: 1;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .explore__row h3 {
+    font-size: 14px;
+  }
+  .explore__row p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .explore__row .btn {
+    width: 100%;
+    margin-top: auto;
+  }
+
+  /* Produk pilihan: 2 kolom, teks tetap terbaca */
+  .featured {
+    gap: 12px;
+  }
+  .featured__card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  .featured__image {
+    height: 130px;
+    margin-bottom: 10px;
+  }
+  .featured__tag {
+    font-size: 10px;
+  }
+  .featured__title {
+    font-size: 14px;
+    line-height: 1.3;
+    margin: 4px 0;
+  }
+  .featured__desc {
+    font-size: 12px;
+    min-height: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .featured__price {
+    margin: 8px 0 10px;
+    font-size: 11px;
+  }
+  .featured__price strong {
+    display: block;
+    font-size: 14px;
+  }
+  .featured__card .btn {
+    padding: 9px 8px;
+    font-size: 12px;
+  }
+
+  /* Cara pemesanan: daftar satu kolom agar tidak sempit */
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .step {
+    padding: 14px;
+    border-radius: 10px;
+  }
+  .step__head {
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .step__head span {
+    width: 28px;
+    height: 28px;
+  }
+  .step__head h3 {
+    font-size: 14px;
+  }
+  .step p {
+    font-size: 12.5px;
+    padding-left: 38px;
+  }
+
+  .section__desc {
+    margin: -8px 0 14px;
+    font-size: 13px;
+  }
+  .faq {
+    border-radius: 12px;
+  }
+  .faq__item summary {
+    padding: 14px 16px;
+    font-size: 13.5px;
+  }
+  .faq__item p {
+    padding: 0 16px 14px;
+  }
+  .cta {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  .cta h2 {
+    font-size: 17px;
+  }
+  .cta .cta__btn {
+    width: 100%;
+  }
+}

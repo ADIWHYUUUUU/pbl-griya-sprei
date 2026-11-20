@@ -1,0 +1,73 @@
+<?php
+$halamanAktif = $_GET['page'] ?? 'admin-dashboard';
+$namaAdmin = $_SESSION['nama'] ?? 'Admin';
+$csrfToken = $_SESSION['csrf_token'] ?? '';
+?>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-main">
+        <div class="sidebar-brand">
+            <img class="brand-icon" src="/assets/images/logo.png" alt="Logo Griya Sprei">
+            <div class="brand-text">
+                <h2>Griya Sprei</h2>
+                <p>Sistem Kelola Toko</p>
+            </div>
+            <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Tutup menu">&times;</button>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Menu utama">
+            <a class="nav-item <?= $halamanAktif === 'admin-dashboard' ? 'active' : '' ?>" href="/?page=admin-dashboard" <?= $halamanAktif === 'admin-dashboard' ? 'aria-current="page"' : '' ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-7h6v7"/></svg>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-item <?= in_array($halamanAktif, ['admin-products', 'admin-add-product', 'admin-edit-product'], true) ? 'active' : '' ?>" href="/?page=admin-products" <?= in_array($halamanAktif, ['admin-products', 'admin-add-product', 'admin-edit-product'], true) ? 'aria-current="page"' : '' ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="M3 8v9l9 5 9-5V8M12 13v9"/></svg>
+                <span>Input Produk</span>
+            </a>
+            <a class="nav-item <?= in_array($halamanAktif, ['admin-orders', 'admin-order-verification'], true) ? 'active' : '' ?>" href="/?page=admin-orders" <?= in_array($halamanAktif, ['admin-orders', 'admin-order-verification'], true) ? 'aria-current="page"' : '' ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 10h6M9 14h6M9 18h3"/></svg>
+                <span>Cek Pesanan</span>
+            </a>
+            <a class="nav-item <?= in_array($halamanAktif, ['admin-payments', 'admin-payment-verify'], true) ? 'active' : '' ?>" href="/?page=admin-payments" <?= in_array($halamanAktif, ['admin-payments', 'admin-payment-verify'], true) ? 'aria-current="page"' : '' ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg>
+                <span>Cek Pembayaran</span>
+            </a>
+            <a class="nav-item <?= in_array($halamanAktif, ['admin-resi-list', 'admin-resi-input'], true) ? 'active' : '' ?>" href="/?page=admin-resi-list" <?= in_array($halamanAktif, ['admin-resi-list', 'admin-resi-input'], true) ? 'aria-current="page"' : '' ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14v11H5zM9 5h6v3H9zM8 12h8M8 16h5"/></svg>
+                <span>Nomor Resi</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <span class="user-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-1a7 7 0 0 1 14 0v1H5Z"/></svg>
+            </span>
+            <div>
+                <strong>Admin</strong>
+                <span><?= htmlspecialchars((string) $namaAdmin, ENT_QUOTES, 'UTF-8') ?></span>
+            </div>
+        </div>
+        <form action="/?action=admin-logout" method="POST" class="sidebar-logout-form" id="adminLogoutForm">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) $csrfToken, ENT_QUOTES, 'UTF-8') ?>">
+            <button type="button" class="logout-link" data-open-logout-dialog>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+                <span>Keluar</span>
+            </button>
+            <dialog class="logout-dialog" aria-labelledby="logoutDialogTitle" aria-describedby="logoutDialogDescription">
+                <div class="logout-dialog__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+                </div>
+                <h2 id="logoutDialogTitle">Keluar Akun?</h2>
+                <p id="logoutDialogDescription">Apakah Anda yakin ingin keluar dari sistem admin?</p>
+                <div class="logout-dialog__actions">
+                    <button type="button" class="logout-dialog__cancel" data-close-logout-dialog>Batal</button>
+                    <button type="submit" class="logout-dialog__confirm">Keluar</button>
+                </div>
+            </dialog>
+        </form>
+    </div>
+</aside>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
