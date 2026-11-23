@@ -142,7 +142,7 @@ if ($isLogin && $popupCustomerId > 0) {
         <!-- SARUNG BANTAL & GULING -->
         <article class="explore__card">
           <div
-            class="explore__image media"
+            class="explore__image explore__image--contain media"
             style="--ph:#9bb87a"
           ><?php if (!empty($homepage['sarung_image'])): ?><img src="<?= $homepageValue('sarung_image'); ?>" alt="Sarung bantal dan guling"><?php endif; ?></div>
           <div class="explore__row">
@@ -153,7 +153,7 @@ if ($isLogin && $popupCustomerId > 0) {
               </p>
             </div>
             <a
-              href="/?page=customer-catalog&category=sprei"
+              href="/?page=customer-catalog&category=sarung"
               class="btn"
             >
               Lihat
