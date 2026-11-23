@@ -108,19 +108,28 @@ class DashboardModel
         return $this->getOrdersForDateRange($start->format('Y-m-d'), $end->format('Y-m-d'));
     }
 
-    public function getOrdersForDateRange(string $startDate, string $endDate): array
-    {
-        $start = new DateTimeImmutable($startDate);
-        $end = (new DateTimeImmutable($endDate))->modify('+1 day');
+  public function getOrdersForDateRange(string $startDate, string $endDate): array
+{
+    $start = new DateTimeImmutable($startDate);
+    $end = (new DateTimeImmutable($endDate))->modify('+1 day');
 
-        return $this->fetchOrders(
-            'p.tanggal_pesan >= :start_date AND p.tanggal_pesan < :end_date',
-            [
-                ':start_date' => $start->format('Y-m-d H:i:s'),
-                ':end_date' => $end->format('Y-m-d H:i:s'),
-            ]
-        );
-    }
+    $sql = "
+        SELECT *
+        FROM view_laporan_penjualan
+        WHERE tanggal_pesan >= :start_date
+          AND tanggal_pesan < :end_date
+        ORDER BY tanggal_pesan DESC, id_pesanan DESC
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+
+    $stmt->execute([
+        ':start_date' => $start->format('Y-m-d H:i:s'),
+        ':end_date' => $end->format('Y-m-d H:i:s'),
+    ]);
+
+    return $stmt->fetchAll();
+}
 
     private function fetchOrders(string $condition, array $parameters, ?int $limit = null): array
     {
