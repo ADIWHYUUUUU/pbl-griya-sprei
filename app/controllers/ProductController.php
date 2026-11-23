@@ -15,7 +15,7 @@ class ProductController
         $this->model = new ProductModel($pdo);
     }
 
-    private function authorizeAdminPost()
+    private function authorizeAdminPost(bool $redirectOnFailure = false)
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -25,6 +25,11 @@ class ProductController
             ($_SESSION['login'] ?? false) !== true ||
             ($_SESSION['role'] ?? '') !== 'ADMIN'
         ) {
+            if ($redirectOnFailure) {
+                header('Location: /?page=admin-login&reason=product-delete', true, 303);
+                exit;
+            }
+
             http_response_code(403);
             exit('Akses ditolak.');
         }
@@ -41,6 +46,12 @@ class ProductController
             !isset($_SESSION['csrf_token']) ||
             !hash_equals($_SESSION['csrf_token'], $token)
         ) {
+            if ($redirectOnFailure) {
+                $_SESSION['product_delete_error'] = 'Formulir hapus sudah tidak berlaku. Silakan klik Hapus lagi.';
+                header('Location: /?page=admin-products', true, 303);
+                exit;
+            }
+
             http_response_code(403);
             exit('Token CSRF tidak valid.');
         }
@@ -455,7 +466,7 @@ class ProductController
     // =========================================
     public function delete($id)
     {
-        $this->authorizeAdminPost();
+        $this->authorizeAdminPost(true);
 
         $id = filter_var($id, FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1]
@@ -466,30 +477,27 @@ class ProductController
             exit('ID produk tidak valid.');
         }
 
-        $product = $this->model->getProductById($id);
-
-        if (!$product) {
-            http_response_code(404);
-            exit('Produk tidak ditemukan.');
-        }
-
         try {
-
-            $deleted = $this->model->deleteProduct($id);
-
-            if (!$deleted) {
-                throw new RuntimeException('Delete gagal.');
-            }
+            $deletedProduct = $this->model->deleteProduct($id);
         } catch (Throwable $e) {
+            if ($e instanceof PDOException && (string) $e->getCode() === '23503') {
+                $_SESSION['product_delete_error'] = 'Produk masih tercatat di riwayat pesanan sehingga tidak bisa dihapus.';
+            } else {
+                error_log('[DELETE PRODUCT] ' . $e->getMessage());
+                $_SESSION['product_delete_error'] = 'Produk gagal dihapus. Silakan coba lagi.';
+            }
+            header('Location: /?page=admin-products', true, 303);
+            exit;
+        }
 
-            error_log('[DELETE PRODUCT] ' . $e->getMessage());
-
-            http_response_code(500);
-            exit('Produk gagal dihapus.');
+        if ($deletedProduct === false) {
+            $_SESSION['product_delete_error'] = 'Produk tidak ditemukan atau sudah dihapus.';
+            header('Location: /?page=admin-products', true, 303);
+            exit;
         }
 
         try {
-            delete_uploaded_file((string) ($product['gambar_produk'] ?? ''), 'produk');
+            delete_uploaded_file((string) ($deletedProduct['gambar_produk'] ?? ''), 'produk');
         } catch (Throwable $cleanupError) {
             error_log('[DELETE PRODUCT IMAGE CLEANUP] ' . $cleanupError->getMessage());
         }

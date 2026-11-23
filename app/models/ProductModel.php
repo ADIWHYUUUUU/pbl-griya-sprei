@@ -155,13 +155,13 @@ class ProductModel
     public function deleteProduct($id)
     {
         $stmt = $this->pdo->prepare(
-            "DELETE FROM produk WHERE id_produk = :id_produk"
+            "DELETE FROM produk WHERE id_produk = :id_produk RETURNING gambar_produk"
         );
 
         $stmt->execute([
             ':id_produk' => $id
         ]);
 
-        return $stmt->rowCount() > 0;
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

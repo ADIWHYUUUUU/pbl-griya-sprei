@@ -22,6 +22,8 @@ $successMessages = [
 ];
 $successKey = $_GET['success'] ?? '';
 $successMessage = is_string($successKey) ? ($successMessages[$successKey] ?? '') : '';
+$deleteError = $_SESSION['product_delete_error'] ?? '';
+unset($_SESSION['product_delete_error']);
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -68,6 +70,9 @@ function e($value)
             <h1>Katalog Produk</h1>
             <a href="/?page=admin-add-product" class="product-add-button"><span aria-hidden="true">+</span> Tambah Produk</a>
         </header>
+        <?php if ($deleteError !== ''): ?>
+            <p role="alert"><?= e($deleteError) ?></p>
+        <?php endif; ?>
 
         <section class="product-table-card" aria-label="Daftar produk">
             <div class="product-table-scroll">

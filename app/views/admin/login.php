@@ -1,3 +1,6 @@
+<?php
+$needsAdminSession = ($_GET['reason'] ?? '') === 'product-delete';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -23,7 +26,7 @@
         <p style="font-size: 14px; color: #777;">Masuk untuk mengelola toko Griya Sprei</p>
     </div>
     <form id="adminLoginForm" action="/?action=admin-login" method="post" novalidate>
-        <p class="flash-message" id="loginMessage" role="alert" hidden></p>
+        <p class="flash-message" id="loginMessage" role="alert"<?= $needsAdminSession ? '' : ' hidden' ?>><?= $needsAdminSession ? 'Masuk kembali sebagai admin untuk menghapus produk.' : '' ?></p>
         <div class="field" id="emailField">
             <label class="field__label" for="email">Email <span class="required">*</span></label>
             <div class="input">
