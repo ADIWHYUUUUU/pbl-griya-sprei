@@ -14,7 +14,10 @@
         "16": "DIPROSES|0|"
     },
     "14": {
-        "59": "MENUNGGU_VERIFIKASI|0||",
+        "86": "DIBATALKAN|0||",
+        "87": "MENUNGGU_PEMBAYARAN|0||",
+        "84": "DIBATALKAN|0||",
+        "59": "DIBATALKAN|0||",
         "42": "DIBATALKAN|0||",
         "41": "DIBATALKAN|0||",
         "40": "DIBATALKAN|0||"
