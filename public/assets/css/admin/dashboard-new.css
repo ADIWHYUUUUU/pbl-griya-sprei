@@ -1830,3 +1830,770 @@ body.admin-dashboard #modalLaporan .pagination-controls a[aria-disabled="true"] 
     }
 
 }
+
+body.admin-dashboard #modalLaporan .modal-container {
+    display: flex;
+    flex-direction: column;
+    width: min(1120px, 100%);
+    max-height: calc(100vh - 28px);
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(28, 38, 31, 0.18);
+}
+
+body.admin-dashboard #modalLaporan .report-modal-header {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 54px;
+    padding: 8px 8px 8px 14px;
+    background: #f7f6f3;
+}
+
+body.admin-dashboard #modalLaporan .report-heading {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    flex-wrap: nowrap;
+    min-width: max-content;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .report-heading-icon {
+    display: grid;
+    place-items: center;
+    align-self: center;
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
+    border-radius: 6px;
+    line-height: 1;
+}
+
+body.admin-dashboard #modalLaporan .report-heading-icon svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+body.admin-dashboard #modalLaporan .report-heading h3 {
+    flex: 0 0 auto;
+    margin: 0;
+    color: #344054;
+    font-size: 13px;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .report-header-actions {
+    display: flex;
+    flex: 0 1 auto;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+}
+
+body.admin-dashboard #modalLaporan .report-period-label {
+    min-width: 74px;
+    color: #344054;
+    font-size: 11px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .report-period-arrow {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--garis);
+    border-radius: 6px;
+    background: #fff;
+    color: #344054;
+    font-size: 17px;
+    line-height: 1;
+    text-decoration: none;
+}
+
+body.admin-dashboard #modalLaporan .report-period-arrow.is-disabled {
+    color: #aab2ad;
+}
+
+body.admin-dashboard #modalLaporan .report-header-actions .report-export-button {
+    padding: 7px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .report-header-actions .close-btn {
+    display: grid;
+    flex: 0 0 26px;
+    place-items: center;
+    width: 26px;
+    height: 30px;
+    margin: 0 -4px 0 2px;
+    padding: 0;
+    font-size: 20px;
+    line-height: 1;
+}
+
+body.admin-dashboard #modalLaporan .modal-body {
+    min-height: 0;
+    padding: 10px 12px 12px;
+    overflow-y: auto;
+}
+
+body.admin-dashboard #modalLaporan .report-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+body.admin-dashboard #modalLaporan .report-summary-card {
+    min-height: 46px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    background: #fafaf9;
+}
+
+body.admin-dashboard #modalLaporan .report-summary-card > small {
+    font-size: 9px;
+}
+
+body.admin-dashboard #modalLaporan .summary-val {
+    margin-top: 3px;
+    color: #344054;
+    font-size: 14px;
+}
+
+body.admin-dashboard #modalLaporan .report-panel,
+body.admin-dashboard #modalLaporan .report-table-panel {
+    margin-bottom: 8px;
+    border-radius: 7px;
+}
+
+body.admin-dashboard #modalLaporan .report-title {
+    padding: 8px 10px;
+    color: #344054;
+    font-size: 10px;
+    text-transform: none;
+}
+
+body.admin-dashboard #modalLaporan .report-panel .daily-line-chart {
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+}
+
+body.admin-dashboard #modalLaporan .report-panel .daily-line-chart svg {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+body.admin-dashboard #modalLaporan .report-table-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 8px;
+}
+
+body.admin-dashboard #modalLaporan .report-table-heading .report-title {
+    flex: 0 0 auto;
+    padding-left: 2px;
+    border: 0;
+}
+
+body.admin-dashboard #modalLaporan .report-table-filters {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+body.admin-dashboard #modalLaporan .report-table-filters label {
+    display: block;
+}
+
+body.admin-dashboard #modalLaporan .report-search {
+    position: relative;
+    flex: 0 0 260px;
+    width: 260px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0;
+    border: 1px solid #d5d9d5;
+    border-radius: 6px;
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.admin-dashboard #modalLaporan .report-search svg {
+    position: absolute;
+    top: 50%;
+    left: 9px;
+    display: block;
+    width: 15px;
+    height: 15px;
+    transform: translateY(-50%);
+    fill: none;
+    stroke: #586579;
+    stroke-linecap: round;
+    stroke-width: 1.8;
+}
+
+body.admin-dashboard #modalLaporan .report-search:focus-within {
+    border-color: #aab8aa;
+    box-shadow: 0 0 0 3px rgba(64, 85, 64, 0.08);
+}
+
+body.admin-dashboard #modalLaporan .report-search input,
+body.admin-dashboard #modalLaporan .report-table-filters select {
+    min-width: 0;
+    height: 28px;
+    min-height: 28px;
+    border: 0;
+    background: transparent;
+    color: #586579;
+    font: inherit;
+    font-size: 11px;
+}
+
+body.admin-dashboard #modalLaporan .report-search input {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    padding: 0 8px 0 30px;
+    color: #344054;
+    -webkit-text-fill-color: #344054;
+    caret-color: #344054;
+    -webkit-appearance: none;
+    appearance: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 28px;
+    opacity: 1;
+    outline: none;
+}
+
+body.admin-dashboard #modalLaporan .report-search input::placeholder {
+    color: #647084;
+    opacity: 1;
+}
+
+body.admin-dashboard #modalLaporan .report-search input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+body.admin-dashboard #modalLaporan .report-table-filters select {
+    min-width: 112px;
+    height: 30px;
+    min-height: 30px;
+    padding: 3px 7px;
+    border: 1px solid var(--garis);
+    border-radius: 5px;
+    background: #fff;
+}
+
+body.admin-dashboard #modalLaporan .report-table {
+    min-width: 620px;
+    font-size: 10px;
+}
+
+body.admin-dashboard #modalLaporan .report-table th {
+    padding: 7px 10px;
+    background: #fafaf9;
+    font-size: 9px;
+}
+
+body.admin-dashboard #modalLaporan .report-table td {
+    padding: 7px 10px;
+    font-size: 10px;
+    vertical-align: middle;
+}
+
+body.admin-dashboard #modalLaporan .report-table td:first-child {
+    min-width: 142px;
+}
+
+body.admin-dashboard #modalLaporan .report-table td:nth-child(3) {
+    min-width: 150px;
+}
+
+body.admin-dashboard #modalLaporan .report-table td:nth-child(4) {
+    font-size: 10px;
+}
+
+body.admin-dashboard #modalLaporan .report-table td strong,
+body.admin-dashboard #modalLaporan .report-table td small {
+    display: block;
+}
+
+body.admin-dashboard #modalLaporan .report-table td small {
+    max-width: 220px;
+    margin-top: 2px;
+    overflow: hidden;
+    color: var(--teks-abu);
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.admin-dashboard #modalLaporan .report-detail-link {
+    display: inline-block;
+    margin-top: 2px;
+    color: #405540;
+    font-size: 9px;
+    text-decoration: underline;
+}
+
+body.admin-dashboard #modalLaporan .report-pagination {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    min-height: 35px;
+    padding: 6px 10px;
+    border-top: 1px solid var(--garis);
+    background: #fafaf9;
+}
+
+body.admin-dashboard #modalLaporan .report-page-summary {
+    color: var(--teks-abu);
+    font-size: 9px;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls {
+    gap: 5px;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls button {
+    min-width: 25px;
+    height: 25px;
+    padding: 0 6px;
+    border: 1px solid var(--garis);
+    border-radius: 5px;
+    background: #fff;
+    color: #344054;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls button.current {
+    border-color: #405540;
+    background: #405540;
+    color: #fff;
+}
+
+body.admin-dashboard #modalLaporan .pagination-controls span {
+    display: grid;
+    place-items: center;
+    min-width: 20px;
+    height: 25px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--teks-abu);
+    font-size: 10px;
+}
+
+body.admin-dashboard #modalLaporan #reportEmptyState[hidden] {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    body.admin-dashboard #modalLaporan .modal-container {
+        max-height: calc(100dvh - 24px);
+    }
+
+    body.admin-dashboard #modalLaporan .report-modal-header {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-header-actions {
+        grid-column: 1;
+        justify-content: flex-end;
+        width: 100%;
+        gap: 5px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-heading {
+        align-items: center;
+        min-width: 0;
+        width: 100%;
+    }
+
+    body.admin-dashboard #modalLaporan .report-heading h3 {
+        font-size: 12px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-period-label {
+        min-width: 0;
+        font-size: 10px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-summary {
+        gap: 5px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-summary-card {
+        padding: 7px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-summary-card > small {
+        font-size: 8px;
+    }
+
+    body.admin-dashboard #modalLaporan .summary-val {
+        font-size: 11px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-table-heading {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 2px;
+        padding-bottom: 7px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-table-filters {
+        width: 100%;
+    }
+
+    body.admin-dashboard #modalLaporan .report-search {
+        flex: 1 1 auto;
+        width: auto;
+        height: 30px;
+        min-height: 30px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-search input {
+        font-size: 10px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-table-filters select {
+        min-width: 102px;
+        height: 30px;
+        min-height: 30px;
+    }
+
+    body.admin-dashboard #modalLaporan .report-pagination {
+        justify-content: center;
+    }
+
+    body.admin-dashboard #modalLaporan .report-page-summary {
+        flex: 1 0 100%;
+        text-align: center;
+    }
+
+    body.admin-dashboard #modalLaporan .pagination-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+body.admin-dashboard-home main {
+    padding: 24px;
+}
+
+body.admin-dashboard-home .dashboard-intro {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+body.admin-dashboard-home .header-title {
+    margin-bottom: 2px;
+    color: #172b24;
+    font-size: 19px;
+}
+
+body.admin-dashboard-home .dashboard-subtitle {
+    color: var(--teks-abu);
+    font-size: 11px;
+}
+
+body.admin-dashboard-home .stats-grid {
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+body.admin-dashboard-home .stat-card {
+    min-height: 76px;
+    padding: 10px 11px;
+    border-radius: 8px;
+}
+
+body.admin-dashboard-home .stat-card .label {
+    font-size: 9px;
+}
+
+body.admin-dashboard-home .stat-card .value {
+    margin: 5px 0 6px;
+    font-size: 18px;
+}
+
+body.admin-dashboard-home .stat-card .subtext {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding-top: 6px;
+    font-size: 9px;
+}
+
+body.admin-dashboard-home .stat-card .subtext span:last-child {
+    color: #344f38;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+body.admin-dashboard-home .verification-box {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+}
+
+body.admin-dashboard-home .verification-box .section-header {
+    min-height: 18px;
+    margin-bottom: 2px;
+    padding: 0 0 5px;
+    border: 0;
+}
+
+body.admin-dashboard-home .verification-box .section-header h3 {
+    font-size: 12px;
+}
+
+body.admin-dashboard-home .verification-heading-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+body.admin-dashboard-home .verification-heading-link:hover {
+    text-decoration: underline;
+}
+
+body.admin-dashboard-home .verification-box .badge {
+    padding: 3px 7px;
+    border: 1px solid #f1d48b;
+    background: #fff8e6;
+    color: #8a6413;
+    font-size: 9px;
+}
+
+body.admin-dashboard-home .verif-item {
+    min-height: 38px;
+    padding: 6px 0;
+}
+
+body.admin-dashboard-home .verification-check {
+    flex-basis: 20px;
+    width: 20px;
+    height: 20px;
+    background: #fff4d6;
+    color: #9a6a0a;
+}
+
+body.admin-dashboard-home .verif-info strong,
+body.admin-dashboard-home .verif-info span {
+    font-size: 10px;
+}
+
+body.admin-dashboard-home .verif-info span {
+    color: var(--teks-abu);
+}
+
+body.admin-dashboard-home .verif-item .btn-outline {
+    min-height: 23px;
+    padding: 5px 9px;
+    border-color: #405540;
+    background: #405540;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+body.admin-dashboard-home .verification-all-link {
+    display: inline-block;
+    margin-top: 4px;
+    color: #344f38;
+    font-size: 9px;
+    text-decoration: underline;
+}
+
+body.admin-dashboard-home .chart-section {
+    padding: 12px;
+}
+
+body.admin-dashboard-home .chart-section > .section-header {
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 0;
+    border: 0;
+}
+
+body.admin-dashboard-home .chart-section .section-header h3 {
+    flex: 0 0 auto;
+}
+
+body.admin-dashboard-home .chart-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+}
+
+body.admin-dashboard-home .chart-report-filter {
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+body.admin-dashboard-home .chart-report-filter .chart-filter-field label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+body.admin-dashboard-home .chart-report-filter .chart-filter-field select,
+body.admin-dashboard-home .chart-report-filter .chart-filter-field input {
+    min-height: 27px;
+    padding: 4px 7px;
+    font-size: 9px;
+}
+
+body.admin-dashboard-home .chart-report-filter .chart-filter-field select {
+    max-width: 100px;
+}
+
+body.admin-dashboard-home .chart-report-filter .chart-filter-field input {
+    width: 120px;
+}
+
+body.admin-dashboard-home .chart-report-filter > .btn {
+    min-height: 27px;
+    padding: 6px 8px;
+    font-size: 9px;
+}
+
+body.admin-dashboard-home .chart-header-actions > [data-modal="modalLaporan"] {
+    flex: 0 0 auto;
+    padding: 6px 8px;
+    font-size: 9px;
+}
+
+body.admin-dashboard-home .chart-section .sales-metrics {
+    margin-bottom: 8px;
+}
+
+body.admin-dashboard-home .chart-section .metric-item {
+    padding: 8px;
+}
+
+body.admin-dashboard-home .chart-section .metric-item small,
+body.admin-dashboard-home .chart-section .metric-item .m-val {
+    font-size: 10px;
+}
+
+body.admin-dashboard-home .chart-section .metric-item .m-val {
+    font-size: 13px;
+}
+
+body.admin-dashboard-home .chart-section .daily-line-chart {
+    overflow: hidden;
+    border-color: #e6ebe6;
+}
+
+body.admin-dashboard-home .daily-line-chart svg {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+body.admin-dashboard-home .chart-section .daily-chart-grid {
+    stroke: #ecefea;
+}
+
+body.admin-dashboard-home .chart-section .daily-chart-line {
+    stroke-width: 2.5;
+}
+
+body.admin-dashboard-home .chart-section .daily-chart-point {
+    stroke-width: 2;
+}
+
+@media (max-width: 1000px) {
+    body.admin-dashboard-home .chart-section > .section-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    body.admin-dashboard-home .chart-header-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    body.admin-dashboard-home .chart-report-filter {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 700px) {
+    body.admin-dashboard-home main {
+        padding: 18px;
+    }
+
+    body.admin-dashboard-home .chart-header-actions,
+    body.admin-dashboard-home .chart-report-filter {
+        align-items: stretch;
+        width: 100%;
+    }
+
+    body.admin-dashboard-home .chart-report-filter {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.admin-dashboard-home .chart-report-filter .chart-filter-field select,
+    body.admin-dashboard-home .chart-report-filter .chart-filter-field input {
+        width: 100%;
+        max-width: none;
+    }
+
+    body.admin-dashboard-home .chart-report-filter > .btn,
+    body.admin-dashboard-home .chart-header-actions > [data-modal="modalLaporan"] {
+        min-height: 32px;
+    }
+}

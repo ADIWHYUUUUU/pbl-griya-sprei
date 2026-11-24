@@ -13,7 +13,6 @@ if (
 
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../models/DashboardModel.php';
-require_once __DIR__ . '/../../controllers/ProductController.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -23,12 +22,15 @@ $namaBulan = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
 ];
+$namaBulanSingkat = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 $tahunSekarang = (int) date('Y');
 $dashboard = new DashboardModel($pdo);
 $tahunAwalLaporan = min($tahunSekarang, $dashboard->getEarliestOrderYear() ?? $tahunSekarang);
 $bulanSekarang = (int) date('n');
 $tanggalHariIni = new DateTimeImmutable('today');
 $awalBulanIni = $tanggalHariIni->modify('first day of this month');
+$tanggalPesananPertama = $dashboard->getEarliestOrderDate();
+$awalBulanPesananPertama = ($tanggalPesananPertama ?? $tanggalHariIni)->modify('first day of this month');
 $bacaAngkaQuery = static function ($value, int $default): int {
     if (!is_string($value) && !is_int($value)) {
         return $default;
@@ -100,13 +102,11 @@ if ($periodeLaporan === 'tahun') {
 }
 
 $stats = $dashboard->getStats();
-$pesananTerbaru = $dashboard->getRecentOrders();
 $pembayaranVerifikasi = $dashboard->getWaitingVerificationPayments();
 $pesananLaporan = $dashboard->getOrdersForDateRange(
     $tanggalAwalLaporan->format('Y-m-d'),
     $tanggalAkhirLaporan->format('Y-m-d')
 );
-$produk = (new ProductController())->getAllProducts();
 
 $jumlahHariPeriode = (int) $tanggalAwalLaporan->diff($tanggalAkhirLaporan)->days + 1;
 $grafikPerBulan = $periodeLaporan === 'tahun' || $jumlahHariPeriode > 62;
@@ -178,18 +178,19 @@ $grafikHarian = static function (string $id) use (
     $maksPendapatanGrafik,
     $grafikPerBulan,
     $labelPeriode,
+    $namaBulanSingkat,
     $formatRupiah,
     $formatNilaiGrafik,
     $esc
 ): string {
-    $jarakTanggal = 110;
     $kiri = 100;
-    $kanan = $kiri + max(900, (count($chartData) - 1) * $jarakTanggal);
-    $lebar = $kanan + 20;
+    $kanan = 980;
+    $lebar = 1000;
     $tinggi = 360;
     $atas = 48;
     $bawah = 300;
     $jumlahInterval = 4;
+    $jarakLabelX = max(1, (int) ceil(count($chartData) / 10));
     $langkah = 1.0;
 
     if ($maksPendapatanGrafik > 0) {
@@ -208,8 +209,10 @@ $grafikHarian = static function (string $id) use (
         $x = $kiri + ($index / $penyebutX * $rentangX);
         $y = $bawah - ($dataHarian['total'] / $batasAtas * $rentangY);
         $tanggal = $grafikPerBulan
-            ? $dataHarian['tanggal']->format('m/Y')
-            : $dataHarian['tanggal']->format('d/m/Y');
+            ? $namaBulanSingkat[(int) $dataHarian['tanggal']->format('n') - 1]
+                . ' ' . $dataHarian['tanggal']->format('Y')
+            : $dataHarian['tanggal']->format('d') . ' '
+                . $namaBulanSingkat[(int) $dataHarian['tanggal']->format('n') - 1];
         $titik[] = [
             'x' => number_format($x, 2, '.', ''),
             'y' => number_format($y, 2, '.', ''),
@@ -239,14 +242,18 @@ $grafikHarian = static function (string $id) use (
     }
 
     $svg .= '<path class="daily-chart-line" d="' . $path . '"></path>';
-    foreach ($titik as $titikHarian) {
+    foreach ($titik as $index => $titikHarian) {
         $labelTitik = $titikHarian['tanggal'] . ': ' . $formatRupiah($titikHarian['total']);
-        $svg .= '<text class="daily-chart-value-label" x="' . $titikHarian['x'] .
-            '" y="' . ($titikHarian['y'] - 12) . '" text-anchor="middle">' .
-            $esc($formatRupiah($titikHarian['total'])) . '</text>' .
-            '<text class="daily-chart-x-label" x="' . $titikHarian['x'] .
-            '" y="' . ($bawah + 24) . '" text-anchor="middle">' .
-            $esc($titikHarian['tanggal']) . '</text>';
+        if ($titikHarian['total'] > 0) {
+            $svg .= '<text class="daily-chart-value-label" x="' . $titikHarian['x'] .
+                '" y="' . ($titikHarian['y'] - 12) . '" text-anchor="middle">' .
+                $esc($formatRupiah($titikHarian['total'])) . '</text>';
+        }
+        if ($index % $jarakLabelX === 0 || $index === count($titik) - 1) {
+            $svg .= '<text class="daily-chart-x-label" x="' . $titikHarian['x'] .
+                '" y="' . ($bawah + 24) . '" text-anchor="middle">' .
+                $esc($titikHarian['tanggal']) . '</text>';
+        }
         $svg .= '<circle class="daily-chart-point" cx="' . $titikHarian['x'] .
             '" cy="' . $titikHarian['y'] . '" r="4" tabindex="0" aria-label="' .
             $esc($labelTitik) . '"><title>' . $esc($labelTitik) . '</title></circle>';
@@ -254,14 +261,10 @@ $grafikHarian = static function (string $id) use (
 
     return $svg . '</svg></div>';
 };
-$maksStok = max(1, ...array_map(static function ($item) {
-    return (int) $item['stok'];
-}, $produk ?: [['stok' => 0]]));
-$skalaStok = max(50, $maksStok);
 $jumlahHalamanLaporan = max(1, (int) ceil(count($pesananLaporan) / 7));
 $halamanDiminta = $bacaAngkaQuery($_GET['halaman'] ?? 1, 1);
 $halamanLaporan = max(1, min($jumlahHalamanLaporan, $halamanDiminta));
-$pesananLaporanHalaman = array_slice($pesananLaporan, ($halamanLaporan - 1) * 7, 7);
+$pesananLaporanHalaman = $pesananLaporan;
 $statusPesanan = [
     'MENUNGGU_PEMBAYARAN' => ['Menunggu Pembayaran', 'badge-info'],
     'MENUNGGU_VERIFIKASI' => ['Menunggu Verifikasi', 'badge-warn'],
@@ -290,6 +293,26 @@ $urlEksporLaporan = '/?' . http_build_query([
     'tanggal_akhir' => $tanggalAkhirLaporan->format('Y-m-d'),
     'ekspor' => 'excel',
 ], '', '&', PHP_QUERY_RFC3986);
+$tanggalBulanSaatIni = $tanggalHariIni->modify('first day of this month');
+$tanggalBulanLaporan = $tanggalAwalLaporan->modify('first day of this month');
+$tanggalBulanSebelumnya = $tanggalBulanLaporan->modify('-1 month');
+$tanggalBulanBerikutnya = $tanggalBulanLaporan->modify('+1 month');
+$urlBulanSebelumnya = '/?' . http_build_query([
+    'page' => 'admin-dashboard',
+    'periode' => 'bulan',
+    'bulan' => (int) $tanggalBulanSebelumnya->format('n'),
+    'tahun' => (int) $tanggalBulanSebelumnya->format('Y'),
+    'halaman' => 1,
+], '', '&', PHP_QUERY_RFC3986) . '#modalLaporan';
+$urlBulanBerikutnya = '/?' . http_build_query([
+    'page' => 'admin-dashboard',
+    'periode' => 'bulan',
+    'bulan' => (int) $tanggalBulanBerikutnya->format('n'),
+    'tahun' => (int) $tanggalBulanBerikutnya->format('Y'),
+    'halaman' => 1,
+], '', '&', PHP_QUERY_RFC3986) . '#modalLaporan';
+$bolehKeBulanSebelumnya = $tanggalBulanSebelumnya >= $awalBulanPesananPertama;
+$bolehKeBulanBerikutnya = $tanggalBulanLaporan < $tanggalBulanSaatIni;
 if (($_GET['ekspor'] ?? '') === 'excel') {
     $namaStatusEkspor = array_map(
         static function (array $status): string {
@@ -335,26 +358,6 @@ $statusBadge = static function ($status) use ($statusPesanan, $esc): string {
     $detail = $statusPesanan[$status] ?? [$status, 'badge-done'];
     return '<span class="badge ' . $esc($detail[1]) . '">' . $esc($detail[0]) . '</span>';
 };
-$detailAttributes = static function (array $order) use ($esc, $formatRupiah, $formatTanggal, $statusPesanan): string {
-    $status = $statusPesanan[$order['status_pesanan']][0] ?? $order['status_pesanan'];
-    $payment = $order['status_pembayaran'] === 'TERVERIFIKASI'
-        ? 'Terverifikasi'
-        : ($order['status_pembayaran'] === 'MENUNGGU_VERIFIKASI'
-            ? 'Menunggu verifikasi'
-            : ($order['status_pembayaran'] === 'DITOLAK' ? 'Ditolak' : 'Belum ada pembayaran'));
-
-    return 'data-order-detail data-kode="' . $esc($order['kode']) .
-        '" data-nama="' . $esc($order['nama_pelanggan']) .
-        '" data-telepon="' . $esc($order['telepon']) .
-        '" data-alamat="' . $esc($order['alamat_pengiriman']) .
-        '" data-produk="' . $esc($order['daftar_produk']) .
-        '" data-total="' . $esc($formatRupiah($order['total'])) .
-        '" data-tanggal="' . $esc($formatTanggal($order['tanggal_pesan'])) .
-        '" data-status="' . $esc($status) .
-        '" data-pembayaran="' . $esc($payment) .
-        '" data-metode="' . $esc($order['metode_pembayaran'] ?? 'Belum tersedia') .
-        '" data-catatan="' . $esc($order['catatan_admin'] ?? '') . '"';
-};
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -365,86 +368,115 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
 </head>
-<body class="admin-dashboard">
+<body class="admin-dashboard admin-dashboard-home">
 
 <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
 
 <main>
     <button type="button" class="burger-btn" id="burgerBtn" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">&#9776;</button>
 
-    <h1 class="header-title">Dashboard</h1>
+    <header class="dashboard-intro">
+        <div>
+            <h1 class="header-title">Dashboard</h1>
+            <p class="dashboard-subtitle">Ringkasan toko dan hal yang perlu segera ditindaklanjuti.</p>
+        </div>
+    </header>
 
     <div id="flashArea"></div>
 
     <section class="stats-grid">
-        <div class="stat-card">
+        <a class="stat-card clickable" href="/?page=admin-orders">
             <div class="label">Pesanan Baru</div>
             <div class="value" id="statBaru"><?= $esc($stats['pesanan_baru'] ?? 0) ?></div>
-            <div class="subtext">Pesanan Baru</div>
-        </div>
-
-        <a class="stat-card clickable" href="#verifikasi">
-            <div class="label">Verifikasi Transfer</div>
-            <div class="value" id="statVerifikasi"><?= $esc($stats['menunggu_verifikasi'] ?? 0) ?></div>
-            <div class="subtext">Menunggu Konfirmasi</div>
+            <div class="subtext"><span>Pesanan baru</span><span>Lihat Pesanan ›</span></div>
         </a>
 
-        <div class="stat-card stat-card-stock">
-            <div class="stat-card-heading">
-                <div class="label">Stok Sprei</div>
-                <button type="button" class="btn-text" data-modal="modalStok">Lihat Stok</button>
-            </div>
-            <div class="value" id="statStok"><?= $esc($stats['total_stok'] ?? 0) ?></div>
-            <div class="subtext">Total Stok Tersedia</div>
+        <a class="stat-card clickable" href="/?page=admin-payments">
+            <div class="label">Verifikasi Transfer</div>
+            <div class="value" id="statVerifikasi"><?= $esc($stats['menunggu_verifikasi'] ?? 0) ?></div>
+            <div class="subtext"><span>Menunggu verifikasi</span><span>Cek Pembayaran ›</span></div>
+        </a>
+
+        <a class="stat-card clickable" href="/?page=admin-resi-list">
+            <div class="label">Perlu Resi</div>
+            <div class="value" id="statResi"><?= $esc($stats['perlu_resi'] ?? 0) ?></div>
+            <div class="subtext"><span>Belum ada resi atau telepon</span><span>Isi Resi ›</span></div>
+        </a>
+    </section>
+
+    <section class="verification-box" id="verifikasi">
+        <div class="section-header">
+            <h3><a class="verification-heading-link" href="/?page=admin-payments">Membutuhkan verifikasi</a></h3>
+            <?php if ($pembayaranVerifikasi !== []): ?>
+                <span class="badge badge-warn"><?= $esc($stats['menunggu_verifikasi'] ?? 0) ?> menunggu</span>
+            <?php endif; ?>
+        </div>
+        <div id="listVerifikasi">
+            <?php if ($pembayaranVerifikasi === []): ?>
+                <p class="empty-text">Tidak ada pembayaran yang menunggu verifikasi.</p>
+            <?php else: ?>
+                <?php foreach (array_slice($pembayaranVerifikasi, 0, 2) as $pembayaran): ?>
+                    <div class="verif-item">
+                        <span class="verification-check" aria-hidden="true">&#9675;</span>
+                        <div class="verif-info">
+                            <strong><?= $esc($pembayaran['nama_pelanggan']) ?> / <?= $esc($pembayaran['kode']) ?></strong>
+                            <span>Menunggu verifikasi pembayaran · <?= $esc($formatTanggal($pembayaran['tanggal_upload'])) ?></span>
+                        </div>
+                        <a class="btn-outline" href="/?page=admin-payment-verify&amp;id=<?= (int) $pembayaran['id_pembayaran'] ?>">Cek Pembayaran</a>
+                    </div>
+                <?php endforeach; ?>
+                <a class="verification-all-link" href="/?page=admin-payments">Lihat semua transfer yang menunggu ›</a>
+            <?php endif; ?>
         </div>
     </section>
 
     <section class="chart-section">
         <div class="section-header">
             <h3>Grafik pendapatan — <?= $esc($labelPeriode) ?></h3>
-            <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
+            <div class="chart-header-actions">
+                <form class="chart-report-filter" action="/" method="get" id="filterLaporan">
+                    <input type="hidden" name="page" value="admin-dashboard">
+                    <div class="chart-filter-field">
+                        <label for="filterPeriode">Tampilkan laporan</label>
+                        <select id="filterPeriode" name="periode" aria-label="Tampilkan laporan">
+                            <option value="bulan" <?= $periodeLaporan === 'bulan' ? 'selected' : '' ?>>Per bulan</option>
+                            <option value="tahun" <?= $periodeLaporan === 'tahun' ? 'selected' : '' ?>>Per tahun</option>
+                            <option value="rentang" <?= $periodeLaporan === 'rentang' ? 'selected' : '' ?>>Rentang tanggal</option>
+                        </select>
+                    </div>
+                    <div class="chart-filter-field" data-periode-group="bulan">
+                        <label for="filterBulan">Bulan</label>
+                        <select id="filterBulan" name="bulan" aria-label="Bulan">
+                            <?php foreach ($namaBulan as $index => $nama): ?>
+                                <option value="<?= $index + 1 ?>" <?= $bulanLaporan === $index + 1 ? 'selected' : '' ?>><?= $esc($nama) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="chart-filter-field" data-periode-group="bulan tahun">
+                        <label for="filterTahun">Tahun</label>
+                        <select id="filterTahun" name="tahun" aria-label="Tahun">
+                            <?php for ($tahun = $tahunAwalLaporan; $tahun <= $tahunSekarang; $tahun++): ?>
+                                <option value="<?= $tahun ?>" <?= $tahunLaporan === $tahun ? 'selected' : '' ?>><?= $tahun ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                    <div class="chart-filter-field" data-periode-group="rentang">
+                        <label for="filterTanggalAwal">Tanggal awal</label>
+                        <input type="date" id="filterTanggalAwal" name="tanggal_awal"
+                            min="<?= $tahunAwalLaporan ?>-01-01" max="<?= $tanggalHariIni->format('Y-m-d') ?>"
+                            value="<?= $esc($tanggalAwalLaporan->format('Y-m-d')) ?>">
+                    </div>
+                    <div class="chart-filter-field" data-periode-group="rentang">
+                        <label for="filterTanggalAkhir">Tanggal akhir</label>
+                        <input type="date" id="filterTanggalAkhir" name="tanggal_akhir"
+                            min="<?= $tahunAwalLaporan ?>-01-01" max="<?= $tanggalHariIni->format('Y-m-d') ?>"
+                            value="<?= $esc($tanggalAkhirLaporan->format('Y-m-d')) ?>">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Terapkan filter</button>
+                </form>
+                <button type="button" class="btn-text" data-modal="modalLaporan">Lihat laporan</button>
+            </div>
         </div>
-
-        <form class="chart-report-filter" action="/" method="get" id="filterLaporan">
-            <input type="hidden" name="page" value="admin-dashboard">
-            <div class="chart-filter-field">
-                <label for="filterPeriode">Tampilkan laporan</label>
-                <select id="filterPeriode" name="periode">
-                    <option value="bulan" <?= $periodeLaporan === 'bulan' ? 'selected' : '' ?>>Per bulan</option>
-                    <option value="tahun" <?= $periodeLaporan === 'tahun' ? 'selected' : '' ?>>Per tahun</option>
-                    <option value="rentang" <?= $periodeLaporan === 'rentang' ? 'selected' : '' ?>>Rentang tanggal</option>
-                </select>
-            </div>
-            <div class="chart-filter-field" data-periode-group="bulan">
-                <label for="filterBulan">Bulan</label>
-                <select id="filterBulan" name="bulan">
-                    <?php foreach ($namaBulan as $index => $nama): ?>
-                        <option value="<?= $index + 1 ?>" <?= $bulanLaporan === $index + 1 ? 'selected' : '' ?>><?= $esc($nama) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="chart-filter-field" data-periode-group="bulan tahun">
-                <label for="filterTahun">Tahun</label>
-                <select id="filterTahun" name="tahun">
-                    <?php for ($tahun = $tahunAwalLaporan; $tahun <= $tahunSekarang; $tahun++): ?>
-                        <option value="<?= $tahun ?>" <?= $tahunLaporan === $tahun ? 'selected' : '' ?>><?= $tahun ?></option>
-                    <?php endfor; ?>
-                </select>
-            </div>
-            <div class="chart-filter-field" data-periode-group="rentang">
-                <label for="filterTanggalAwal">Tanggal awal</label>
-                <input type="date" id="filterTanggalAwal" name="tanggal_awal"
-                    min="<?= $tahunAwalLaporan ?>-01-01" max="<?= $tanggalHariIni->format('Y-m-d') ?>"
-                    value="<?= $esc($tanggalAwalLaporan->format('Y-m-d')) ?>">
-            </div>
-            <div class="chart-filter-field" data-periode-group="rentang">
-                <label for="filterTanggalAkhir">Tanggal akhir</label>
-                <input type="date" id="filterTanggalAkhir" name="tanggal_akhir"
-                    min="<?= $tahunAwalLaporan ?>-01-01" max="<?= $tanggalHariIni->format('Y-m-d') ?>"
-                    value="<?= $esc($tanggalAkhirLaporan->format('Y-m-d')) ?>">
-            </div>
-            <button type="submit" class="btn btn-primary">Terapkan filter</button>
-        </form>
         <?php if ($kesalahanLaporan !== ''): ?>
             <p class="chart-filter-error" role="alert"><?= $esc($kesalahanLaporan) ?></p>
         <?php endif; ?>
@@ -463,206 +495,86 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
         <?= $grafikHarian('grafikPendapatan') ?>
     </section>
 
-    <section class="verification-box" id="verifikasi">
-        <div class="section-header">
-            <h3>Membutuhkan verifikasi</h3>
-        </div>
-        <div id="listVerifikasi">
-            <?php if ($pembayaranVerifikasi === []): ?>
-                <p class="empty-text">Tidak ada pembayaran yang menunggu verifikasi.</p>
-            <?php else: ?>
-                <?php foreach (array_slice($pembayaranVerifikasi, 0, 2) as $pembayaran): ?>
-                    <div class="verif-item">
-                        <span class="verification-check" aria-hidden="true">&#10003;</span>
-                        <div class="verif-info">
-                            <strong><?= $esc($pembayaran['nama_pelanggan']) ?> / <?= $esc($pembayaran['kode']) ?></strong>
-                            <span>Transfer pembayaran perlu diperiksa.</span>
-                            <small><?= $esc($formatTanggal($pembayaran['tanggal_upload'])) ?></small>
-                        </div>
-                        <a class="btn-outline" href="/?page=admin-payment-verify&amp;id=<?= (int) $pembayaran['id_pembayaran'] ?>">Cek Pembayaran</a>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
-    </section>
-
-    <section class="table-box" id="daftarPesanan">
-        <div class="section-header">
-            <h3>Daftar pesanan</h3>
-            <a class="btn-text" href="/?page=admin-orders">Lihat Pesanan</a>
-        </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Kode Pesanan</th>
-                        <th>Pelanggan &amp; Produk</th>
-                        <th>Tanggal</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelPesanan">
-                    <?php if ($pesananTerbaru === []): ?>
-                        <tr><td class="empty-cell" colspan="6">Belum ada pesanan.</td></tr>
-                    <?php else: ?>
-                        <?php foreach (array_slice($pesananTerbaru, 0, 4) as $pesanan): ?>
-                            <tr>
-                                <td>
-                                    <strong><?= $esc($pesanan['kode']) ?></strong>
-                                    <small>Pesanan online</small>
-                                </td>
-                                <td>
-                                    <strong><?= $esc($pesanan['nama_pelanggan']) ?></strong>
-                                    <small><?= $esc($pesanan['daftar_produk']) ?></small>
-                                </td>
-                                <td><?= $esc($formatTanggal($pesanan['tanggal_pesan'])) ?></td>
-                                <td class="order-total"><?= $esc($formatRupiah($pesanan['total'])) ?></td>
-                                <td><?= $statusBadge($pesanan['status_pesanan']) ?></td>
-                                <td>
-                                    <button type="button" class="btn-outline" <?= $detailAttributes($pesanan) ?>>Lihat detail</button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </section>
 </main>
-
-<!-- POPUP: DETAIL PESANAN -->
-<div class="modal-overlay" id="modalDetail" role="dialog" aria-modal="true" aria-labelledby="judulDetail" aria-hidden="true">
-    <section class="modal-container detail-order-modal">
-        <div class="modal-form">
-            <header class="modal-header">
-                <div class="detail-order-heading">
-                    <span class="detail-order-icon" aria-hidden="true">&#9638;</span>
-                    <div>
-                        <h3 id="judulDetail">Detail Pesanan Ringkas</h3>
-                        <small class="muted" id="dKodeTanggal"></small>
-                    </div>
-                </div>
-                <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
-            </header>
-
-            <div class="modal-body">
-                <div class="detail-order-grid">
-                    <div class="detail-order-column">
-                        <section class="detail-order-card">
-                            <small class="card-label">Pelanggan</small>
-                            <strong id="dNama"></strong>
-                            <p class="detail-contact"><span aria-hidden="true">&#9742;</span><span id="dTelepon"></span></p>
-                            <p class="detail-contact"><span aria-hidden="true">&#9679;</span><span id="dAlamat"></span></p>
-                        </section>
-
-                        <section class="detail-order-card detail-product-card">
-                            <small class="card-label">Produk sprei</small>
-                            <div id="dItems"></div>
-                            <p class="detail-customer-note" id="dCatatanPelanggan"></p>
-                        </section>
-                    </div>
-
-                    <div class="detail-order-column">
-                        <section class="detail-order-card detail-total-card">
-                            <small class="card-label">Total tagihan</small>
-                            <p class="price-text" id="dTotal"></p>
-                            <p class="detail-payment-status" id="dMetode"></p>
-                        </section>
-
-                        <section class="detail-order-card detail-edit-card">
-                            <div class="form-group">
-                                <label for="dStatus">Status Pesanan</label>
-                                <input class="form-control" type="text" id="dStatus" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="dCatatanAdmin">Catatan untuk Admin</label>
-                                <input class="form-control" type="text" id="dCatatanAdmin" readonly>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-            </div>
-
-            <footer class="modal-footer detail-order-footer" aria-hidden="true"></footer>
-        </div>
-    </section>
-</div>
-
-<!-- POPUP: LIHAT STOK -->
-<div class="modal-overlay" id="modalStok" role="dialog" aria-modal="true" aria-labelledby="judulStok" aria-hidden="true">
-    <section class="modal-container stock-list-modal">
-        <header class="modal-header">
-            <h3 id="judulStok">LIHAT STOK</h3>
-            <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
-        </header>
-        <div class="modal-body">
-            <div id="daftarStok" class="stock-list">
-                <?php if ($produk === []): ?>
-                    <p class="empty-text">Belum ada produk dengan stok.</p>
-                <?php else: ?>
-                    <?php foreach ($produk as $item): ?>
-                        <?php $stokProduk = max(0, (int) $item['stok']); ?>
-                        <div class="stock-row">
-                            <div class="stock-row-heading">
-                                <span class="stock-name"><?= $esc($item['nama_produk']) ?></span>
-                                <strong class="stock-qty"><?= $esc($stokProduk) ?> set</strong>
-                            </div>
-                            <span class="progress" aria-label="Stok <?= $esc($stokProduk) ?> set">
-                                <span class="progress-fill" style="width: <?= min(100, (int) round($stokProduk / $skalaStok * 100)) ?>%"></span>
-                            </span>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-</div>
 
 <!-- POPUP: LAPORAN PENJUALAN -->
 <div class="modal-overlay" id="modalLaporan" role="dialog" aria-modal="true" aria-labelledby="judulLaporan" aria-hidden="true">
     <section class="modal-container modal-lg">
         <header class="modal-header report-modal-header">
             <div class="report-heading">
-                <span class="report-heading-icon" aria-hidden="true">&#128202;</span>
-                <div>
-                    <h3 id="judulLaporan">Laporan &amp; Ringkasan Penjualan</h3>
-                    <small class="muted">Periode: <?= $esc($labelPeriode) ?></small>
-                </div>
+                <span class="report-heading-icon" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" focusable="false">
+                        <path d="M3 16h14M5 14V9m5 5V5m5 9v-7"></path>
+                    </svg>
+                </span>
+                <h3 id="judulLaporan">Laporan &amp; Ringkasan Penjualan</h3>
             </div>
-            <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
-        </header>
-
-        <div class="modal-body">
-            <div class="report-export-actions">
+            <div class="report-header-actions">
+                <?php if ($periodeLaporan === 'bulan'): ?>
+                    <?php if ($bolehKeBulanSebelumnya): ?>
+                        <a class="report-period-arrow" href="<?= $esc($urlBulanSebelumnya) ?>" aria-label="Bulan sebelumnya">&lsaquo;</a>
+                    <?php else: ?>
+                        <span class="report-period-arrow is-disabled" aria-hidden="true">&lsaquo;</span>
+                    <?php endif; ?>
+                    <strong class="report-period-label"><?= $esc($labelPeriode) ?></strong>
+                    <?php if ($bolehKeBulanBerikutnya): ?>
+                        <a class="report-period-arrow" href="<?= $esc($urlBulanBerikutnya) ?>" aria-label="Bulan berikutnya">&rsaquo;</a>
+                    <?php else: ?>
+                        <span class="report-period-arrow is-disabled" aria-hidden="true">&rsaquo;</span>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <strong class="report-period-label"><?= $esc($labelPeriode) ?></strong>
+                <?php endif; ?>
                 <a class="btn btn-primary report-export-button" href="<?= $esc($urlEksporLaporan) ?>">
                     <span aria-hidden="true">&#8681;</span> Ekspor ke Excel
                 </a>
+                <button type="button" class="close-btn" data-close aria-label="Tutup">&times;</button>
             </div>
+        </header>
+
+        <div class="modal-body">
             <div class="report-summary">
                 <div class="report-summary-card">
                     <small>Total penjualan</small>
                     <div class="summary-val" id="lapTotal"><?= $esc($formatRupiah($totalPenjualan)) ?></div>
                 </div>
                 <div class="report-summary-card">
-                    <small>Transaksi selesai</small>
-                    <div class="summary-line">
-                        <div class="summary-val" id="lapSelesai"><?= $esc($jumlahSelesai) ?> pesanan</div>
-                        <span class="period-badge"><?= $esc($labelPeriode) ?></span>
-                    </div>
-                    <small class="summary-note" id="lapTerbayar"><?= $esc($jumlahTerbayar) ?> transaksi berbayar</small>
+                    <small>Pesanan selesai</small>
+                    <div class="summary-val" id="lapSelesai"><?= $esc($jumlahSelesai) ?> pesanan</div>
+                </div>
+                <div class="report-summary-card">
+                    <small>Transaksi berbayar</small>
+                    <div class="summary-val" id="lapTerbayar"><?= $esc($jumlahTerbayar) ?> transaksi</div>
                 </div>
             </div>
 
             <section class="report-panel">
-                <h4 class="report-title" id="judulTren">Grafik pendapatan (<?= $esc($labelPeriode) ?>)</h4>
+                <h4 class="report-title" id="judulTren">Grafik pendapatan harian</h4>
                 <?= $grafikHarian('grafikTrenHarian') ?>
             </section>
 
             <section class="report-table-panel">
-                <h4 class="report-title">Daftar pesanan &amp; transaksi (<?= $esc($labelPeriode) ?>)</h4>
+                <div class="report-table-heading">
+                    <h4 class="report-title">Daftar pesanan &amp; transaksi</h4>
+                    <div class="report-table-filters">
+                        <label class="report-search">
+                            <svg aria-hidden="true" viewBox="0 0 20 20" focusable="false">
+                                <circle cx="8.5" cy="8.5" r="5.5"></circle>
+                                <path d="m13 13 4 4"></path>
+                            </svg>
+                            <input type="search" id="reportSearch" placeholder="Cari invoice atau pelanggan" aria-label="Cari invoice atau pelanggan">
+                        </label>
+                        <label>
+                            <span class="sr-only">Filter status pesanan</span>
+                            <select id="reportStatusFilter" aria-label="Filter status pesanan">
+                                <option value="">Semua status</option>
+                                <?php foreach ($statusPesanan as $status => $detail): ?>
+                                    <option value="<?= $esc($status) ?>"><?= $esc($detail[0]) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                    </div>
+                </div>
                 <div class="table-wrap">
                     <table class="report-table">
                         <thead>
@@ -672,14 +584,13 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                                 <th>Pelanggan &amp; produk</th>
                                 <th>Total</th>
                                 <th>Status</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="lapTabel">
-                            <?php if ($pesananLaporanHalaman === []): ?>
-                                <tr><td class="empty-cell" colspan="5">Tidak ada pesanan pada periode ini.</td></tr>
-                            <?php else: ?>
+                        <tbody id="lapTabel" data-initial-page="<?= $halamanLaporan ?>">
+                            <?php if ($pesananLaporan !== []): ?>
                                 <?php foreach ($pesananLaporanHalaman as $pesanan): ?>
-                                    <tr>
+                                    <tr data-report-order data-status="<?= $esc($pesanan['status_pesanan']) ?>">
                                         <td><strong><?= $esc($pesanan['kode']) ?></strong></td>
                                         <td><?= $esc($formatTanggal($pesanan['tanggal_pesan'])) ?></td>
                                         <td>
@@ -688,36 +599,19 @@ $detailAttributes = static function (array $order) use ($esc, $formatRupiah, $fo
                                         </td>
                                         <td><?= $esc($formatRupiah($pesanan['total'])) ?></td>
                                         <td><?= $statusBadge($pesanan['status_pesanan']) ?></td>
+                                        <td><a class="report-detail-link" href="/?page=admin-orders&amp;cari=<?= rawurlencode((string) $pesanan['kode']) ?>">Detail</a></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
+                            <tr id="reportEmptyState" <?= $pesananLaporan === [] ? '' : 'hidden' ?>>
+                                <td class="empty-cell" colspan="6"><?= $pesananLaporan === [] ? 'Tidak ada pesanan pada periode ini.' : 'Tidak ada pesanan yang cocok.' ?></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="report-pagination">
-                    <div class="pagination-controls" aria-label="Halaman laporan">
-                        <?php
-                        $linkLaporan = static function (int $page) use (
-                            $periodeLaporan,
-                            $bulanLaporan,
-                            $tahunLaporan,
-                            $tanggalAwalLaporan,
-                            $tanggalAkhirLaporan
-                        ): string {
-                            return '/?page=admin-dashboard&periode=' . rawurlencode($periodeLaporan)
-                                . '&bulan=' . $bulanLaporan
-                                . '&tahun=' . $tahunLaporan
-                                . '&tanggal_awal=' . $tanggalAwalLaporan->format('Y-m-d')
-                                . '&tanggal_akhir=' . $tanggalAkhirLaporan->format('Y-m-d')
-                                . '&halaman=' . $page . '#modalLaporan';
-                        };
-                        ?>
-                        <a href="<?= $esc($linkLaporan(max(1, $halamanLaporan - 1))) ?>" aria-label="Halaman sebelumnya" <?= $halamanLaporan <= 1 ? 'aria-disabled="true" tabindex="-1"' : '' ?>>&lsaquo;</a>
-                        <?php for ($page = 1; $page <= $jumlahHalamanLaporan; $page++): ?>
-                            <a href="<?= $esc($linkLaporan($page)) ?>" <?= $page === $halamanLaporan ? 'class="current" aria-current="page"' : '' ?>><?= $page ?></a>
-                        <?php endfor; ?>
-                        <a href="<?= $esc($linkLaporan(min($jumlahHalamanLaporan, $halamanLaporan + 1))) ?>" aria-label="Halaman berikutnya" <?= $halamanLaporan >= $jumlahHalamanLaporan ? 'aria-disabled="true" tabindex="-1"' : '' ?>>&rsaquo;</a>
-                    </div>
+                    <span class="report-page-summary" id="reportPageSummary" aria-live="polite"></span>
+                    <nav class="pagination-controls" id="reportPagination" aria-label="Halaman laporan"></nav>
                 </div>
             </section>
         </div>
