@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../helpers/upload.php';
+require_once __DIR__ . '/../helpers/product_pricing.php';
 require_once __DIR__ . '/../models/ProductModel.php';
 
 class ProductController
@@ -130,6 +131,9 @@ class ProductController
         $tinggi = $isPillowBolster
             ? null
             : filter_var($_POST['tinggi_standar'] ?? null, FILTER_VALIDATE_INT);
+        if ($kategori === 'BED_COVER' && !array_key_exists('tinggi_standar', $_POST)) {
+            $tinggi = product_pricing_options($kategori)[$jenisKain]['height'] ?? false;
+        }
 
         $harga = filter_var(
             $_POST['harga_dasar'] ?? null,
@@ -287,9 +291,7 @@ class ProductController
         // =====================================
 
         $nama = trim($_POST['nama_produk'] ?? '');
-        $kategori = $this->normalizeProductCategory(
-            trim($_POST['kategori_produk'] ?? '')
-        );
+        $kategori = $this->normalizeProductCategory($product['kategori_produk']);
         $jenisKain = trim($_POST['jenis_kain'] ?? '');
         $motifInput = $_POST['motif'] ?? '';
         if (!is_string($motifInput)) {
@@ -313,6 +315,13 @@ class ProductController
         $tinggi = $isPillowBolster
             ? null
             : filter_var($_POST['tinggi_standar'] ?? null, FILTER_VALIDATE_INT);
+
+        if ($kategori === 'BED_COVER' && !array_key_exists('tinggi_standar', $_POST)) {
+            $savedHeight = (int) ($product['tinggi_standar'] ?? 0);
+            $tinggi = $savedHeight > 0
+                ? $savedHeight
+                : (product_pricing_options($kategori)[$jenisKain]['height'] ?? false);
+        }
 
         $harga = filter_var(
             $_POST['harga_dasar'] ?? null,
@@ -408,7 +417,6 @@ class ProductController
 
         $data = [
             'nama_produk'     => $nama,
-            'kategori_produk' => $kategori,
             'jenis_kain'      => $jenisKain,
             'motif'           => $motif,
             'panjang_standar' => $panjang,

@@ -315,6 +315,78 @@
     }
 }
 
+.admin-product-form-page .sidebar {
+    --garis: #e3e3dd;
+}
+
+.admin-product-form-page .sidebar * {
+    font-family: inherit;
+}
+
+@media (min-width: 769px) {
+    .admin-product-form-page .sidebar {
+        flex-basis: 300px;
+        width: 300px;
+    }
+
+    .admin-product-form-page .sidebar-brand {
+      padding: 24px 22px;
+    }
+
+    .admin-product-form-page .brand-icon,
+    .admin-product-form-page .user-avatar {
+      width: 48px;
+      height: 48px;
+      flex-basis: 48px;
+    }
+
+    .admin-product-form-page .brand-text h2 {
+      color: #252a23;
+      font-size: 18px;
+    }
+
+    .admin-product-form-page .brand-text p {
+      font-size: 13px;
+    }
+
+    .admin-product-form-page .sidebar-nav {
+      gap: 6px;
+      padding: 14px;
+    }
+
+    .admin-product-form-page .nav-item {
+      min-height: 44px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .admin-product-form-page .nav-item.active {
+      font-weight: 600;
+    }
+
+    .admin-product-form-page .nav-item svg,
+    .admin-product-form-page .logout-link svg {
+      width: 20px;
+      height: 20px;
+      flex-basis: 20px;
+    }
+
+    .admin-product-form-page .sidebar-footer {
+      padding: 20px 22px;
+    }
+
+    .admin-product-form-page .user-profile {
+      gap: 12px;
+    }
+
+    .admin-product-form-page .user-avatar {
+      width: 44px;
+      height: 44px;
+      flex-basis: 44px;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .sidebar,
     .logout-link {

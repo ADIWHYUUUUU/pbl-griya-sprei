@@ -119,7 +119,6 @@ class ProductModel
     {
         $sql = "UPDATE produk SET
                     nama_produk = :nama_produk,
-                    kategori_produk = :kategori_produk,
                     jenis_kain = :jenis_kain,
                     motif = NULLIF(:motif, ''),
                     panjang_standar = :panjang_standar,
@@ -136,7 +135,6 @@ class ProductModel
         return $this->executeProductStatement($stmt, [
             ':id_produk'       => $id,
             ':nama_produk'     => $data['nama_produk'],
-            ':kategori_produk' => $data['kategori_produk'],
             ':jenis_kain'      => $data['jenis_kain'],
             ':motif'           => $data['motif'],
             ':panjang_standar' => $data['panjang_standar'],

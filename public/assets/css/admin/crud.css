@@ -1,30 +1,26 @@
 body.admin-products {
   display: block;
-  height: auto;
-  overflow: visible;
+  height: 100dvh;
+  overflow: hidden;
   background: #f7f6f3;
   color: #252a23;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-.admin-products .admin-layout * {
+.admin-products .product-main * {
   font-family: inherit;
 }
 
 .admin-products .admin-layout {
   display: flex;
-  min-height: 100vh;
-}
-
-.admin-products .sidebar {
-  --garis: #e3e3dd;
+  height: 100%;
 }
 
 .admin-products main.product-main {
   flex: 1;
   min-width: 0;
-  height: auto;
-  overflow: visible;
+  height: 100%;
+  overflow-y: auto;
   padding: 0;
 }
 
@@ -361,73 +357,6 @@ body.admin-products {
 .product-pagination [aria-disabled="true"] {
   background: #f0f2ed;
   color: #6b7684;
-}
-
-@media (min-width: 769px) {
-  .admin-products .sidebar {
-    position: static;
-    align-self: stretch;
-    flex-basis: 300px;
-    width: 300px;
-    height: auto;
-  }
-
-  .admin-products .sidebar-brand {
-    padding: 24px 22px;
-  }
-
-  .admin-products .brand-icon,
-  .admin-products .user-avatar {
-    width: 48px;
-    height: 48px;
-    flex-basis: 48px;
-  }
-
-  .admin-products .brand-text h2 {
-    color: #252a23;
-    font-size: 18px;
-  }
-
-  .admin-products .brand-text p {
-    font-size: 13px;
-  }
-
-  .admin-products .sidebar-nav {
-    gap: 6px;
-    padding: 14px;
-  }
-
-  .admin-products .nav-item {
-    min-height: 44px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 15px;
-  }
-
-  .admin-products .nav-item.active {
-    font-weight: 600;
-  }
-
-  .admin-products .nav-item svg,
-  .admin-products .logout-link svg {
-    width: 20px;
-    height: 20px;
-    flex-basis: 20px;
-  }
-
-  .admin-products .sidebar-footer {
-    padding: 20px 22px;
-  }
-
-  .admin-products .user-profile {
-    gap: 12px;
-  }
-
-  .admin-products .user-avatar {
-    width: 44px;
-    height: 44px;
-    flex-basis: 44px;
-  }
 }
 
 @media (max-width: 768px) {

@@ -1,20 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const categoryInputs = document.querySelectorAll("#kategori_produk, input[name='kategori_produk'][type='radio']");
+  const categoryInputs = document.querySelectorAll("input[name='kategori_produk'][type='radio']");
   const heightField = document.getElementById("tinggi_standar_field");
   const heightInput = document.getElementById("tinggi_standar");
-  const sizeGrid = document.querySelector(".product-size-grid, .edit-grid-3");
+  const sizeGrid = document.querySelector(".product-size-grid");
 
   if (!categoryInputs.length || !heightField || !heightInput) return;
 
   function updateHeightField() {
-    const categoryInput = document.querySelector("#kategori_produk, input[name='kategori_produk']:checked");
-    const hideHeight = categoryInput?.value === "SARUNG_BANTAL_GULING";
+    const categoryInput = document.querySelector("input[name='kategori_produk']:checked");
+    const hideHeight = categoryInput?.value !== "SPREI";
     heightField.hidden = hideHeight;
     heightInput.required = !hideHeight;
-
-    if (hideHeight) {
-      heightInput.value = "";
-    }
+    heightInput.disabled = hideHeight;
 
     if (sizeGrid) {
       sizeGrid.classList.toggle("without-height", hideHeight);

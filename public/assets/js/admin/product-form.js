@@ -17,6 +17,17 @@ document.addEventListener("DOMContentLoaded", function () {
   const defaultCatalogPhoto = catalogPhoto.innerHTML;
   const picker = photoInput.closest(".product-photo-picker");
   const formatNumber = new Intl.NumberFormat("id-ID");
+  const changes = document.getElementById("productChanges");
+  const changeCount = document.getElementById("productChangeCount");
+  const bedCoverExamples = {
+    nama_produk: "Bed Cover Katun Jepang Garis",
+    motif: "Garis",
+    panjang_standar: "240",
+    lebar_standar: "220",
+    harga_dasar: "350000",
+    stok: "5",
+  };
+  const defaultPlaceholders = Object.keys(bedCoverExamples).map((id) => [id, field(id).placeholder]);
   let previewUrl = null;
 
   function field(id) {
@@ -27,15 +38,58 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById(id).textContent = value;
   }
 
+  function productDetails() {
+    const category = form.querySelector('input[name="kategori_produk"]:checked');
+    const fabric = field("jenis_kain");
+    return [
+      ["Kategori", category.closest("label").querySelector("strong").textContent],
+      ["Nama produk", field("nama_produk").value.trim()],
+      ["Jenis kain", fabric.value ? fabric.selectedOptions[0].textContent : ""],
+      ["Motif", field("motif").value.trim()],
+      ["Panjang", field("panjang_standar").value],
+      ["Lebar", field("lebar_standar").value],
+      ["Tinggi karet", field("tinggi_standar").disabled ? "" : field("tinggi_standar").value],
+      ["Harga dasar", field("harga_dasar").value ? "Rp" + formatNumber.format(field("harga_dasar").value) : ""],
+      ["Stok", field("stok").value ? field("stok").value + " set" : ""],
+      ["Foto", photoInput.files[0]?.name ?? defaultPhotoNameForSummary],
+      ["Deskripsi", field("deskripsi").value.trim()],
+    ];
+  }
+
+  const defaultPhotoNameForSummary = photoPreview.querySelector("img") ? "Foto saat ini" : "";
+  const originalDetails = changes ? productDetails() : [];
+
+  function updateChanges() {
+    if (!changes) return;
+    const entries = productDetails().filter(([, value], index) => value !== originalDetails[index][1]);
+    changeCount.hidden = entries.length === 0;
+    changeCount.textContent = entries.length + " perubahan belum disimpan";
+    changes.replaceChildren();
+    if (!entries.length) {
+      changes.textContent = "Belum ada perubahan.";
+      return;
+    }
+
+    const previousValues = new Map(originalDetails);
+    entries.forEach(([label, value]) => {
+      const row = document.createElement("div");
+      const title = document.createElement("div");
+      const previous = document.createElement("s");
+      const current = document.createElement("strong");
+      title.textContent = label;
+      previous.textContent = previousValues.get(label) || "Kosong";
+      current.textContent = value || "Kosong";
+      row.append(title, previous, " → ", current);
+      changes.append(row);
+    });
+  }
+
   function updateCatalog() {
     const category = form.querySelector('input[name="kategori_produk"]:checked');
-    const isBedCover = category.value === "BED_COVER";
-    showText("productHeightLabel", isBedCover ? "Tinggi" : "Tinggi karet");
-    showText("productHeightHelp", isBedCover ? "Tinggi standar Bed Cover." : "Tinggi karet untuk kategori Sprei.");
     const fabric = field("jenis_kain");
     const dimensions = ["panjang_standar", "lebar_standar", "tinggi_standar"]
       .map(field)
-      .filter((input) => input.required && input.value && input.validity.valid)
+      .filter((input) => !input.disabled && input.value && input.validity.valid)
       .map((input) => input.value);
     const price = field("harga_dasar");
     const stock = field("stok");
@@ -43,6 +97,11 @@ document.addEventListener("DOMContentLoaded", function () {
       ? "Rp" + formatNumber.format(price.value)
       : "";
 
+    showText("productSizeTitle", {
+      SPREI: "Ukuran Kasur",
+      BED_COVER: "Ukuran Bed Cover",
+      SARUNG_BANTAL_GULING: "Ukuran Sarung Bantal & Guling",
+    }[category.value]);
     showText("catalogCategory", [
       category.closest("label").querySelector("strong").textContent,
       fabric.value ? fabric.selectedOptions[0].textContent : "",
@@ -59,6 +118,18 @@ document.addEventListener("DOMContentLoaded", function () {
         return !input.required || (input.value.trim() && input.validity.valid);
       });
       item.classList.toggle("is-complete", complete);
+    });
+    if (photoInput.required) {
+      const photoReady = photoInput.files.length > 0 && photoInput.validity.valid;
+      showText("productPhotoCheckLabel", photoReady ? "Foto produk" : "Foto produk belum dipilih");
+    }
+    updateChanges();
+  }
+
+  function updateExamples() {
+    const selectedCategory = form.querySelector('input[name="kategori_produk"]:checked').value;
+    defaultPlaceholders.forEach(([id, placeholder]) => {
+      field(id).placeholder = selectedCategory === "BED_COVER" ? bedCoverExamples[id] : placeholder;
     });
   }
   let submitting = false;
@@ -90,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function validatePhoto(file) {
-    if (!file) return "Pilih foto produk terlebih dahulu.";
+    if (!file) return photoInput.required ? "Pilih foto produk terlebih dahulu." : "";
 
     const extension = file.name.split(".").pop().toLowerCase();
     const supportedExtension = ["jpg", "jpeg", "png"].includes(extension);
@@ -147,6 +218,9 @@ document.addEventListener("DOMContentLoaded", function () {
   photoInput.addEventListener("change", updatePhoto);
   form.addEventListener("input", updateCatalog);
   form.addEventListener("change", updateCatalog);
+  form.querySelectorAll('input[name="kategori_produk"]').forEach((input) => {
+    input.addEventListener("change", updateExamples);
+  });
 
   picker.addEventListener("dragover", function (event) {
     event.preventDefault();
@@ -171,6 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   updatePhoto();
+  updateExamples();
   updateCatalog();
   photoInput.addEventListener("invalid", function () {
     if (!photoInput.files || photoInput.files.length === 0) {

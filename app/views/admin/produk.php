@@ -74,7 +74,7 @@ function e($value)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Katalog Produk - Griya Sprei</title>
-    <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
+    <link rel="stylesheet" href="/assets/css/admin/sidebar.css?v=<?= filemtime(__DIR__ . '/../../../public/assets/css/admin/sidebar.css') ?>">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
     <link rel="stylesheet" href="/assets/css/admin/crud.css?v=<?= filemtime(__DIR__ . '/../../../public/assets/css/admin/crud.css') ?>">
 </head>
