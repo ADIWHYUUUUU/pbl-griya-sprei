@@ -81,6 +81,31 @@ $copyTotal = fmod($total, 1.0) === 0.0
 </head>
 <body>
 <?php require __DIR__ . '/../layouts/header.php'; ?>
+<?php if ($message !== '' && $messageType === 'success'): ?>
+    <div class="payment-success-modal" id="paymentSuccessModal" role="dialog" aria-modal="true" aria-labelledby="paymentSuccessTitle" aria-describedby="paymentSuccessDescription">
+        <div class="payment-success-modal__panel">
+            <div class="payment-success-modal__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="m8.5 12 2.5 2.5 4.5-5"></path>
+                </svg>
+            </div>
+            <h2 id="paymentSuccessTitle">Bukti pembayaran terkirim</h2>
+            <p id="paymentSuccessDescription">
+                Admin akan memverifikasi pembayaran Anda. Status pesanan
+                <strong><?= $escape($order['no_invoice'] ?: 'ORD-' . $order['id_pesanan']) ?></strong>
+                akan diperbarui di halaman Pesanan Saya.
+            </p>
+            <span class="payment-success-modal__status">Menunggu verifikasi admin</span>
+            <div class="payment-success-modal__actions">
+                <a class="payment-success-modal__primary" href="/?page=customer-orders">Lihat Pesanan Saya</a>
+                <a class="payment-success-modal__secondary" href="/?page=customer-home">Kembali ke Beranda</a>
+            </div>
+        </div>
+    </div>
+<?php else: ?>
+    <?php if ($message !== ''): ?><div class="payment-message payment-message--<?= $escape($messageType) ?>" role="alert"><?= $escape($message) ?></div><?php endif; ?>
+<?php endif; ?>
 <main class="payment-page">
     <div class="payment-container">
         <nav class="payment-breadcrumb">
@@ -94,8 +119,6 @@ $copyTotal = fmod($total, 1.0) === 0.0
                 <p>Invoice <strong><?= $escape($order['no_invoice'] ?: 'ORD-' . $order['id_pesanan']) ?></strong> · <?= $escape($orderDateLabel) ?></p>
             </div>
         </header>
-
-        <?php if ($message !== ''): ?><div class="payment-message payment-message--<?= $escape($messageType) ?>" role="alert"><?= $escape($message) ?></div><?php endif; ?>
 
         <section class="delivery-card" aria-label="Informasi pengiriman">
             <h2>Dikirim kepada</h2>

@@ -19,7 +19,21 @@ class DashboardModel
                     FROM pembayaran
                     WHERE status_pembayaran::text = 'MENUNGGU_VERIFIKASI'
                 ) AS menunggu_verifikasi,
-                (SELECT COALESCE(SUM(stok), 0) FROM produk) AS total_stok"
+                (
+                    SELECT COUNT(*)
+                    FROM pesanan
+                    WHERE status_pesanan::text IN ('DIPROSES', 'DIKIRIM')
+                      AND (
+                        (
+                            metode_pengiriman::text = 'INSTANT_GOJEK'
+                            AND NULLIF(BTRIM(nomor_telepon_kurir), '') IS NULL
+                        )
+                        OR (
+                            COALESCE(metode_pengiriman::text, '') <> 'INSTANT_GOJEK'
+                            AND NULLIF(BTRIM(nomor_resi), '') IS NULL
+                        )
+                      )
+                ) AS perlu_resi"
         );
 
         return $stmt->fetch();
@@ -98,6 +112,14 @@ class DashboardModel
         $year = $statement->fetchColumn();
 
         return $year === false || $year === null ? null : (int) $year;
+    }
+
+    public function getEarliestOrderDate(): ?DateTimeImmutable
+    {
+        $statement = $this->pdo->query('SELECT MIN(tanggal_pesan)::date FROM pesanan');
+        $date = $statement->fetchColumn();
+
+        return $date === false || $date === null ? null : new DateTimeImmutable((string) $date);
     }
 
     public function getOrdersForMonth(int $month, int $year): array

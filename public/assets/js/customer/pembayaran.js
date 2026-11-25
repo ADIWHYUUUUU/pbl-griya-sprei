@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const paymentSuccessModal = document.querySelector("#paymentSuccessModal");
+  if (paymentSuccessModal) {
+    document.body.classList.add("payment-modal-open");
+  }
+
   const form = document.querySelector(".payment-form");
   const uploadControl = document.querySelector(".upload-control");
   const proofInput = document.querySelector("#payment-proof");

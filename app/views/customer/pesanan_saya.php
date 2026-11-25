@@ -209,7 +209,7 @@ unset($order);
             <?php endif; ?>
 
             <?php foreach ($orders as $order): ?>
-                <article class="kartu pesanan">
+                <article class="kartu pesanan" data-pesanan-card>
                     <div class="pesanan-kepala">
                         <div class="info-waktu">
                             <b>[<?= e($order['kode']) ?>]</b>
@@ -306,6 +306,7 @@ unset($order);
                     </div>
                 </article>
             <?php endforeach; ?>
+            <nav class="pagination" id="paginationPesanan" aria-label="Halaman pesanan"></nav>
         </div>
     </main>
 

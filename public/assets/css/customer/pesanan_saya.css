@@ -822,3 +822,48 @@ body.ada-modal {
     font-size: 17px;
   }
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 36px 0 0;
+}
+
+.page-btn {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: #e4e4e1;
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #d6d6d2;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.page-btn--active {
+  background: var(--green);
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .pagination {
+    gap: 6px;
+    margin-top: 28px;
+  }
+
+  .page-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+}
