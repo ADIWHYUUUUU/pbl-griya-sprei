@@ -22,7 +22,7 @@ $escape = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
 $couriers = [
-    'INSTANT_GOJEK' => 'GoJek Instant',
+    'INSTANT_GOJEK' => 'Gojek Instant',
     'EKSPEDISI_JNE' => 'JNE Express',
     'EKSPEDISI_JNT' => 'J&T Express',
 ];
@@ -41,6 +41,13 @@ $formatDate = static function ($timestamp): string {
 
     $date = new DateTimeImmutable((string) $timestamp);
     return $date->format('d M Y');
+};
+$formatLongDate = static function ($timestamp): string {
+    if ($timestamp === null || $timestamp === '') {
+        return '-';
+    }
+
+    return (new DateTimeImmutable((string) $timestamp))->format('d F Y');
 };
 $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): array {
     $raw = trim((string) ($value ?? ''));
@@ -87,6 +94,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
         <main class="dashboard-main">
             <div class="page-breadcrumb">Admin <span aria-hidden="true">›</span> <strong>Nomor Resi Pengiriman</strong></div>
             <h1 class="page-title">Daftar Nomor Resi Pengiriman</h1>
+            <p class="page-description">Isi nomor resi atau kontak kurir untuk pesanan yang siap dikirim.</p>
 
             <?php if (is_array($flash) && isset($flash['text'])): ?>
                 <div class="flash-message <?= $escape($flash['type'] ?? 'error') ?>" role="status">
@@ -145,14 +153,16 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                 'invoice' => (string) ($order['kode'] ?? 'INV/000000'),
                                 'resi' => $tracking,
                                 'resiLabel' => $courierKey === 'INSTANT_GOJEK'
-                                    ? 'NOMOR TELEPON KURIR GOJEK'
+                                    ? 'NOMOR TELEPON KURIR'
                                     : 'NOMOR RESI PENGIRIMAN',
                                 'courier' => $courierLabel,
                                 'courierKey' => $courierKey,
+                                'trackingStatus' => $trackingIsFilled ? 'Sudah diisi' : 'Belum diisi',
                                 'customer' => (string) ($order['nama_pelanggan'] ?? 'Pelanggan'),
                                 'phone' => (string) ($order['telepon'] ?? '-'),
                                 'address' => (string) ($order['alamat_pengiriman'] ?? 'Alamat belum tersedia'),
                                 'product' => implode("\n", $specLines),
+                                'date' => $formatLongDate($order['tanggal_pesan'] ?? null),
                                 'note' => trim((string) ($order['catatan_pengiriman'] ?? '')),
                                 'orderId' => $orderId,
                             ];
@@ -180,9 +190,6 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                     <?php if ($tracking !== ''): ?>
                                         <div class="resi-action-group">
                                             <button type="button" class="action-btn secondary resi-detail-trigger" data-detail='<?= json_encode($detailData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>'><?= $courierKey === 'INSTANT_GOJEK' ? 'Lihat Telepon' : 'Lihat Resi' ?></button>
-                                            <?php if (in_array($order['status_pesanan'] ?? '', ['DIPROSES', 'DIKIRIM'], true)): ?>
-                                                <a href="/?page=admin-resi-input&amp;id=<?= $orderId ?>" class="action-btn"><?= $courierKey === 'INSTANT_GOJEK' ? 'Ubah Telepon' : 'Ubah Resi' ?></a>
-                                            <?php endif; ?>
                                         </div>
                                     <?php else: ?>
                                         <div class="resi-action-group">
@@ -199,11 +206,11 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <div class="order-footer">
+                    <div class="footer-note" id="orderCount" data-total="<?= count($orders) ?>">Menampilkan <?= count($orders) ?> pesanan yang siap dikirim atau telah dikirim.</div>
+                    <nav class="pager" id="orderPager" aria-label="Halaman daftar resi"></nav>
+                </div>
             </section>
-
-            <div class="order-footer">
-                <div class="footer-note" id="orderCount" data-total="<?= count($orders) ?>">Menampilkan <?= count($orders) ?> dari <?= count($orders) ?> pesanan yang siap dikirim atau telah dikirim.</div>
-            </div>
         </main>
     </div>
 
@@ -211,44 +218,58 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
         <div class="resi-modal-backdrop" data-close="resi-modal"></div>
         <div class="resi-modal-panel" role="dialog" aria-modal="true" aria-labelledby="resiModalTitle">
             <div class="resi-modal-header">
-                <h2 id="resiModalTitle">Detail Nomor Resi &amp; Pengiriman</h2>
+                <div class="resi-modal-heading">
+                    <span class="resi-modal-icon" id="resiModalIcon" aria-hidden="true">
+                        <svg class="package-icon" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>
+                        <svg class="phone-icon" viewBox="0 0 24 24"><path d="M6 3h4l2 5-3 2c1.4 2.8 3.2 4.6 6 6l2-3 5 2v4c0 1.1-.9 2-2 2C10 21 3 14 3 5c0-1.1.9-2 2-2h1Z"></path></svg>
+                    </span>
+                    <div>
+                        <h2 id="resiModalTitle">Nomor Resi Pengiriman</h2>
+                        <p id="resiModalSubtitle">INV/000000</p>
+                    </div>
+                </div>
                 <button type="button" class="resi-close-btn" aria-label="Tutup detail resi" data-close="resi-modal">×</button>
             </div>
 
             <div class="resi-modal-body">
-                <div class="resi-modal-subtitle" id="resiModalSubtitle">Detail nomor resi dan pengiriman</div>
-
                 <div class="resi-box">
                     <div class="resi-box-main">
-                        <div class="resi-box-label" id="resiLabelValue">NOMOR RESI / TELEPON KURIR</div>
+                        <div class="resi-box-label" id="resiLabelValue">NOMOR RESI</div>
                         <div class="resi-box-number" id="resiNumberValue">-</div>
                     </div>
-                    <button type="button" class="resi-copy-btn" id="copyResiBtn">Salin Resi</button>
+                    <button type="button" class="resi-copy-btn" id="copyResiBtn">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"></path></svg>
+                        <span>Salin</span>
+                    </button>
                 </div>
 
-                <div class="resi-info-row">
-                    <div class="resi-info-label">KURIR &amp; LAYANAN</div>
-                    <div class="resi-info-value" id="resiCourierValue">J&amp;T Express</div>
-                    <div class="resi-info-subvalue" id="resiCourierService">Layanan pengiriman</div>
-                </div>
-
-                <div class="resi-two-col">
-                    <div class="resi-card">
-                        <div class="resi-card-title">PENERIMA</div>
-                        <div class="resi-card-name" id="resiCustomerName">-</div>
-                        <div class="resi-card-phone" id="resiCustomerPhone">-</div>
-                        <div class="resi-card-address" id="resiCustomerAddress">-</div>
+                <div class="resi-detail-grid">
+                    <div class="resi-detail-item">
+                        <h3>Pengiriman</h3>
+                        <span class="courier-badge" id="resiCourierValue">Ekspedisi</span>
                     </div>
-
-                    <div class="resi-card">
-                        <div class="resi-card-title">RINCIAN BARANG</div>
-                        <div class="resi-card-product">
-                            <div class="resi-product-copy">
-                                <div class="resi-product-name" id="resiProductName">-</div>
-                                <div class="resi-product-meta" id="resiProductMeta">-</div>
-                            </div>
-                        </div>
-                        <div class="resi-product-note" id="resiProductNote">Tidak ada catatan pengiriman.</div>
+                    <div class="resi-detail-item">
+                        <h3>Status</h3>
+                        <span class="tracking-status filled" id="resiTrackingStatus">Sudah diisi</span>
+                    </div>
+                    <div class="resi-detail-item">
+                        <h3>Produk</h3>
+                        <strong id="resiProductName">-</strong>
+                        <span id="resiProductMeta">-</span>
+                    </div>
+                    <div class="resi-detail-item">
+                        <h3>Tanggal Pesanan</h3>
+                        <span id="resiOrderDate">-</span>
+                    </div>
+                    <div class="resi-detail-item">
+                        <h3>Pelanggan</h3>
+                        <strong id="resiCustomerName">-</strong>
+                        <span id="resiCustomerPhone">-</span>
+                        <span id="resiCustomerAddress">-</span>
+                    </div>
+                    <div class="resi-detail-item">
+                        <h3>Catatan Pengiriman</h3>
+                        <span id="resiProductNote">Tidak ada catatan</span>
                     </div>
                 </div>
 
