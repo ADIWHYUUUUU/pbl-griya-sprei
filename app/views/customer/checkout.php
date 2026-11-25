@@ -56,7 +56,8 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     $formValues = is_array($formValues) ? $formValues : [];
     unset($_SESSION['checkout_form']);
     $checkoutMessage = (string) ($_SESSION['checkout_message'] ?? '');
-    unset($_SESSION['checkout_message']);
+    $checkoutMessageType = ($_SESSION['checkout_message_type'] ?? '') === 'success' ? 'success' : 'error';
+    unset($_SESSION['checkout_message'], $_SESSION['checkout_message_type']);
     $produkPesanan = [];
     foreach ($checkoutCart as $itemId => $cartItem) {
         if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId) || !is_array($cartItem)) {
@@ -131,11 +132,17 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     $alamatDefault = (new UserModel($GLOBALS['pdo']))->getShippingAddress($customerId);
     $alamatAwal = (string) ($formValues['alamat'] ?? $alamatDefault);
     $catatanAwal = (string) ($formValues['catatan_alamat'] ?? '');
+    $alamatTersimpan = trim($alamatDefault) !== '';
+    $alamatEditorAktif = !$alamatTersimpan
+        || ($formValues['edit_alamat'] ?? '') === '1'
+        || (isset($formValues['alamat']) && $formValues['alamat'] !== $alamatDefault);
+    $jumlahProduk = count($produkPesanan);
+    $jumlahItem = array_sum(array_column($produkPesanan, 'jumlah'));
     $infoReguler = 'Pengiriman reguler ke seluruh area di Indonesia.';
     $metodeKirim = [
-        'instan' => ['kelompok' => 'Kurir Instan', 'jenis' => 'instan', 'nama' => 'Gojek / Grab Express', 'info' => 'Khusus area Kota Malang', 'waktu' => 'Dikirim setelah produksi selesai'],
-        'jnt' => ['kelompok' => 'Ekspedisi Reguler', 'jenis' => 'reguler', 'nama' => 'J&T Express', 'info' => $infoReguler, 'waktu' => 'Perkiraan: 1–3 hari'],
-        'jne' => ['kelompok' => 'Ekspedisi Reguler', 'jenis' => 'reguler', 'nama' => 'JNE Express', 'info' => $infoReguler, 'waktu' => 'Perkiraan: 1–3 hari'],
+        'instan' => ['kelompok' => 'Kurir Instan', 'jenis' => 'instan', 'nama' => 'Gojek / Grab / Maxim', 'logo' => 'GGM', 'info' => 'Khusus area Kota Malang', 'waktu' => 'Dikirim setelah produksi selesai'],
+        'jnt' => ['kelompok' => 'Ekspedisi Reguler', 'jenis' => 'reguler', 'nama' => 'J&T Express', 'logo' => 'JT', 'info' => $infoReguler, 'waktu' => 'Perkiraan 1–3 hari'],
+        'jne' => ['kelompok' => 'Ekspedisi Reguler', 'jenis' => 'reguler', 'nama' => 'JNE Express', 'logo' => 'JNE', 'info' => $infoReguler, 'waktu' => 'Perkiraan 1–3 hari'],
     ];
 }
 
@@ -150,7 +157,7 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/base.css">
-    <link rel="stylesheet" href="/assets/css/customer/checkout.css">
+    <link rel="stylesheet" href="/assets/css/customer/checkout.css?v=<?= (int) filemtime(__DIR__ . '/../../../public/assets/css/customer/checkout.css') ?>">
 </head>
 <body>
 <?php require __DIR__ . '/../layouts/header.php'; ?>
@@ -163,6 +170,7 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
         <a href="/?page=customer-cart">Keranjang</a> /
         <b>Checkout</b>
     </nav>
+    <h1 class="checkout-page-title">Checkout</h1>
 
 <?php if (isset($pesananBaru)) { ?>
 
@@ -189,142 +197,167 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
 <?php } else { ?>
 
     <?php if ($checkoutMessage !== ''): ?>
-        <p class="checkout-message" role="alert"><?= checkoutEscape($checkoutMessage) ?></p>
+        <p class="checkout-message checkout-message--<?= checkoutEscape($checkoutMessageType) ?>" role="<?= $checkoutMessageType === 'success' ? 'status' : 'alert' ?>"><?= checkoutEscape($checkoutMessage) ?></p>
     <?php endif; ?>
 
     <form method="post" action="/?action=customer-order-create" id="formCheckout">
         <input type="hidden" name="csrf_token" value="<?= checkoutEscape($_SESSION['csrf_token']) ?>">
 
-        <!-- ================= DATA & ALAMAT ================= -->
-        <section class="kartu">
-            <div class="kepala">
-                <span class="ikon-bulat">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
-                </span>
-                <div>
-                    <h2>Data &amp; Alamat Pengiriman</h2>
-                    <small>Informasi pemesan dan tujuan pengiriman</small>
-                </div>
-                <button type="button" class="tombol-kecil" id="tombolUbahAlamat" aria-controls="inputAlamat">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m14 5 5 5-10 10H4v-5z"/></svg>
-                    Ubah Alamat
-                </button>
+        <div class="checkout-layout" data-address-saved="<?= $alamatTersimpan ? 'true' : 'false' ?>">
+            <div class="checkout-main-column">
+                <section class="kartu address-card" aria-labelledby="addressTitle">
+                    <div class="section-title-row">
+                        <div>
+                            <h2 id="addressTitle">1. Alamat Pengiriman</h2>
+                            <p>Pastikan alamat sudah benar. Admin menghitung ongkir dari alamat ini.</p>
+                        </div>
+                    </div>
+
+                    <div class="customer-identity">
+                        <span class="eyebrow">Pemesan</span>
+                        <strong><?= checkoutEscape($pemesan['nama']) ?></strong>
+                        <span><?= checkoutEscape($pemesan['telepon']) ?> · <?= checkoutEscape($pemesan['email']) ?></span>
+                    </div>
+
+                    <div class="address-saved" id="addressSaved" <?= $alamatEditorAktif ? 'hidden' : '' ?>>
+                        <div class="saved-address-copy">
+                            <span class="eyebrow">Alamat tersimpan</span>
+                            <p><?= nl2br(checkoutEscape($alamatDefault)) ?></p>
+                            <?php if ($catatanAwal !== ''): ?>
+                                <span class="saved-address-note">Patokan: <?= checkoutEscape($catatanAwal) ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <button type="button" class="button button-outline" id="tombolUbahAlamat" aria-controls="addressEditor">Edit</button>
+                    </div>
+                    <input type="hidden" name="alamat" id="alamatTersimpanInput" value="<?= checkoutEscape($alamatTersimpan ? $alamatDefault : '') ?>" <?= $alamatEditorAktif ? 'disabled' : '' ?>>
+
+                    <div class="address-editor" id="addressEditor" <?= !$alamatEditorAktif ? 'hidden' : '' ?>>
+                        <?php if (!$alamatTersimpan): ?>
+                            <div class="address-notice">Anda belum punya alamat tersimpan. Isi alamat dan patokan di bawah, lalu tekan <strong>Simpan Alamat</strong>. Data ini menjadi alamat utama akun Anda.</div>
+                        <?php endif; ?>
+                        <label class="field-label" for="inputAlamat">Alamat lengkap <span>*</span></label>
+                        <textarea name="alamat" id="inputAlamat" rows="3" maxlength="2000" required placeholder="Nama jalan, nomor, RT/RW, kelurahan, kecamatan, kota" <?= !$alamatEditorAktif ? 'disabled' : '' ?>><?= checkoutEscape($alamatAwal) ?></textarea>
+                        <label class="field-label" for="inputCatatanAlamat">Patokan alamat <span class="optional">(opsional)</span></label>
+                        <input type="text" name="catatan_alamat" id="inputCatatanAlamat" maxlength="1000" value="<?= checkoutEscape($catatanAwal) ?>" placeholder="Contoh: patokan rumah atau warna pagar" <?= !$alamatEditorAktif ? 'disabled' : '' ?>>
+                        <p class="field-help">Alamat disimpan di akun. Patokan alamat hanya dipakai untuk pesanan ini.</p>
+                        <div class="address-actions">
+                            <button type="submit" class="button button-primary" formaction="/?action=customer-shipping-address-save" formnovalidate data-save-address>Simpan Alamat</button>
+                            <?php if ($alamatTersimpan): ?>
+                                <button type="button" class="button button-outline" id="tombolBatalAlamat">Batal</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php if (!$alamatEditorAktif): ?>
+                        <input type="hidden" name="catatan_alamat" value="<?= checkoutEscape($catatanAwal) ?>">
+                    <?php endif; ?>
+                </section>
+
+                <section class="kartu order-card" aria-labelledby="orderTitle">
+                    <div class="section-title-row">
+                        <div>
+                            <h2 id="orderTitle">2. Pesanan Anda <span class="title-meta">(<?= $jumlahProduk ?> produk)</span></h2>
+                        </div>
+                        <a class="text-link" href="/?page=customer-cart">Ubah di keranjang</a>
+                    </div>
+
+                    <div class="checkout-products">
+                        <?php foreach ($produkPesanan as $produk): ?>
+                            <article class="checkout-product">
+                                <?php if ($produk['gambar'] !== ''): ?>
+                                    <img src="<?= checkoutEscape($produk['gambar']) ?>" alt="<?= checkoutEscape($produk['nama']) ?>" class="product-thumb">
+                                <?php else: ?>
+                                    <div class="product-thumb product-thumb-placeholder" aria-hidden="true"></div>
+                                <?php endif; ?>
+                                <div class="product-copy">
+                                    <h3><?= checkoutEscape($produk['nama']) ?> <span class="label label-<?= checkoutEscape($produk['jenis']) ?>"><?= strtoupper(checkoutEscape($produk['jenis'])) ?></span></h3>
+                                    <p><?= checkoutEscape($produk['kain']) ?> · <?= checkoutEscape($produk['ukuran']) ?> · <?= (int) $produk['jumlah'] ?> pcs</p>
+                                    <p><?= $produk['harga_satuan'] === null ? 'Harga dikonfirmasi Admin' : 'Rp ' . number_format($produk['harga_satuan'], 0, ',', '.') . ' / pcs' ?></p>
+                                    <?php if ($produk['tambahan'] !== '-'): ?>
+                                        <p>Tambahan: <?= checkoutEscape($produk['tambahan']) ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($produk['catatan'] !== ''): ?>
+                                        <p>Catatan: <?= checkoutEscape($produk['catatan']) ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                </section>
+
+                <section class="kartu shipping-card" aria-labelledby="shippingTitle">
+                    <div class="section-title-row">
+                        <div>
+                            <h2 id="shippingTitle">3. Metode Pengiriman <span>*</span></h2>
+                            <p>Kurir instan hanya untuk alamat di Kota Malang.</p>
+                        </div>
+                    </div>
+
+                    <?php
+                    $selectedMethod = is_string($formValues['metode'] ?? null) && isset($metodeKirim[$formValues['metode']])
+                        ? $formValues['metode']
+                        : 'instan';
+                    ?>
+                    <div class="shipping-options">
+                        <h3 class="shipping-group-title">Kurir instan</h3>
+                        <label class="opsi <?= $selectedMethod === 'instan' ? 'terpilih' : '' ?>">
+                            <input type="radio" name="metode" value="instan" <?= $selectedMethod === 'instan' ? 'checked' : '' ?>>
+                            <span class="courier-logo courier-logo-gojek">GGM</span>
+                            <span class="courier-copy"><strong>Gojek / Grab / Maxim</strong><small>Khusus area Kota Malang</small></span>
+                            <small class="waktu">Dikirim setelah<br>produksi selesai</small>
+                        </label>
+
+                        <h3 class="shipping-group-title">Ekspedisi reguler</h3>
+                        <?php foreach (['jnt', 'jne'] as $kode):
+                            $m = $metodeKirim[$kode];
+                        ?>
+                            <label class="opsi <?= $selectedMethod === $kode ? 'terpilih' : '' ?>">
+                                <input type="radio" name="metode" value="<?= $kode ?>" <?= $selectedMethod === $kode ? 'checked' : '' ?>>
+                                <span class="courier-logo"><?= checkoutEscape($m['logo']) ?></span>
+                                <span class="courier-copy"><strong><?= checkoutEscape($m['nama']) ?></strong><small><?= checkoutEscape($m['info']) ?></small></span>
+                                <small class="waktu"><?= checkoutEscape($m['waktu']) ?></small>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <label class="field-label shipping-note-label" for="catatanKirim">Catatan untuk kurir <span class="optional">(opsional)</span></label>
+                    <textarea class="shipping-note" id="catatanKirim" name="catatan_kirim" rows="2" maxlength="1000" placeholder="Contoh: titipkan di satpam jika rumah kosong"><?= checkoutEscape($formValues['catatan_kirim'] ?? '') ?></textarea>
+                </section>
             </div>
 
-            <div class="dua-kolom">
-                <div>
-                    <small class="judul-kecil">IDENTITAS PEMESAN</small>
-                    <p class="baris-ikon"><b id="teksNama"><?= checkoutEscape($pemesan['nama']) ?></b></p>
-                    <p class="baris-ikon">📞 <span id="teksTelepon"><?= checkoutEscape($pemesan['telepon']) ?></span></p>
-                    <p class="baris-ikon">✉️ <?= checkoutEscape($pemesan['email']) ?></p>
-                </div>
-                <div class="kotak-alamat">
-                    <label class="isian">Alamat Pengiriman Lengkap
-                        <textarea name="alamat" id="inputAlamat" rows="3" maxlength="2000" required placeholder="Masukkan nama jalan, nomor rumah, kelurahan, kecamatan, kota, dan kode pos"><?= checkoutEscape($alamatAwal) ?></textarea>
-                    </label>
-                    <label class="isian">Catatan Khusus Pengiriman <small>(Opsional)</small>
-                        <input type="text" name="catatan_alamat" id="inputCatatanAlamat" maxlength="1000" value="<?= checkoutEscape($catatanAwal) ?>" placeholder="Contoh: patokan rumah atau warna pagar">
-                    </label>
-                </div>
-            </div>
-        </section>
+            <aside class="checkout-summary" aria-labelledby="summaryTitle">
+                <h2 id="summaryTitle">Ringkasan</h2>
+                <dl class="summary-totals">
+                    <div><dt>Produk</dt><dd><?= $jumlahProduk ?> item · <?= $jumlahItem ?> pcs</dd></div>
+                    <div><dt>Pengiriman</dt><dd id="summaryShipping"><?= checkoutEscape($metodeKirim[$selectedMethod]['nama'] ?? $metodeKirim['instan']['nama']) ?></dd></div>
+                    <div><dt>Total tagihan</dt><dd>Ditetapkan Admin</dd></div>
+                </dl>
 
-        <!-- ================= DETAIL PESANAN ================= -->
-        <section class="kartu">
-            <div class="kepala">
-                <span class="ikon-bulat">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
-                </span>
-                <div>
-                    <h2>Detail Pesanan</h2>
-                    <small><?= count($produkPesanan) ?> produk dalam pesanan Anda. Ubah spesifikasi dari keranjang sebelum checkout.</small>
+                <div class="summary-process">
+                    <h3>Setelah Anda kirim pesanan</h3>
+                    <ol>
+                        <li><span>1</span><p>Admin memeriksa pesanan dan menetapkan total, diskon, dan ongkir (maks. 1×24 jam).</p></li>
+                        <li><span>2</span><p>Anda menerima tagihan dan membayar dalam 2×24 jam, jika tidak pesanan dibatalkan otomatis.</p></li>
+                        <li><span>3</span><p>Pesanan diproses dan dikirim.</p></li>
+                    </ol>
                 </div>
-            </div>
 
-            <?php foreach ($produkPesanan as $produk): ?>
-            <div class="produk">
-                <?php if ($produk['gambar'] !== ''): ?>
-                    <img src="<?= checkoutEscape($produk['gambar']) ?>" alt="<?= checkoutEscape($produk['nama']) ?>" class="foto-produk">
-                <?php else: ?>
-                    <div class="foto-produk foto-placeholder" aria-hidden="true">Gambar tidak tersedia</div>
-                <?php endif; ?>
-                <div class="detail">
-                    <h3>
-                        <?= checkoutEscape($produk['nama']) ?>
-                        <span class="label label-<?= checkoutEscape($produk['jenis']) ?>"><?= strtoupper(checkoutEscape($produk['jenis'])) ?></span>
-                    </h3>
-                    <p><small>Jenis kain:</small> <?= checkoutEscape($produk['kain']) ?></p>
-                    <p><small>Ukuran:</small> <?= checkoutEscape($produk['ukuran']) ?> &nbsp;&nbsp; <small>Jumlah:</small> <?= (int) $produk['jumlah'] ?> pcs</p>
-                    <p><small>Harga satuan:</small> <?= $produk['harga_satuan'] === null ? 'Dikonfirmasi Admin' : 'Rp ' . number_format($produk['harga_satuan'], 0, ',', '.') ?></p>
-                    <p><small>Tambahan:</small> <?= checkoutEscape($produk['tambahan']) ?></p>
-                    <p class="catatan-produk"><b>Catatan:</b> <?= checkoutEscape($produk['catatan'] ?: '-') ?></p>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </section>
-
-        <!-- ================= METODE PENGIRIMAN ================= -->
-        <section class="kartu">
-            <div class="kepala">
-                <span class="ikon-bulat">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>
-                </span>
-                <div>
-                    <h2>Metode Pengiriman</h2>
-                    <small>Pilih preferensi pengiriman produk</small>
-                </div>
-            </div>
-
-            <div class="pilihan-kirim">
-                <?php $selectedMethod = $formValues['metode'] ?? 'instan'; foreach ($metodeKirim as $kode => $m) { ?>
-                <label class="opsi <?= $selectedMethod === $kode ? 'terpilih' : '' ?>">
-                    <input type="radio" name="metode" value="<?= $kode ?>" <?= $selectedMethod === $kode ? 'checked' : '' ?>>
-                    <span class="kelompok kelompok-<?= checkoutEscape($m['jenis']) ?>"><?= checkoutEscape($m['kelompok']) ?></span>
-                    <b><?= checkoutEscape($m['nama']) ?></b>
-                    <small><?= checkoutEscape($m['info']) ?></small>
-                    <small class="waktu"><?= checkoutEscape($m['waktu']) ?></small>
+                <label class="persetujuan">
+                    <input type="checkbox" name="setuju" id="cekSetuju" value="1" required>
+                    <span>Ukuran kasur (P × L × T) sudah saya ukur dengan akurat. Pesanan yang sudah masuk tahap pemotongan kain tidak dapat dibatalkan atau diubah.</span>
                 </label>
-                <?php } ?>
-            </div>
 
-            <label class="label-catatan">Catatan pengiriman <small>(Opsional)</small>
-                <textarea name="catatan_kirim" rows="2" maxlength="1000" placeholder="Contoh: Titipkan di satpam jika rumah sedang kosong, hubungi nomor ini sebelum datang"><?= checkoutEscape($formValues['catatan_kirim'] ?? '') ?></textarea>
-            </label>
-        </section>
+                <ul class="checkout-checklist" aria-live="polite">
+                    <li id="checkAddress" class="<?= $alamatTersimpan ? 'complete' : '' ?>"><?= $alamatTersimpan ? 'Alamat tersimpan' : 'Alamat belum disimpan' ?></li>
+                    <li id="checkShipping" class="complete">Metode pengiriman dipilih</li>
+                    <li id="checkAgreement">Konfirmasi ukuran</li>
+                </ul>
 
-        <!-- ================= ALUR & PERSETUJUAN ================= -->
-        <section class="kartu kartu-info">
-            <div class="kepala">
-                <span class="ikon-bulat">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                </span>
-                <div>
-                    <h2>Alur Penetapan Total &amp; Validasi Admin</h2>
-                    <p class="teks-alur">
-                        Setelah Anda menekan tombol <b>"Kirim Pesanan"</b> di bawah, pesanan akan diteruskan ke sistem
-                        produksi dengan status <span class="status">MENUNGGU VERIFIKASI</span>. Admin akan segera
-                        memverifikasi pesanan dan menghitung total biaya serta ongkos kirim sesuai alamat Anda,
-                        kemudian menerbitkan invoice resmi.
-                    </p>
-                </div>
-            </div>
-
-            <label class="persetujuan">
-                <input type="checkbox" name="setuju" id="cekSetuju" value="1" required>
-                <span>Saya mengonfirmasi bahwa data ukuran kasur (P × L × T) sudah diukur secara akurat. Saya mengerti
-                      bahwa pesanan yang telah masuk tahap pemotongan kain tidak dapat dibatalkan atau diubah.</span>
-            </label>
-        </section>
-
-        <!-- ================= TOMBOL KIRIM ================= -->
-        <div class="bagian-kirim">
-            <button type="submit" class="tombol tombol-besar" id="tombolKirim" disabled>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
-                Kirim Pesanan
-            </button>
-            <small>🕓 Verifikasi Admin: Maks 1×24 Jam</small>
+                <button type="submit" class="tombol tombol-besar" id="tombolKirim" disabled>
+                    Kirim Pesanan
+                </button>
+                <small class="summary-footnote">Isi alamat dan centang konfirmasi ukuran untuk mengirim pesanan.</small>
+            </aside>
         </div>
-
 
     </form>
 
@@ -333,6 +366,6 @@ if (isset($_GET['berhasil'], $_SESSION['pesanan_terakhir'])) {
 </div>
 </main>
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
-<script src="/assets/js/customer/checkout.js"></script>
+<script src="/assets/js/customer/checkout.js?v=<?= (int) filemtime(__DIR__ . '/../../../public/assets/js/customer/checkout.js') ?>"></script>
 </body>
 </html>

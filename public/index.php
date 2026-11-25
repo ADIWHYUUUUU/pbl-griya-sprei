@@ -35,6 +35,7 @@ if ($action !== '') {
 	$isProductAction = in_array($action, $productActions, true);
 	$isCartAction = in_array($action, ['customer-cart-add', 'customer-cart-update', 'customer-cart-remove', 'customer-checkout-start'], true);
 	$isOrderAction = $action === 'customer-order-create';
+	$isShippingAddressAction = $action === 'customer-shipping-address-save';
 	$isPaymentAction = $action === 'customer-payment-submit';
 	$adminOrderActions = ['admin-order-verify-save', 'admin-order-status-save'];
 	$isAdminOrderAction = in_array($action, $adminOrderActions, true);
@@ -42,7 +43,7 @@ if ($action !== '') {
 	$adminPaymentActions = ['admin-payment-verify-save'];
 	$isAdminPaymentAction = in_array($action, $adminPaymentActions, true);
 	$isPasswordResetAction = isset($passwordResetActions[$action]);
-	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
+	if (!$isLogout && !$isProductAction && !$isCartAction && !$isOrderAction && !$isShippingAddressAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction) {
 		header('Content-Type: application/json; charset=utf-8');
 	}
 
@@ -53,7 +54,7 @@ if ($action !== '') {
 		exit;
 	}
 
-	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction && !$isPasswordResetAction) {
+	if (!isset($actions[$action]) && !$isProductAction && !$isCartAction && !$isOrderAction && !$isShippingAddressAction && !$isAdminOrderAction && !$isAdminResiAction && !$isPaymentAction && !$isAdminPaymentAction && !$isPasswordResetAction) {
 		http_response_code(404);
 		echo json_encode(['success' => false, 'message' => 'Endpoint tidak ditemukan.']);
 		exit;
@@ -77,6 +78,9 @@ if ($action !== '') {
 			} else {
 				$controller->verifySave();
 			}
+		} elseif ($isShippingAddressAction) {
+			require_once __DIR__ . '/../app/controllers/OrderController.php';
+			(new OrderController())->saveShippingAddress();
 		} elseif ($isCartAction || $isOrderAction) {
 			require_once __DIR__ . '/../app/controllers/OrderController.php';
 			$controller = new OrderController();
@@ -128,8 +132,19 @@ if ($action !== '') {
 			echo json_encode(['success' => false, 'message' => $message]);
 		} elseif ($isCartAction) {
 			echo 'Keranjang gagal diproses. Silakan coba lagi.';
+		} elseif ($isShippingAddressAction) {
+			$_SESSION['checkout_message'] = 'Alamat gagal disimpan. Silakan coba lagi.';
+			$_SESSION['checkout_message_type'] = 'error';
+			$_SESSION['checkout_form'] = [
+				'alamat' => is_string($_POST['alamat'] ?? null) ? $_POST['alamat'] : '',
+				'catatan_alamat' => is_string($_POST['catatan_alamat'] ?? null) ? $_POST['catatan_alamat'] : '',
+				'metode' => is_string($_POST['metode'] ?? null) ? $_POST['metode'] : '',
+				'catatan_kirim' => is_string($_POST['catatan_kirim'] ?? null) ? $_POST['catatan_kirim'] : '',
+			];
+			header('Location: /?page=customer-checkout', true, 303);
 		} elseif ($isOrderAction) {
 			$_SESSION['checkout_message'] = 'Pesanan gagal disimpan. Silakan coba lagi.';
+			$_SESSION['checkout_message_type'] = 'error';
 			header('Location: /?page=customer-checkout', true, 303);
 		} elseif ($isProductAction) {
 			echo 'Produk gagal disimpan. Silakan coba lagi.';

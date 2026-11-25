@@ -6,6 +6,57 @@ require_once __DIR__ . '/../helpers/product_pricing.php';
 
 class OrderController
 {
+    public function saveShippingAddress(): void
+    {
+        if (!$this->hasValidCsrfToken()) {
+            $_SESSION['checkout_message'] = 'Sesi keamanan berakhir. Muat ulang halaman dan coba lagi.';
+            $_SESSION['checkout_message_type'] = 'error';
+            $this->redirect('/?page=customer-checkout');
+        }
+        $this->requireCustomer();
+
+        $address = $_POST['alamat'] ?? null;
+        $addressNote = $_POST['catatan_alamat'] ?? '';
+        if (
+            !is_string($address)
+            || !is_string($addressNote)
+            || !$this->isWithinLength($address, 2000)
+            || !$this->isWithinLength($addressNote, 1000)
+            || trim($address) === ''
+        ) {
+            $_SESSION['checkout_message'] = 'Alamat lengkap wajib diisi dengan benar.';
+            $_SESSION['checkout_message_type'] = 'error';
+            $_SESSION['checkout_form'] = [
+                'alamat' => is_string($address) ? $address : '',
+                'catatan_alamat' => is_string($addressNote) ? $addressNote : '',
+                'metode' => is_string($_POST['metode'] ?? null) ? $_POST['metode'] : '',
+                'catatan_kirim' => is_string($_POST['catatan_kirim'] ?? null) ? $_POST['catatan_kirim'] : '',
+            ];
+            $this->redirect('/?page=customer-checkout');
+        }
+
+        $userId = filter_var($_SESSION['id_user'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        if ($userId === false || $userId === null) {
+            throw new UnexpectedValueException('ID customer tidak valid saat menyimpan alamat.');
+        }
+
+        global $pdo;
+        require_once __DIR__ . '/../models/UserModel.php';
+        (new UserModel($pdo))->updateShippingAddress((int) $userId, trim($address));
+
+        $_SESSION['checkout_message'] = 'Alamat utama berhasil disimpan.';
+        $_SESSION['checkout_message_type'] = 'success';
+        $_SESSION['checkout_form'] = [
+            'alamat' => trim($address),
+            'catatan_alamat' => trim($addressNote),
+            'metode' => is_string($_POST['metode'] ?? null) ? $_POST['metode'] : '',
+            'catatan_kirim' => is_string($_POST['catatan_kirim'] ?? null) ? $_POST['catatan_kirim'] : '',
+        ];
+        $this->redirect('/?page=customer-checkout');
+    }
+
     public function startCheckout(): void
     {
         if (!$this->hasValidCsrfToken()) {
@@ -237,7 +288,12 @@ class OrderController
         if (($_SESSION['cart'] ?? []) === []) {
             unset($_SESSION['cart']);
         }
-        unset($_SESSION['checkout_item_ids'], $_SESSION['checkout_form'], $_SESSION['checkout_message']);
+        unset(
+            $_SESSION['checkout_item_ids'],
+            $_SESSION['checkout_form'],
+            $_SESSION['checkout_message'],
+            $_SESSION['checkout_message_type']
+        );
         $_SESSION['pesanan_terakhir'] = [
             'id' => $orderId,
             'kode' => $createdOrder['no_invoice'],
@@ -640,6 +696,7 @@ class OrderController
     private function checkoutError(string $message): void
     {
         $_SESSION['checkout_message'] = $message;
+        $_SESSION['checkout_message_type'] = 'error';
         $formFields = ['alamat', 'catatan_alamat', 'metode', 'catatan_kirim'];
         $_SESSION['checkout_form'] = [];
         foreach ($formFields as $field) {

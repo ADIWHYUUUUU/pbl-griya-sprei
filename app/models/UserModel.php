@@ -47,6 +47,23 @@ class UserModel
         return (string) $address;
     }
 
+    public function updateShippingAddress(int $userId, string $address): void
+    {
+        $statement = $this->pdo->prepare(
+            'UPDATE "user"
+             SET alamat_pengiriman = :alamat_pengiriman
+             WHERE id_user = :id_user'
+        );
+        $statement->execute([
+            ':alamat_pengiriman' => $address,
+            ':id_user' => $userId,
+        ]);
+
+        if ($statement->rowCount() !== 1) {
+            throw new UnexpectedValueException('Alamat akun customer gagal diperbarui.');
+        }
+    }
+
 
     // =========================
     // TAMBAH USER
