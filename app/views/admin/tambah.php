@@ -19,6 +19,9 @@ $escape = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
 $product = is_array($product ?? null) ? $product : [];
+$assetUrl = static function (string $path): string {
+    return $path . '?v=' . filemtime(__DIR__ . '/../../../public' . $path);
+};
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -28,7 +31,7 @@ $product = is_array($product ?? null) ? $product : [];
     <title>Tambah Produk - Griya Sprei</title>
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
-    <link rel="stylesheet" href="/assets/css/admin/product-form.css">
+    <link rel="stylesheet" href="<?= $escape($assetUrl('/assets/css/admin/product-form.css')) ?>">
 </head>
 <body class="admin-dashboard admin-product-form-page">
 <div class="admin-layout">
@@ -106,11 +109,12 @@ $product = is_array($product ?? null) ? $product : [];
                             </span>
                         </label>
                         <label class="product-form-field" id="tinggi_standar_field">
-                            <span>Tinggi karet <b>*</b></span>
+                            <span><span id="productHeightLabel">Tinggi karet</span> <b>*</b></span>
                             <span class="product-input-suffix">
                                 <input type="number" id="tinggi_standar" name="tinggi_standar" min="1" step="1" required>
                                 <span aria-hidden="true">cm</span>
                             </span>
+                            <small id="productHeightHelp">Tinggi karet untuk kategori Sprei.</small>
                         </label>
                     </div>
                 </section>
@@ -201,7 +205,7 @@ $product = is_array($product ?? null) ? $product : [];
     </main>
 </div>
 <script src="/assets/js/admin/sidebar.js"></script>
-<script src="/assets/js/admin/product-category-height.js"></script>
-<script src="/assets/js/admin/product-form.js"></script>
+<script src="<?= $escape($assetUrl('/assets/js/admin/product-category-height.js')) ?>"></script>
+<script src="<?= $escape($assetUrl('/assets/js/admin/product-form.js')) ?>"></script>
 </body>
 </html>

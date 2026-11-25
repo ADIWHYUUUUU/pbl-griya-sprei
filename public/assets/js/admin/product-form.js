@@ -29,6 +29,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateCatalog() {
     const category = form.querySelector('input[name="kategori_produk"]:checked');
+    const isBedCover = category.value === "BED_COVER";
+    showText("productHeightLabel", isBedCover ? "Tinggi" : "Tinggi karet");
+    showText("productHeightHelp", isBedCover ? "Tinggi standar Bed Cover." : "Tinggi karet untuk kategori Sprei.");
     const fabric = field("jenis_kain");
     const dimensions = ["panjang_standar", "lebar_standar", "tinggi_standar"]
       .map(field)
