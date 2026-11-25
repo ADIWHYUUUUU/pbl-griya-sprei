@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/payment_deadline.php';
+
 class PaymentModel
 {
     // Business rule: a fully paid order moves from waiting payment to processing.
@@ -18,13 +20,15 @@ class PaymentModel
         $statement = $this->pdo->prepare(
             'SELECT p.id_pesanan, p.no_invoice, p.tanggal_pesan,
                    p.status_pesanan::text AS status_pesanan,
+                   CASE WHEN (' . PAYMENT_DEADLINE_SQL . ") <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+                        THEN 1 ELSE 0 END AS pembayaran_kedaluwarsa,
                    p.alamat_pengiriman, p.catatan_alamat,
                    p.metode_pengiriman::text AS metode_pengiriman,
                    p.catatan_pengiriman, p.tagihan_pokok, p.ongkir, p.diskon,
                    u.nama AS nama_pelanggan, u.no_hp AS telepon_pelanggan
             FROM pesanan p
-            JOIN "user" u ON u.id_user = p.id_user
-            WHERE p.id_pesanan = :id_pesanan AND p.id_user = :id_user'
+            JOIN \"user\" u ON u.id_user = p.id_user
+            WHERE p.id_pesanan = :id_pesanan AND p.id_user = :id_user"
         );
         $statement->execute([':id_pesanan' => $orderId, ':id_user' => $userId]);
         $order = $statement->fetch();
@@ -89,6 +93,16 @@ class PaymentModel
             $latestStatus = $activeStatement->fetchColumn();
             if ($latestStatus !== false && $latestStatus !== 'DITOLAK') {
                 throw new DomainException('Pembayaran aktif untuk pesanan ini sudah ada.');
+            }
+
+            $deadline = $this->pdo->prepare(
+                'SELECT CASE WHEN (' . PAYMENT_DEADLINE_SQL . ") <= clock_timestamp() AT TIME ZONE 'UTC'
+                             THEN 1 ELSE 0 END
+                 FROM pesanan p WHERE p.id_pesanan = :id_pesanan"
+            );
+            $deadline->execute([':id_pesanan' => $orderId]);
+            if ((int) $deadline->fetchColumn() === 1) {
+                throw new DomainException('Batas waktu pembayaran sudah lewat.');
             }
 
             $statement = $this->pdo->prepare(

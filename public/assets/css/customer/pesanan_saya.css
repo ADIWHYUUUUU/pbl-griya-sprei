@@ -37,21 +37,26 @@ small {
   font-size: 11px;
 }
 
+.pesanan-saya-page {
+  background: #f6f4f0;
+}
+
 main.container {
   width: 100%;
+  max-width: 1000px;
+  padding: 0 24px;
 }
 
 .isi {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 0 50px;
+  padding: 36px 0 56px;
+  color: #232321;
+  font-family: Inter, system-ui, sans-serif;
   font-size: 14px;
 }
 
 .breadcrumb {
-  font-size: 12px;
-  color: var(--abu);
-  margin-bottom: 14px;
+  font-size: 13.5px;
+  color: #5f5f5a;
 }
 
 .breadcrumb a:hover {
@@ -63,14 +68,13 @@ main.container {
 }
 
 .judul-halaman {
-  font-size: 26px;
-  margin-bottom: 4px;
+  font-size: 32px;
+  margin: 6px 0 4px;
 }
 
 .sub-judul {
-  color: var(--abu);
-  font-size: 13px;
-  margin-bottom: 20px;
+  color: #5f5f5a;
+  font-size: 15px;
 }
 
 /* ---------- Tombol ---------- */
@@ -132,36 +136,87 @@ main.container {
 .kotak-cari {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 12px;
+  padding: 10px 12px 10px 18px;
+  margin: 22px 0 14px;
+  border-color: #e6e3dc;
+  border-radius: 14px;
   color: var(--abu);
 }
 
 .kotak-cari input {
   flex: 1;
+  min-width: 0;
+  min-height: 36px;
   border: none;
-  outline: none;
   background: none;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--teks);
 }
 
+.kotak-cari .tombol {
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.filter-pesanan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.filter-pesanan-chip {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #d9d5cb;
+  border-radius: 999px;
+  background: #fff;
+  color: #3a3a37;
+  font: 500 13.5px Inter, system-ui, sans-serif;
+  white-space: nowrap;
+}
+
+.filter-pesanan-chip:hover {
+  border-color: var(--hijau);
+}
+
+.filter-pesanan-chip[aria-current="page"] {
+  border-color: var(--hijau);
+  background: var(--hijau);
+  color: #fff;
+}
+
 /* ---------- Kartu pesanan ---------- */
+.pesanan {
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  border-color: #e6e3dc;
+  border-radius: 18px;
+}
+
 .pesanan-kepala {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--garis);
-  font-size: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ece9e2;
+  font-size: 14px;
 }
 
 .info-waktu span {
-  color: var(--abu);
-  margin-left: 4px;
+  color: #5f5f5a;
+  font-size: 13.5px;
 }
 
 .info-waktu .terverifikasi {
@@ -173,30 +228,40 @@ main.container {
   display: inline-block;
   padding: 5px 12px;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .badge-tunggu {
-  background: var(--oranye-muda);
-  color: var(--oranye);
+  background: #fdf0d9;
+  color: #7a4800;
 }
 
-.badge-bayar,
-.badge-lunas {
-  background: var(--hijau-muda);
-  color: var(--hijau);
+.badge-bayar {
+  background: #e3eefb;
+  color: #1f4f8f;
+}
+
+.badge-proses {
+  background: #ece6f7;
+  color: #54358f;
 }
 
 .badge-tolak {
-  background: var(--merah-muda);
-  color: var(--merah);
+  background: #fbe4e2;
+  color: #a12a22;
 }
 
+.badge-lunas,
 .badge-selesai {
-  background: #eceee9;
-  color: #4a5246;
+  background: #e2eedf;
+  color: #2f5a2b;
+}
+
+.badge-netral {
+  background: #ecece8;
+  color: #4a4a45;
 }
 
 .badge-kecil {
@@ -213,9 +278,10 @@ main.container {
 /* ---------- Informasi produk dan tagihan ---------- */
 .pesanan-isi {
   display: grid;
-  grid-template-columns: 72px 1fr 210px;
-  gap: 16px;
-  padding: 16px 0 12px;
+  grid-template-columns: 72px minmax(0, 1fr) fit-content(300px);
+  gap: 18px;
+  align-items: start;
+  padding: 18px 0 14px;
 }
 
 .foto-produk {
@@ -223,7 +289,7 @@ main.container {
   height: 72px;
   object-fit: cover;
   border: 1px solid var(--garis);
-  border-radius: 8px;
+  border-radius: 10px;
   background: #eceee7;
 }
 
@@ -235,13 +301,15 @@ main.container {
 }
 
 .info-produk h3 {
-  font-size: 14px;
-  margin-bottom: 5px;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .info-produk p {
-  font-size: 12px;
+  font-size: 13.5px;
   margin-bottom: 3px;
+  color: #5f5f5a;
 }
 
 .pil-rincian {
@@ -258,16 +326,22 @@ main.container {
 .info-tagihan {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   text-align: right;
 }
 
-.info-tagihan .nominal {
-  font-size: 20px;
+.pesanan small {
+  color: #5f5f5a;
+  font-size: inherit;
 }
 
+.info-tagihan small {
+  font-size: 12.5px;
+}
+
+.info-tagihan .nominal,
 .info-tagihan .belum {
-  font-size: 18px;
+  font-size: 24px;
 }
 
 .hijau,
@@ -280,17 +354,50 @@ main.container {
 }
 
 /* ---------- Informasi berdasarkan status pesanan ---------- */
+.pesanan-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pesanan-status-item {
+  display: flex;
+  flex: 1 1 240px;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f6f4f0;
+  color: #5f5f5a;
+  font-size: 12.5px;
+}
+
+.pesanan-status-item .badge {
+  white-space: normal;
+}
+
 .kotak-status {
-  margin-bottom: 12px;
-  padding: 11px 14px;
-  border-radius: 8px;
-  font-size: 12px;
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
   line-height: 1.55;
 }
 
 .kotak-tolak {
-  background: #fdf3f1;
-  border: 1px solid #f1d3ce;
+  background: #fbe4e2;
+  border: 1px solid #f1c4c0;
+  color: #7d1f19;
+}
+
+.kotak-tenggat {
+  background: #fdf0d9;
+  border: 1px solid #f0dcb0;
+  color: #5f3a00;
 }
 
 .kotak-tolak p {
@@ -317,6 +424,11 @@ main.container {
   display: flex;
   background: var(--latar);
   border: 1px solid var(--garis);
+}
+
+.pesanan .kotak-tunggu {
+  background: #f6f4f0;
+  border-color: #e6e3dc;
 }
 
 .kotak-bayar {
@@ -350,7 +462,20 @@ main.container {
 .pesanan-aksi .kiri {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+}
+
+.pesanan-aksi .tombol {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pesanan-aksi .tombol-garis {
+  border-color: #d9d5cb;
+  color: #232321;
 }
 
 /* ---------- Modal ---------- */
@@ -600,7 +725,7 @@ body.ada-modal {
    ===================================================== */
 
 /* Tablet */
-@media (max-width: 900px) {
+@media (max-width: 640px) {
   .isi {
     padding: 20px 0 40px;
     font-size: 13px;
@@ -615,7 +740,7 @@ body.ada-modal {
   }
 
   .pesanan-isi {
-    grid-template-columns: 64px minmax(0, 1fr) 180px;
+    grid-template-columns: 64px minmax(0, 1fr);
     gap: 14px;
   }
 
@@ -636,14 +761,6 @@ body.ada-modal {
     padding: 8px 13px;
     font-size: 11.5px;
   }
-}
-
-/* Tablet potret */
-@media (max-width: 900px) {
-  .pesanan-isi {
-    grid-template-columns: 60px minmax(0, 1fr);
-  }
-
   .info-tagihan {
     grid-column: 1 / -1;
     padding-top: 10px;
@@ -654,6 +771,11 @@ body.ada-modal {
 
 /* HP */
 @media (max-width: 480px) {
+  .filter-pesanan-chip {
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+
   .isi {
     padding: 14px 0 32px;
     font-size: 12.5px;
@@ -825,17 +947,18 @@ body.ada-modal {
 
 .pagination {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  margin: 36px 0 0;
+  gap: 10px;
+  margin: 30px 0 0;
 }
 
 .page-btn {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border: 0;
-  border-radius: 8px;
-  background: #e4e4e1;
+  border-radius: 10px;
+  background: #ecece8;
   font-weight: 500;
   display: grid;
   place-items: center;

@@ -41,8 +41,10 @@ foreach ($order['items'] as $item) {
 $principal = (float) ($order['tagihan_pokok'] ?: $subtotal);
 $total = $principal + (float) $order['ongkir'] - (float) $order['diskon'];
 $payment = $order['payment'];
-$canPay = $order['status_pesanan'] === 'MENUNGGU_PEMBAYARAN';
 $paymentActive = $payment && $payment['status_pembayaran'] !== 'DITOLAK';
+$paymentExpired = $order['status_pesanan'] === 'MENUNGGU_PEMBAYARAN'
+    && !$paymentActive && (int) $order['pembayaran_kedaluwarsa'] === 1;
+$canPay = $order['status_pesanan'] === 'MENUNGGU_PEMBAYARAN' && !$paymentExpired;
 $accounts = array_filter(
     $config['accounts'],
     static fn (array $account): bool => !str_contains(strtoupper((string) $account['account']), 'TODO')
@@ -174,9 +176,11 @@ $copyTotal = fmod($total, 1.0) === 0.0
 
         <?php if (!$canPay): ?>
             <div class="payment-notice">
-                <?= $order['status_pesanan'] === 'MENUNGGU_VERIFIKASI'
-                    ? 'Nominal final masih menunggu konfirmasi admin. Form pembayaran akan terbuka setelah pesanan berstatus Menunggu Pembayaran.'
-                    : 'Pesanan ini belum dapat menerima pembayaran.' ?>
+                <?= match (true) {
+                    $paymentExpired => 'Batas waktu pembayaran sudah lewat.',
+                    $order['status_pesanan'] === 'MENUNGGU_VERIFIKASI' => 'Nominal final masih menunggu konfirmasi admin. Form pembayaran akan terbuka setelah pesanan berstatus Menunggu Pembayaran.',
+                    default => 'Pesanan ini belum dapat menerima pembayaran.',
+                } ?>
             </div>
         <?php elseif ($paymentActive): ?>
             <div class="payment-notice">Bukti pembayaran Anda sedang diproses admin.</div>
