@@ -26,6 +26,14 @@ $couriers = [
     'EKSPEDISI_JNE' => 'JNE Express',
     'EKSPEDISI_JNT' => 'J&T Express',
 ];
+$hasTracking = static function (array $order): bool {
+    $tracking = ($order['metode_pengiriman'] ?? '') === 'INSTANT_GOJEK'
+        ? ($order['nomor_telepon_kurir'] ?? '')
+        : ($order['nomor_resi'] ?? '');
+
+    return trim((string) $tracking) !== '';
+};
+$filledTrackingCount = count(array_filter($orders, $hasTracking));
 $formatDate = static function ($timestamp): string {
     if ($timestamp === null || $timestamp === '') {
         return '-';
@@ -71,7 +79,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
     <title>Input Nomor Resi - Griya Sprei</title>
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
-    <link rel="stylesheet" href="/assets/css/admin/nomor_resi.css">
+    <link rel="stylesheet" href="/assets/css/admin/nomor_resi.css?v=<?= (int) filemtime(__DIR__ . '/../../../public/assets/css/admin/nomor_resi.css') ?>">
 </head>
 <body class="resi-page">
     <div class="admin-layout">
@@ -85,6 +93,19 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                     <?= $escape($flash['text']) ?>
                 </div>
             <?php endif; ?>
+
+            <div class="order-toolbar">
+                <label class="order-search">
+                    <span class="visually-hidden">Cari invoice atau pelanggan</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+                    <input type="search" id="orderSearch" placeholder="Cari invoice atau nama pelanggan">
+                </label>
+                <div class="tracking-filters" role="group" aria-label="Filter status nomor resi">
+                    <button type="button" class="tracking-filter active" data-tracking-filter="all" aria-pressed="true">Semua <span><?= count($orders) ?></span></button>
+                    <button type="button" class="tracking-filter" data-tracking-filter="empty" aria-pressed="false">Belum diisi <span><?= count($orders) - $filledTrackingCount ?></span></button>
+                    <button type="button" class="tracking-filter" data-tracking-filter="filled" aria-pressed="false">Sudah diisi <span><?= $filledTrackingCount ?></span></button>
+                </div>
+            </div>
 
             <section class="order-table-wrap">
                 <table>
@@ -105,6 +126,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                         <?php endif; ?>
                         <?php foreach ($orders as $order):
                             $courierKey = (string) ($order['metode_pengiriman'] ?? '');
+                            $trackingIsFilled = $hasTracking($order);
                             $tracking = trim((string) ($courierKey === 'INSTANT_GOJEK'
                                 ? ($order['nomor_telepon_kurir'] ?? '')
                                 : ($order['nomor_resi'] ?? '')));
@@ -112,6 +134,13 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                             $courierLabel = $couriers[$courierKey] ?? $courierKey ?: 'Ekspedisi';
                             $specLines = $normalizeSpecLines($order['daftar_spesifikasi'] ?? '');
                             $specDisplay = implode('<br>', array_map(static fn ($line) => htmlspecialchars((string) $line, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), array_slice($specLines, 0, 2)));
+                            $searchText = implode(' ', [
+                                (string) ($order['kode'] ?? ''),
+                                (string) ($order['nama_pelanggan'] ?? ''),
+                                (string) ($order['telepon'] ?? ''),
+                                (string) ($order['alamat_pengiriman'] ?? ''),
+                                implode(' ', $specLines),
+                            ]);
                             $detailData = [
                                 'invoice' => (string) ($order['kode'] ?? 'INV/000000'),
                                 'resi' => $tracking,
@@ -128,7 +157,7 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                 'orderId' => $orderId,
                             ];
                         ?>
-                            <tr>
+                            <tr data-tracking-status="<?= $trackingIsFilled ? 'filled' : 'empty' ?>" data-search="<?= $escape($searchText) ?>">
                                 <td>
                                     <span class="invoice"><?= $escape($order['kode'] ?? 'INV/000000') ?></span>
                                     <span class="date"><?= $escape($formatDate($order['tanggal_pesan'] ?? null)) ?></span>
@@ -142,7 +171,10 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                     <div class="spec"><?= $specDisplay ?></div>
                                 </td>
                                 <td>
-                                    <span class="courier-badge"><?= $escape($courierLabel) ?></span>
+                                    <div class="shipping-status">
+                                        <span class="courier-badge"><?= $escape($courierLabel) ?></span>
+                                        <span class="tracking-status <?= $trackingIsFilled ? 'filled' : 'empty' ?>"><?= $trackingIsFilled ? 'Sudah diisi' : 'Belum diisi' ?></span>
+                                    </div>
                                 </td>
                                 <td>
                                     <?php if ($tracking !== ''): ?>
@@ -160,12 +192,17 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
                                 </td>
                             </tr>
                         <?php endforeach; ?>
+                        <?php if ($orders !== []): ?>
+                            <tr class="filter-empty-state" hidden>
+                                <td colspan="5" class="empty-state">Tidak ada pesanan yang sesuai dengan pencarian atau filter ini.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </section>
 
             <div class="order-footer">
-                <div class="footer-note">Menampilkan <?= count($orders) ?> pesanan yang siap dikirim atau telah dikirim.</div>
+                <div class="footer-note" id="orderCount" data-total="<?= count($orders) ?>">Menampilkan <?= count($orders) ?> dari <?= count($orders) ?> pesanan yang siap dikirim atau telah dikirim.</div>
             </div>
         </main>
     </div>
@@ -217,13 +254,12 @@ $normalizeSpecLines = static function ($value, $fallback = 'Detail pesanan'): ar
 
                 <div class="resi-modal-footer">
                     <button type="button" class="resi-secondary-btn" data-close="resi-modal">Tutup</button>
-                    <button type="button" class="resi-primary-btn fill" id="printLabelBtn">Cetak Label Pengiriman</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="/assets/js/admin/sidebar.js"></script>
-    <script src="/assets/js/admin/nomor_resi.js"></script>
+    <script src="/assets/js/admin/nomor_resi.js?v=<?= (int) filemtime(__DIR__ . '/../../../public/assets/js/admin/nomor_resi.js') ?>"></script>
 </body>
 </html>

@@ -701,16 +701,24 @@ body.resi-page {
     line-height: 1.45;
 }
 
-.resi-page .courier-badge {
+.resi-page .courier-badge,
+.resi-page .tracking-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-width: 0;
-    padding: 5px 9px;
-    border-color: #d5dfd3;
+    padding: 3px 8px;
+    border: 0;
     border-radius: 999px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.resi-page .courier-badge {
     background: #f0f3ef;
     color: #526351;
-    font-size: 12px;
-    font-weight: 500;
-    white-space: nowrap;
 }
 
 .resi-page .action-btn {
@@ -922,5 +930,135 @@ body.resi-page {
     .resi-page .resi-modal-body {
         padding-right: 14px;
         padding-left: 14px;
+    }
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.resi-page .order-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.resi-page .order-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: min(100%, 300px);
+    min-height: 36px;
+    padding: 0 10px;
+    border: 1px solid #dfe6dc;
+    border-radius: 7px;
+    background: #fff;
+    color: #788276;
+}
+
+.resi-page .order-search svg {
+    flex: 0 0 15px;
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.7;
+}
+
+.resi-page .order-search input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #344139;
+    font: inherit;
+    font-size: 12px;
+}
+
+.resi-page .tracking-filters {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.resi-page .tracking-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 30px;
+    padding: 5px 10px;
+    border: 1px solid #e1e7df;
+    border-radius: 999px;
+    background: #fff;
+    color: #647064;
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.resi-page .tracking-filter span {
+    color: #7c8878;
+    font-size: 10px;
+}
+
+.resi-page .tracking-filter.active {
+    border-color: #405642;
+    background: #405642;
+    color: #fff;
+}
+
+.resi-page .tracking-filter.active span {
+    color: #e2ebe0;
+}
+
+.resi-page .shipping-status {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.resi-page .tracking-status {
+    font-weight: 500;
+}
+
+.resi-page .tracking-status.filled {
+    background: #e8f2e7;
+    color: #3f7042;
+}
+
+.resi-page .tracking-status.empty {
+    background: #f7f0dc;
+    color: #8c7130;
+}
+
+.resi-page .order-table-wrap tbody tr[hidden] {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .resi-page .order-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .resi-page .order-search {
+        width: 100%;
+    }
+
+    .resi-page .tracking-filters {
+        justify-content: flex-start;
     }
 }

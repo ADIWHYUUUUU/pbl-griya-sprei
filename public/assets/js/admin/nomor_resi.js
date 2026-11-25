@@ -12,9 +12,60 @@ document.addEventListener('DOMContentLoaded', function () {
     const resiProductMeta = document.getElementById('resiProductMeta');
     const resiProductNote = document.getElementById('resiProductNote');
     const copyResiBtn = document.getElementById('copyResiBtn');
-    const printLabelBtn = document.getElementById('printLabelBtn');
 
     let activeResi = '';
+    const trackingFilters = document.querySelectorAll('[data-tracking-filter]');
+    const orderRows = Array.from(document.querySelectorAll('tbody tr[data-tracking-status]'));
+    const orderSearch = document.getElementById('orderSearch');
+    const filterEmptyState = document.querySelector('.filter-empty-state');
+    const orderCount = document.getElementById('orderCount');
+    let activeTrackingFilter = 'all';
+
+    const filterOrders = function () {
+        const searchTerm = orderSearch ? orderSearch.value.trim().toLocaleLowerCase() : '';
+        let visibleCount = 0;
+
+        orderRows.forEach(function (row) {
+            const matchesFilter = activeTrackingFilter === 'all'
+                || row.dataset.trackingStatus === activeTrackingFilter;
+            const matchesSearch = !searchTerm
+                || (row.dataset.search || '').toLocaleLowerCase().includes(searchTerm);
+            const isVisible = matchesFilter && matchesSearch;
+
+            row.hidden = !isVisible;
+            if (isVisible) {
+                visibleCount += 1;
+            }
+        });
+
+        if (filterEmptyState) {
+            filterEmptyState.hidden = visibleCount > 0;
+        }
+
+        if (orderCount) {
+            const totalCount = Number(orderCount.dataset.total || 0);
+            orderCount.textContent = 'Menampilkan ' + visibleCount + ' dari ' + totalCount
+                + ' pesanan yang siap dikirim atau telah dikirim.';
+        }
+    };
+
+    trackingFilters.forEach(function (button) {
+        button.addEventListener('click', function () {
+            activeTrackingFilter = button.dataset.trackingFilter || 'all';
+            trackingFilters.forEach(function (filterButton) {
+                const isActive = filterButton === button;
+                filterButton.classList.toggle('active', isActive);
+                filterButton.setAttribute('aria-pressed', String(isActive));
+            });
+            filterOrders();
+        });
+    });
+
+    if (orderSearch) {
+        orderSearch.addEventListener('input', filterOrders);
+    }
+
+    filterOrders();
 
     const setModalState = function (isOpen) {
         if (!resiModal) {
@@ -123,9 +174,4 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (printLabelBtn) {
-        printLabelBtn.addEventListener('click', function () {
-            window.print();
-        });
-    }
 });

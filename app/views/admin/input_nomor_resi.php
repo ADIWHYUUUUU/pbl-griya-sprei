@@ -70,12 +70,19 @@ $tracking = trim((string) ($isGojek
     ? ($order['nomor_telepon_kurir'] ?? '')
     : ($order['nomor_resi'] ?? '')));
 $customerAddress = trim((string) ($order['alamat_pengiriman'] ?? ''));
-$customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_alamat'] ?? '')) !== '' ? '\n' . trim((string) ($order['catatan_alamat'] ?? '')) : '';
+$customerAddress .= $customerAddress !== '' && trim((string) ($order['catatan_alamat'] ?? '')) !== '' ? "\n" . trim((string) ($order['catatan_alamat'] ?? '')) : '';
 $trackingLabel = $isGojek ? 'Nomor Telepon Kurir Gojek' : 'Nomor Resi Pengiriman';
 $trackingPlaceholder = $isGojek ? 'Contoh: 081234567890' : 'Contoh: JNE882910481290';
 $trackingHint = $isGojek
     ? 'Masukkan nomor telepon kurir Gojek.'
     : 'Masukkan nomor resi dari ekspedisi J&T atau JNE.';
+$courierLabel = ($order['metode_pengiriman'] ?? '') === 'INSTANT_GOJEK'
+    ? 'GoJek Instant'
+    : (($order['metode_pengiriman'] ?? '') === 'EKSPEDISI_JNT' ? 'J&T Express' : 'JNE Express');
+$productSize = ($item['tipe_ukuran'] ?? 'STANDARD') === 'CUSTOM' ? 'Custom Size' : 'Ukuran Standar';
+$productSize .= ' · ' . (int) ($item['panjang'] ?? 0) . ' × ' . (int) ($item['lebar'] ?? 0);
+$productSize .= ($item['tinggi'] ?? null) === null ? '' : ' × ' . (int) $item['tinggi'];
+$productSize .= ' cm';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -85,24 +92,19 @@ $trackingHint = $isGojek
     <title>Input Nomor Pengiriman - Griya Sprei</title>
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
-    <link rel="stylesheet" href="/assets/css/admin/input_nomor_resi.css">
+    <link rel="stylesheet" href="/assets/css/admin/input_nomor_resi.css?v=<?= (int) filemtime(__DIR__ . '/../../../public/assets/css/admin/input_nomor_resi.css') ?>">
 </head>
 <body class="resi-input-page">
     <div class="admin-layout">
         <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
         <main class="dashboard-main">
             <div class="resi-input-content">
-                <nav class="page-breadcrumb" aria-label="Breadcrumb">
-                    <a href="/?page=admin-dashboard">Admin</a>
-                    <span aria-hidden="true">›</span>
-                    <a href="/?page=admin-resi-list">Nomor Resi</a>
-                    <span aria-hidden="true">›</span>
-                    <strong aria-current="page"><?= $isGojek ? 'Input Nomor Telepon Kurir' : 'Input Nomor Resi' ?></strong>
-                </nav>
-
                 <div class="page-heading">
-                    <h1 class="page-title"><?= $isGojek ? 'Input Nomor Telepon Kurir Gojek' : 'Input Nomor Resi Pengiriman' ?></h1>
-                    <a class="resi-back-link" href="/?page=admin-resi-list">&larr; Kembali ke daftar</a>
+                    <div>
+                        <h1 class="page-title"><?= $isGojek ? 'Input Nomor Telepon Kurir Gojek' : 'Input Nomor Resi Pengiriman' ?></h1>
+                        <p class="page-description">Simpan nomor pengiriman agar pesanan dapat dilacak oleh pelanggan.</p>
+                    </div>
+                    <a class="resi-back-link" href="/?page=admin-resi-list">Kembali ke daftar</a>
                 </div>
 
                 <?php if (is_array($flash) && isset($flash['text'])): ?>
@@ -111,57 +113,27 @@ $trackingHint = $isGojek
                     </div>
                 <?php endif; ?>
 
-                <div class="form-card">
-                    <div class="order-meta">
-                        <strong><?= $escape($order['no_invoice'] ?? 'INV/000000') ?></strong>
-                        <span><?= $escape($deliveryDate) ?></span>
-                        <span class="badge-courier"><?= $escape($status[0]) ?></span>
-                    </div>
-
-                    <div class="order-brief">
-                        <?php if ($image !== ''): ?>
-                            <div class="product-image"><img src="<?= $escape($image) ?>" alt="<?= $escape($item['nama_produk'] ?? 'Produk') ?>"></div>
-                        <?php else: ?>
-                            <div class="product-image" aria-hidden="true"></div>
-                        <?php endif; ?>
-                        <div class="product-meta">
-                            <strong><?= $escape($item['nama_produk'] ?? 'Produk') ?></strong>
-                            <span><?= $escape(($item['tipe_ukuran'] ?? 'STANDARD') === 'CUSTOM' ? 'Custom Size' : 'Ukuran Standar') ?> • <?= (int) ($item['panjang'] ?? 0) ?> × <?= (int) ($item['lebar'] ?? 0) ?><?= ($item['tinggi'] ?? null) === null ? '' : ' × ' . (int) $item['tinggi'] ?> cm</span>
-                        </div>
-                    </div>
-
-                    <div class="customer-card">
-                        <div class="customer-meta">
-                            <div>
-                                <div><strong><?= $escape($order['nama_pelanggan'] ?? 'Pelanggan') ?></strong></div>
-                                <div><?= $escape($order['telepon'] ?? '-') ?></div>
-                            </div>
-                        </div>
-                        <div class="badge-courier"><?= $escape(($order['metode_pengiriman'] ?? '') === 'INSTANT_GOJEK' ? 'GoJek Instant' : (($order['metode_pengiriman'] ?? '') === 'EKSPEDISI_JNT' ? 'J&T Express' : 'JNE Express')) ?></div>
-                    </div>
-
-                    <form action="/?action=admin-order-resi-save" method="POST">
+                <div class="resi-layout">
+                    <form class="form-card shipping-form" action="/?action=admin-order-resi-save" method="POST">
                         <input type="hidden" name="csrf_token" value="<?= $escape($_SESSION['csrf_token']) ?>">
                         <input type="hidden" name="id_pesanan" value="<?= (int) $order['id_pesanan'] ?>">
 
-                        <div class="section-header">
-                            <div>Rincian Pengiriman</div>
-                            <span class="badge-courier required-badge">Wajib Diisi</span>
+                        <div class="form-section-heading">
+                            <h2>Rincian Pengiriman</h2>
+                            <p>Lengkapi informasi pengiriman untuk pesanan ini.</p>
                         </div>
-                        <div class="section-content">
-                            <div class="form-grid">
-                                <div class="field field-wide">
-                                    <label for="nomor_resi"><?= $escape($trackingLabel) ?></label>
-                                    <input id="nomor_resi" name="nomor_pengiriman"
-                                        type="<?= $isGojek ? 'tel' : 'text' ?>"
-                                        value="<?= $escape($tracking) ?>"
-                                        placeholder="<?= $escape($trackingPlaceholder) ?>"
-                                        maxlength="50"
-                                        <?= $isGojek ? 'inputmode="tel" autocomplete="tel"' : '' ?>
-                                        aria-describedby="trackingHint"
-                                        required>
-                                    <small class="field-hint" id="trackingHint"><?= $escape($trackingHint) ?></small>
-                                </div>
+                        <div class="form-fields">
+                            <div class="field field-wide">
+                                <label for="nomor_resi"><?= $escape($trackingLabel) ?> <span class="required-mark">*</span></label>
+                                <input id="nomor_resi" name="nomor_pengiriman"
+                                    type="<?= $isGojek ? 'tel' : 'text' ?>"
+                                    value="<?= $escape($tracking) ?>"
+                                    placeholder="<?= $escape($trackingPlaceholder) ?>"
+                                    maxlength="50"
+                                    <?= $isGojek ? 'inputmode="tel" autocomplete="tel"' : '' ?>
+                                    aria-describedby="trackingHint"
+                                    required>
+                                <small class="field-hint" id="trackingHint"><?= $escape($trackingHint) ?></small>
                             </div>
 
                             <div class="field field-note">
@@ -180,6 +152,46 @@ $trackingHint = $isGojek
                             <button type="submit" class="button primary"><?= $isGojek ? 'Simpan Nomor Telepon' : 'Simpan Nomor Resi' ?></button>
                         </div>
                     </form>
+
+                    <aside class="order-summary" aria-labelledby="summaryTitle">
+                        <h2 id="summaryTitle">Ringkasan Pesanan</h2>
+                        <div class="summary-invoice">
+                            <div>
+                                <span class="summary-label">Nomor Pesanan</span>
+                                <strong><?= $escape($order['no_invoice'] ?? 'INV/000000') ?></strong>
+                            </div>
+                            <span class="status-badge"><?= $escape($status[0]) ?></span>
+                        </div>
+
+                        <div class="summary-product">
+                            <?php if ($image !== ''): ?>
+                                <div class="product-image"><img src="<?= $escape($image) ?>" alt="<?= $escape($item['nama_produk'] ?? 'Produk') ?>"></div>
+                            <?php else: ?>
+                                <div class="product-image" aria-hidden="true"></div>
+                            <?php endif; ?>
+                            <div class="product-meta">
+                                <strong><?= $escape($item['nama_produk'] ?? 'Produk') ?></strong>
+                                <span><?= $escape($productSize) ?></span>
+                            </div>
+                        </div>
+
+                        <div class="summary-details">
+                            <div class="summary-group">
+                                <span class="summary-label">Pelanggan</span>
+                                <strong><?= $escape($order['nama_pelanggan'] ?? 'Pelanggan') ?></strong>
+                                <span><?= $escape($order['telepon'] ?? '-') ?></span>
+                            </div>
+                            <div class="summary-group">
+                                <span class="summary-label">Pengiriman</span>
+                                <strong><?= $escape($courierLabel) ?></strong>
+                                <span><?= nl2br($escape($customerAddress !== '' ? $customerAddress : 'Alamat belum tersedia')) ?></span>
+                            </div>
+                            <div class="summary-group summary-date">
+                                <span class="summary-label">Tanggal Pesanan</span>
+                                <span><?= $escape($deliveryDate) ?></span>
+                            </div>
+                        </div>
+                    </aside>
                 </div>
             </div>
         </main>
