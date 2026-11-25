@@ -4,14 +4,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const resiNumberValue = document.getElementById('resiNumberValue');
     const resiModalSubtitle = document.getElementById('resiModalSubtitle');
     const resiCourierValue = document.getElementById('resiCourierValue');
-    const resiCourierService = document.getElementById('resiCourierService');
+    const resiTrackingStatus = document.getElementById('resiTrackingStatus');
     const resiCustomerName = document.getElementById('resiCustomerName');
     const resiCustomerPhone = document.getElementById('resiCustomerPhone');
     const resiCustomerAddress = document.getElementById('resiCustomerAddress');
     const resiProductName = document.getElementById('resiProductName');
     const resiProductMeta = document.getElementById('resiProductMeta');
     const resiProductNote = document.getElementById('resiProductNote');
+    const resiOrderDate = document.getElementById('resiOrderDate');
     const copyResiBtn = document.getElementById('copyResiBtn');
+    const copyResiLabel = copyResiBtn ? copyResiBtn.querySelector('span') : null;
 
     let activeResi = '';
     const trackingFilters = document.querySelectorAll('[data-tracking-filter]');
@@ -19,34 +21,82 @@ document.addEventListener('DOMContentLoaded', function () {
     const orderSearch = document.getElementById('orderSearch');
     const filterEmptyState = document.querySelector('.filter-empty-state');
     const orderCount = document.getElementById('orderCount');
+    const orderPager = document.getElementById('orderPager');
+    const pageSize = 10;
+    let currentPage = 1;
     let activeTrackingFilter = 'all';
+
+    const renderPager = function (pageCount) {
+        if (!orderPager) {
+            return;
+        }
+
+        orderPager.replaceChildren();
+        if (pageCount <= 1) {
+            return;
+        }
+
+        const addPageButton = function (label, page, options) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'page-number' + (options.active ? ' active' : '');
+            button.textContent = label;
+            button.disabled = options.disabled;
+            if (options.active) {
+                button.setAttribute('aria-current', 'page');
+            }
+            button.addEventListener('click', function () {
+                currentPage = page;
+                filterOrders();
+            });
+            orderPager.appendChild(button);
+        };
+
+        addPageButton('‹ Sebelumnya', Math.max(1, currentPage - 1), { disabled: currentPage === 1 });
+
+        const firstPage = Math.max(1, Math.min(currentPage - 2, pageCount - 4));
+        const lastPage = Math.min(pageCount, firstPage + 4);
+        for (let page = firstPage; page <= lastPage; page += 1) {
+            addPageButton(String(page), page, { active: page === currentPage, disabled: false });
+        }
+
+        addPageButton('Berikutnya ›', Math.min(pageCount, currentPage + 1), { disabled: currentPage === pageCount });
+    };
 
     const filterOrders = function () {
         const searchTerm = orderSearch ? orderSearch.value.trim().toLocaleLowerCase() : '';
-        let visibleCount = 0;
+        const matchingRows = [];
 
         orderRows.forEach(function (row) {
             const matchesFilter = activeTrackingFilter === 'all'
                 || row.dataset.trackingStatus === activeTrackingFilter;
             const matchesSearch = !searchTerm
                 || (row.dataset.search || '').toLocaleLowerCase().includes(searchTerm);
-            const isVisible = matchesFilter && matchesSearch;
-
-            row.hidden = !isVisible;
-            if (isVisible) {
-                visibleCount += 1;
+            if (matchesFilter && matchesSearch) {
+                matchingRows.push(row);
             }
         });
 
+        const pageCount = Math.max(1, Math.ceil(matchingRows.length / pageSize));
+        currentPage = Math.min(currentPage, pageCount);
+        const firstVisibleIndex = (currentPage - 1) * pageSize;
+        const lastVisibleIndex = Math.min(firstVisibleIndex + pageSize, matchingRows.length);
+        const visibleRows = new Set(matchingRows.slice(firstVisibleIndex, lastVisibleIndex));
+        orderRows.forEach(function (row) {
+            row.hidden = !visibleRows.has(row);
+        });
+
         if (filterEmptyState) {
-            filterEmptyState.hidden = visibleCount > 0;
+            filterEmptyState.hidden = matchingRows.length > 0;
         }
 
         if (orderCount) {
-            const totalCount = Number(orderCount.dataset.total || 0);
-            orderCount.textContent = 'Menampilkan ' + visibleCount + ' dari ' + totalCount
-                + ' pesanan yang siap dikirim atau telah dikirim.';
+            const rangeStart = matchingRows.length > 0 ? firstVisibleIndex + 1 : 0;
+            orderCount.textContent = 'Menampilkan ' + rangeStart + '–' + lastVisibleIndex + ' dari '
+                + matchingRows.length + ' pesanan yang siap dikirim atau telah dikirim.';
         }
+
+        renderPager(pageCount);
     };
 
     trackingFilters.forEach(function (button) {
@@ -57,12 +107,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 filterButton.classList.toggle('active', isActive);
                 filterButton.setAttribute('aria-pressed', String(isActive));
             });
+            currentPage = 1;
             filterOrders();
         });
     });
 
     if (orderSearch) {
-        orderSearch.addEventListener('input', filterOrders);
+        orderSearch.addEventListener('input', function () {
+            currentPage = 1;
+            filterOrders();
+        });
     }
 
     filterOrders();
@@ -89,21 +143,25 @@ document.addEventListener('DOMContentLoaded', function () {
         activeResi = detail.resi;
 
         modalTitle.textContent = detail.courierKey === 'INSTANT_GOJEK'
-            ? 'Detail Nomor Telepon & Pengiriman'
-            : 'Detail Nomor Resi & Pengiriman';
+            ? 'Nomor Telepon Kurir Gojek'
+            : 'Nomor Resi Pengiriman';
+        document.getElementById('resiModalIcon').classList.toggle('phone', detail.courierKey === 'INSTANT_GOJEK');
         resiNumberValue.textContent = detail.resi;
         document.getElementById('resiLabelValue').textContent = detail.resiLabel || 'NOMOR RESI PENGIRIMAN';
-        resiModalSubtitle.textContent = 'No. Pesanan: ' + detail.invoice + ' • ' + detail.courier;
+        resiModalSubtitle.textContent = detail.invoice;
         resiCourierValue.textContent = detail.courier;
-        resiCourierService.textContent = detail.courierKey === 'INSTANT_GOJEK' ? 'Pengiriman instan' : 'Layanan ekspedisi';
+        resiTrackingStatus.textContent = detail.trackingStatus || 'Sudah diisi';
+        resiTrackingStatus.classList.toggle('filled', detail.trackingStatus !== 'Belum diisi');
+        resiTrackingStatus.classList.toggle('empty', detail.trackingStatus === 'Belum diisi');
         if (copyResiBtn) {
-            copyResiBtn.textContent = detail.courierKey === 'INSTANT_GOJEK'
-                ? 'Salin Telepon'
-                : 'Salin Resi';
+            if (copyResiLabel) {
+                copyResiLabel.textContent = 'Salin';
+            }
         }
         resiCustomerName.textContent = detail.customer || 'Pelanggan';
         resiCustomerPhone.textContent = detail.phone || '-';
         resiCustomerAddress.textContent = detail.address || 'Alamat belum tersedia';
+        resiOrderDate.textContent = detail.date || '-';
 
         const productText = detail.product || 'Rincian produk tidak tersedia';
         const lines = String(productText).split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
@@ -154,10 +212,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(activeResi).then(function () {
-                    copyResiBtn.textContent = 'Tersalin';
-                    window.setTimeout(function () {
-                        copyResiBtn.textContent = 'Salin Resi';
-                    }, 1200);
+                    if (copyResiLabel) {
+                        copyResiLabel.textContent = 'Tersalin';
+                        window.setTimeout(function () {
+                            copyResiLabel.textContent = 'Salin';
+                        }, 1200);
+                    }
                 });
             } else {
                 const tempInput = document.createElement('input');
@@ -166,10 +226,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 tempInput.select();
                 document.execCommand('copy');
                 document.body.removeChild(tempInput);
-                copyResiBtn.textContent = 'Tersalin';
-                window.setTimeout(function () {
-                    copyResiBtn.textContent = 'Salin Resi';
-                }, 1200);
+                if (copyResiLabel) {
+                    copyResiLabel.textContent = 'Tersalin';
+                    window.setTimeout(function () {
+                        copyResiLabel.textContent = 'Salin';
+                    }, 1200);
+                }
             }
         });
     }
