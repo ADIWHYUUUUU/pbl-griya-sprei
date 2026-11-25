@@ -6,16 +6,21 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require_once __DIR__ . '/../app/config/database.php';
+require_once __DIR__ . '/../app/helpers/payment_deadline.php';
 
 try {
     $pdo->beginTransaction();
 
+    $paymentDeadline = PAYMENT_DEADLINE_SQL;
     $statement = $pdo->query(
         "WITH expired_orders AS (
             SELECT p.id_pesanan
             FROM public.pesanan AS p
             WHERE p.status_pesanan::text IN ('MENUNGGU_VERIFIKASI', 'MENUNGGU_PEMBAYARAN')
-              AND p.tanggal_pesan < CURRENT_TIMESTAMP - INTERVAL '48 hours'
+              AND CASE WHEN p.status_pesanan::text = 'MENUNGGU_PEMBAYARAN'
+                       THEN ($paymentDeadline)
+                       ELSE p.tanggal_pesan + INTERVAL '48 hours'
+                  END <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
               AND NOT EXISTS (
                   SELECT 1
                   FROM public.pembayaran AS b

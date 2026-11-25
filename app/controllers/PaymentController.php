@@ -67,6 +67,9 @@ class PaymentController
         if ($order['payment'] && $order['payment']['status_pembayaran'] !== 'DITOLAK') {
             $this->setError($orderId, 'Pembayaran sebelumnya masih diproses atau sudah diverifikasi.');
         }
+        if ((int) $order['pembayaran_kedaluwarsa'] === 1) {
+            $this->setError($orderId, 'Batas waktu pembayaran sudah lewat.');
+        }
 
         $config = require __DIR__ . '/../config/payment.php';
         $method = $_POST['metode_pembayaran'] ?? '';

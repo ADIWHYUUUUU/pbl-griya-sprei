@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/payment_deadline.php';
+
 class OrderModel
 {
     private PDO $pdo;
@@ -11,12 +13,14 @@ class OrderModel
 
     public function getCustomerOrders(int $customerId): array
     {
+        $paymentDeadline = PAYMENT_DEADLINE_SQL;
         $statement = $this->pdo->prepare(
             "SELECT
                 p.id_pesanan,
                 COALESCE(p.no_invoice, 'ORD-' || p.id_pesanan::text) AS kode,
                 p.tanggal_pesan,
                 p.tanggal_verifikasi_admin,
+                ($paymentDeadline) AS batas_pembayaran,
                 p.status_pesanan::text AS status_pesanan,
                 p.alamat_pengiriman,
                 p.catatan_alamat,
@@ -73,6 +77,7 @@ class OrderModel
                     'kode' => (string) $row['kode'],
                     'tanggal_pesan' => $row['tanggal_pesan'],
                     'tanggal_verifikasi_admin' => $row['tanggal_verifikasi_admin'],
+                    'batas_pembayaran' => $row['batas_pembayaran'],
                     'status_pesanan' => (string) $row['status_pesanan'],
                     'alamat_pengiriman' => (string) $row['alamat_pengiriman'],
                     'catatan_alamat' => (string) ($row['catatan_alamat'] ?? ''),

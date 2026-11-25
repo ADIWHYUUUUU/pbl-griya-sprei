@@ -1,17 +1,19 @@
 {
     "19": {
-        "57": "MENUNGGU_VERIFIKASI|0|",
-        "54": "MENUNGGU_VERIFIKASI|0|",
-        "53": "MENUNGGU_PEMBAYARAN|0|",
-        "55": "MENUNGGU_PEMBAYARAN|0|",
-        "51": "DIBATALKAN|1|",
-        "49": "DIBATALKAN|0|",
-        "31": "DIKIRIM|1|GJK123456789",
-        "29": "DIPROSES|1|",
-        "26": "DIBATALKAN|0|",
-        "25": "SELESAI|0|",
-        "24": "DIBATALKAN|0|",
-        "16": "DIPROSES|0|"
+        "91": "MENUNGGU_PEMBAYARAN|1||",
+        "73": "DIBATALKAN|0||",
+        "57": "DIBATALKAN|0||",
+        "54": "DIBATALKAN|0||",
+        "53": "DIBATALKAN|0||",
+        "55": "DIBATALKAN|0||",
+        "51": "DIBATALKAN|1||",
+        "49": "DIBATALKAN|0||",
+        "31": "DIKIRIM|1||GJK123456789",
+        "29": "DIPROSES|1||",
+        "26": "DIBATALKAN|0||",
+        "25": "SELESAI|0||",
+        "24": "DIBATALKAN|0||",
+        "16": "DIPROSES|0||"
     },
     "14": {
         "86": "DIBATALKAN|0||",
