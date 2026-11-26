@@ -67,8 +67,8 @@ $assetUrl = static function (string $path): string {
                 <?php endif; ?>
                 <section class="product-form-section">
                     <h2><span>1</span>Jenis Produk</h2>
-                    <p><?= $isEdit ? 'Kategori ditetapkan saat produk ditambahkan.' : 'Pilih kategori dulu, isian ukuran akan menyesuaikan.' ?></p>
-                    <fieldset class="product-categories" aria-label="Kategori" <?= $isEdit ? 'disabled' : '' ?>>
+                    <p>Pilih kategori produk. Isian ukuran akan menyesuaikan.</p>
+                    <fieldset class="product-categories" aria-label="Kategori">
                         <label><input type="radio" name="kategori_produk" value="SPREI" <?= $category === 'SPREI' ? 'checked' : '' ?>><strong>Sprei</strong><small>Fitted sheet, ada tinggi karet</small></label>
                         <label><input type="radio" name="kategori_produk" value="BED_COVER" <?= $category === 'BED_COVER' ? 'checked' : '' ?>><strong>Bed Cover</strong><small>Hanya panjang &amp; lebar</small></label>
                         <label><input type="radio" name="kategori_produk" value="SARUNG_BANTAL_GULING" <?= $category === 'SARUNG_BANTAL_GULING' ? 'checked' : '' ?>><strong>Sarung Bantal &amp; Guling</strong><small>Hanya panjang &amp; lebar</small></label>

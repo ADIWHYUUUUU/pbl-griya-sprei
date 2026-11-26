@@ -291,7 +291,11 @@ class ProductController
         // =====================================
 
         $nama = trim($_POST['nama_produk'] ?? '');
-        $kategori = $this->normalizeProductCategory($product['kategori_produk']);
+        $savedCategory = $this->normalizeProductCategory($product['kategori_produk']);
+        $categoryInput = $_POST['kategori_produk'] ?? $savedCategory;
+        $kategori = is_string($categoryInput)
+            ? $this->normalizeProductCategory(trim($categoryInput))
+            : '';
         $jenisKain = trim($_POST['jenis_kain'] ?? '');
         $motifInput = $_POST['motif'] ?? '';
         if (!is_string($motifInput)) {
@@ -318,7 +322,7 @@ class ProductController
 
         if ($kategori === 'BED_COVER' && !array_key_exists('tinggi_standar', $_POST)) {
             $savedHeight = (int) ($product['tinggi_standar'] ?? 0);
-            $tinggi = $savedHeight > 0
+            $tinggi = $savedCategory === $kategori && $savedHeight > 0
                 ? $savedHeight
                 : (product_pricing_options($kategori)[$jenisKain]['height'] ?? false);
         }
@@ -417,6 +421,7 @@ class ProductController
 
         $data = [
             'nama_produk'     => $nama,
+            'kategori_produk' => $kategori,
             'jenis_kain'      => $jenisKain,
             'motif'           => $motif,
             'panjang_standar' => $panjang,
