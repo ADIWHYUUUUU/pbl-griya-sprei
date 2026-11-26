@@ -1,0 +1,296 @@
+.detail-pesanan {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 24px 56px;
+  color: #232321;
+  font: 400 14px Inter, system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.detail-muted {
+  color: #5f5f5a;
+  font-size: 13.5px;
+}
+
+.detail-pesanan-back {
+  display: inline-block;
+  margin: 14px 0 6px;
+  color: #4f6350;
+  font-weight: 600;
+}
+
+.detail-pesanan-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.detail-pesanan-heading h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+}
+
+.detail-pesanan-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-pesanan .badge {
+  white-space: normal;
+}
+
+.detail-pesanan > .kotak-status {
+  margin-bottom: 20px;
+}
+
+.detail-pesanan-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  gap: 24px;
+}
+
+.detail-pesanan-card {
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  border: 1px solid #e6e3dc;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.detail-pesanan-card h2 {
+  margin: 0 0 14px;
+  font-size: 16px;
+}
+
+.detail-pesanan-item {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid #ece9e2;
+}
+
+.detail-pesanan-item:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.detail-pesanan-item:last-child {
+  padding-bottom: 0;
+}
+
+.detail-pesanan-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid #e6e3dc;
+  border-radius: 10px;
+  background: #ecece8;
+}
+
+.detail-pesanan-price {
+  display: grid;
+  gap: 3px;
+  text-align: right;
+}
+
+.detail-pesanan-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+  gap: 10px 16px;
+}
+
+.detail-pesanan-facts dt {
+  color: #5f5f5a;
+}
+
+.detail-pesanan-facts dd {
+  margin: 0;
+  font-weight: 500;
+}
+
+.detail-pesanan-proof {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid #e6e3dc;
+  border-radius: 10px;
+  background: #f6f4f0;
+}
+
+.detail-pesanan-proof div {
+  flex: 1;
+  min-width: 110px;
+}
+
+.detail-pesanan-proof small {
+  display: block;
+  font-size: 12.5px;
+}
+
+.detail-proof-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 8px;
+  background: #dfe7de;
+  color: #2f5a2b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.detail-pesanan-totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 6px;
+}
+
+.detail-pesanan-totals dd {
+  margin: 0;
+  text-align: right;
+}
+
+.detail-pesanan-totals .detail-pesanan-total {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid #ece9e2;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.detail-pesanan-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.detail-pesanan-actions:empty {
+  display: none;
+}
+
+.detail-pesanan .tombol {
+  min-height: 44px;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.detail-pesanan .tombol-garis {
+  border-color: #d9d5cb;
+}
+
+.detail-pesanan-actions .tombol {
+  width: 100%;
+}
+
+.detail-summary-note {
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+
+.detail-pesanan-timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail-pesanan-timeline li {
+  position: relative;
+  padding: 0 0 18px 34px;
+}
+
+.detail-pesanan-timeline li::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #4f6350;
+  border-radius: 50%;
+  background: #4f6350;
+}
+
+.detail-pesanan-timeline li::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  bottom: 0;
+  left: 7px;
+  width: 2px;
+  background: #4f6350;
+}
+
+.detail-pesanan-timeline li:last-child {
+  padding-bottom: 0;
+}
+
+.detail-pesanan-timeline li:last-child::after {
+  display: none;
+}
+
+.detail-pesanan-timeline .detail-timeline-current::before {
+  background: #fff;
+  box-shadow: 0 0 0 4px #dfe7de;
+}
+
+.detail-pesanan-timeline strong,
+.detail-pesanan-timeline span {
+  display: block;
+}
+
+@media (max-width: 860px) {
+  .detail-pesanan-columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-pesanan {
+    padding: 24px 16px 36px;
+  }
+
+  .detail-pesanan-heading h1 {
+    font-size: 21px;
+  }
+
+  .detail-pesanan-card {
+    padding: 16px;
+  }
+
+  .detail-pesanan-item {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .detail-pesanan-thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .detail-pesanan-price {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .detail-pesanan-facts {
+    grid-template-columns: minmax(0, 105px) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .detail-pesanan-proof {
+    grid-column: 1 / -1;
+  }
+}

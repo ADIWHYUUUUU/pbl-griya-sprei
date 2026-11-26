@@ -294,6 +294,49 @@ class OrderModel
         return $statement->rowCount() === 1;
     }
 
+    public function changeCustomerOrderStatus(int $orderId, int $customerId, string $newStatus): bool
+    {
+        if (!in_array($newStatus, ['DIBATALKAN', 'SELESAI'], true)) {
+            throw new InvalidArgumentException('Status tujuan tidak valid.');
+        }
+
+        $this->pdo->beginTransaction();
+        try {
+            $lock = $this->pdo->prepare(
+                'SELECT status_pesanan::text FROM pesanan
+                 WHERE id_pesanan = :id AND id_user = :customer FOR UPDATE'
+            );
+            $params = ['id' => $orderId, 'customer' => $customerId];
+            $lock->execute($params);
+            $previousStatus = $lock->fetchColumn();
+            $allowed = $newStatus === 'SELESAI'
+                ? $previousStatus === 'DIKIRIM'
+                : in_array($previousStatus, ['MENUNGGU_VERIFIKASI', 'MENUNGGU_PEMBAYARAN'], true);
+
+            if ($allowed && $newStatus === 'DIBATALKAN') {
+                $payment = $this->pdo->prepare(
+                    "SELECT 1 FROM pembayaran WHERE id_pesanan = :id
+                     AND status_pembayaran::text IN ('MENUNGGU_VERIFIKASI', 'TERVERIFIKASI') LIMIT 1"
+                );
+                $payment->execute(['id' => $orderId]);
+                $allowed = $payment->fetchColumn() === false;
+            }
+
+            if ($allowed) {
+                $update = $this->pdo->prepare(
+                    'UPDATE pesanan SET status_pesanan = CAST(:status AS status_pesanan_enum)
+                     WHERE id_pesanan = :id AND id_user = :customer'
+                );
+                $update->execute($params + ['status' => $newStatus]);
+            }
+            $this->pdo->commit();
+            return $allowed || $previousStatus === $newStatus;
+        } catch (Throwable $error) {
+            $this->pdo->rollBack();
+            throw $error;
+        }
+    }
+
     public function changeAdminOrderStatus(int $orderId, string $newStatus): void
     {
         $transitions = [

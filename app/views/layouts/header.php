@@ -41,7 +41,7 @@ $activeNavPage = match ($currentPage) {
     'customer-catalog', 'customer-detail' => 'catalog',
     'customer-cart' => '',
     'customer-about' => 'about',
-    'customer-orders', 'customer-payment', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
+    'customer-orders', 'customer-order-detail', 'customer-payment', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php' => 'orders',
     default => '',
 };
 

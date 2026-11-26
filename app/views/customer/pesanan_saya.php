@@ -17,30 +17,7 @@ function rupiah($amount): string
     return 'Rp ' . number_format((float) $amount, 0, ',', '.');
 }
 
-function tanggal($value): string
-{
-    $timestamp = new DateTimeImmutable((string) $value, new DateTimeZone('UTC'));
-    return str_replace(
-        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-        $timestamp->setTimezone(new DateTimeZone('Asia/Jakarta'))->format('d M Y, H:i')
-    );
-}
-
-function sisaWaktuPembayaran(int $seconds): string
-{
-    $minutes = (int) ceil($seconds / 60);
-    $days = intdiv($minutes, 1440);
-    $hours = intdiv($minutes % 1440, 60);
-
-    if ($days > 0) {
-        return $days . ' hari' . ($hours > 0 ? ' ' . $hours . ' jam' : '');
-    }
-
-    return $hours > 0
-        ? $hours . ' jam' . ($minutes % 60 > 0 ? ' ' . ($minutes % 60) . ' menit' : '')
-        : $minutes . ' menit';
-}
+require_once __DIR__ . '/../../helpers/order_display.php';
 
 $customerId = filter_var($_SESSION['id_user'] ?? null, FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1],
@@ -91,57 +68,23 @@ $paymentMethodLabels = [
     'TRANSFER_BSI' => 'Transfer BSI',
     'TRANSFER_MANDIRI' => 'Transfer Mandiri',
 ];
-$dataModal = [];
 foreach ($orders as &$order) {
-    [$statusLabel, $statusClass] = $orderStatusLabels[$order['status_pesanan']]
-        ?? [$order['status_pesanan'], 'tunggu'];
-
-    if ($order['status_pembayaran'] === 'DITOLAK') {
-        $statusLabel = 'Bukti Pembayaran Ditolak';
-        $statusClass = 'tolak';
-    } elseif (
-        $order['status_pesanan'] === 'MENUNGGU_PEMBAYARAN'
-        && $order['status_pembayaran'] === 'MENUNGGU_VERIFIKASI'
-    ) {
-        $statusLabel = 'Menunggu Verifikasi Pembayaran';
-        $statusClass = 'tunggu';
-    }
-
-    $productNames = [];
-    $productSpecs = [];
+    $productNames = array_column($order['produk'], 'nama');
     $extras = [];
-    $itemNotes = [];
     foreach ($order['produk'] as $product) {
-        $productNames[] = $product['nama'];
-        $size = $product['tinggi'] === null
-            ? sprintf('%d × %d cm', $product['panjang'], $product['lebar'])
-            : sprintf('%d × %d × %d cm', $product['panjang'], $product['lebar'], $product['tinggi']);
-        $productSpecs[] = sprintf(
-            '%s: %s · %d pcs',
-            $product['tipe_ukuran'] === 'CUSTOM' ? 'Custom' : 'Standar',
-            $size,
-            $product['jumlah']
-        );
         if ($product['tambah_sarban'] > 0) {
             $extras[] = $product['tambah_sarban'] . ' sarung bantal';
         }
         if ($product['tambah_sargul'] > 0) {
             $extras[] = $product['tambah_sargul'] . ' sarung guling';
         }
-        if ($product['catatan'] !== '') {
-            $itemNotes[] = $product['nama'] . ': ' . $product['catatan'];
-        }
     }
 
-    $order['status_label'] = $statusLabel;
-    $order['status_class'] = $statusClass;
     $order['tagihan_final'] = !in_array($order['status_pesanan'], ['MENUNGGU_VERIFIKASI', 'DIBATALKAN'], true);
     $order['lunas'] = $order['status_pembayaran'] === 'TERVERIFIKASI'
         || in_array($order['status_pesanan'], ['DIPROSES', 'DIKIRIM', 'SELESAI'], true);
     $order['nama_produk'] = $productNames === [] ? 'Produk tidak tersedia' : implode(', ', $productNames);
-    $order['spesifikasi'] = implode("\n", $productSpecs);
     $order['tambahan'] = $extras === [] ? '-' : implode(', ', array_unique($extras));
-    $order['catatan_produk'] = $itemNotes === [] ? '-' : implode("\n", $itemNotes);
     $order['gambar'] = '';
     foreach ($order['produk'] as $product) {
         if ($product['gambar'] !== '') {
@@ -150,36 +93,6 @@ foreach ($orders as &$order) {
         }
     }
 
-    $dataModal[$order['kode']] = [
-        'kode' => $order['kode'],
-        'status' => $statusLabel,
-        'tagihan' => $order['tagihan_final'] ? rupiah($order['total']) : 'Belum ditetapkan',
-        'produk' => $order['nama_produk'],
-        'spesifikasi' => $order['spesifikasi'],
-        'tambahan' => $order['tambahan'],
-        'catatan_produk' => $order['catatan_produk'],
-        'alamat' => $order['alamat_pengiriman'],
-        'catatan_alamat' => $order['catatan_alamat'],
-        'pengiriman' => $shippingLabels[$order['metode_pengiriman']] ?? $order['metode_pengiriman'],
-        'catatan_pengiriman' => $order['catatan_pengiriman'],
-        'resi' => $order['metode_pengiriman'] === 'INSTANT_GOJEK'
-            ? ($order['nomor_telepon_kurir'] ?? '')
-            : ($order['nomor_resi'] ?? ''),
-        'resi_label' => $order['metode_pengiriman'] === 'INSTANT_GOJEK'
-            ? 'Nomor telepon kurir'
-            : 'Nomor resi',
-        'status_pembayaran' => match ($order['status_pembayaran']) {
-            'MENUNGGU_VERIFIKASI' => 'Menunggu verifikasi pembayaran',
-            'TERVERIFIKASI' => 'Terverifikasi',
-            'DITOLAK' => 'Ditolak',
-            default => 'Belum ada pembayaran',
-        },
-        'metode_pembayaran' => $paymentMethodLabels[$order['metode_pembayaran']] ?? '-',
-        'nominal_transfer' => $order['nominal_transfer'] === null
-            ? '-'
-            : rupiah($order['nominal_transfer']),
-        'catatan_admin' => $order['catatan_admin'],
-    ];
 }
 unset($order);
 ?>
@@ -251,7 +164,7 @@ unset($order);
                     ? (new DateTimeImmutable($order['batas_pembayaran'], new DateTimeZone('UTC')))->getTimestamp() - time()
                     : 0;
                 [$cardStatusLabel, $cardStatusClass] = $orderStatusLabels[$order['status_pesanan']]
-                    ?? [$order['status_label'], $order['status_class']];
+                    ?? [$order['status_pesanan'], 'netral'];
                 $paymentMethod = $paymentMethodLabels[$order['metode_pembayaran']] ?? '';
                 $paymentBank = $paymentMethod !== '' ? ' (' . substr($paymentMethod, strlen('Transfer ')) . ')' : '';
                 [$paymentLabel, $paymentClass] = match (true) {
@@ -385,7 +298,11 @@ unset($order);
 
                     <div class="pesanan-aksi">
                         <div class="kiri">
-                            <button type="button" class="tombol tombol-garis" data-buka-detail="<?= e($order['kode']) ?>">Lihat Detail</button>
+                            <?php if ($order['status_pesanan'] === 'DIBATALKAN'): ?>
+                                <button type="button" class="tombol tombol-garis" disabled>Lihat Detail</button>
+                            <?php else: ?>
+                                <a class="tombol tombol-garis" href="/?page=customer-order-detail&amp;id=<?= (int) $order['id_pesanan'] ?>">Lihat Detail</a>
+                            <?php endif; ?>
                             <?php if ($needsPayment && $secondsRemaining > 0): ?>
                                 <a class="tombol" href="/?page=customer-payment&amp;id=<?= (int) $order['id_pesanan'] ?>">
                                     <?= $order['status_pembayaran'] === 'DITOLAK' ? 'Unggah Ulang Bukti Pembayaran' : 'Bayar Sekarang' ?>
@@ -399,49 +316,7 @@ unset($order);
         </div>
     </main>
 
-    <div class="modal-latar" id="modalDetail">
-        <div class="modal modal-lebar" role="dialog" aria-modal="true" aria-labelledby="detailJudul">
-            <div class="modal-kepala">
-                <div>
-                    <h2 id="detailJudul">Detail Pesanan <span class="kode-kecil">[<span data-isi="kode"></span>]</span></h2>
-                    <small>Status: <span data-isi="status"></span></small>
-                </div>
-                <button type="button" class="tutup-modal" data-tutup-modal aria-label="Tutup">×</button>
-            </div>
-            <div class="modal-isi">
-                <section class="bagian-detail">
-                    <div class="judul-detail"><b>RINCIAN PESANAN</b></div>
-                    <h3 data-isi="produk"></h3>
-                    <p class="kutipan" data-isi="spesifikasi"></p>
-                    <p><small>Kelengkapan:</small> <span data-isi="tambahan"></span></p>
-                    <p><small>Catatan produk:</small></p>
-                    <p class="kutipan" data-isi="catatan_produk"></p>
-                </section>
-                <section class="bagian-detail">
-                    <div class="judul-detail"><b>PENGIRIMAN &amp; PEMBAYARAN</b></div>
-                    <p><small>Total tagihan:</small> <b data-isi="tagihan"></b></p>
-                    <p><small>Metode pengiriman:</small> <span data-isi="pengiriman"></span></p>
-                    <p><small>Alamat:</small> <span data-isi="alamat"></span></p>
-                    <p><small>Catatan alamat:</small> <span data-isi="catatan_alamat"></span></p>
-                    <p><small>Catatan pengiriman:</small> <span data-isi="catatan_pengiriman"></span></p>
-                    <p><small data-isi="resi_label"></small> <span data-isi="resi"></span></p>
-                    <p><small>Status pembayaran:</small> <span data-isi="status_pembayaran"></span></p>
-                    <p><small>Metode pembayaran:</small> <span data-isi="metode_pembayaran"></span></p>
-                    <p><small>Nominal transfer:</small> <span data-isi="nominal_transfer"></span></p>
-                    <div class="catatan-admin" id="detailCatatanAdmin">
-                        <b>Catatan Admin:</b>
-                        <p data-isi="catatan_admin"></p>
-                    </div>
-                </section>
-            </div>
-            <div class="modal-kaki">
-                <button type="button" class="tombol tombol-garis" data-tutup-modal>Tutup</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="application/json" id="dataPesanan"><?= json_encode($dataModal, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
-    <script src="/assets/js/customer/pesanan_saya.js"></script>
+    <script src="/assets/js/customer/pesanan_saya.js?v=<?= filemtime(__DIR__ . '/../../../public/assets/js/customer/pesanan_saya.js') ?>"></script>
     <?php require __DIR__ . '/../layouts/footer.php'; ?>
 </body>
 </html>

@@ -199,7 +199,7 @@ if ($action !== '') {
 $pages = require __DIR__ . '/../routes/web.php';
 $page = $_GET['page'] ?? 'customer-home';
 
-$orderPages = ['customer-orders', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php'];
+$orderPages = ['customer-orders', 'customer-order-detail', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php'];
 if (
 	in_array($page, $orderPages, true)
 	&& (($_SESSION['login'] ?? false) !== true || ($_SESSION['role'] ?? '') !== 'CUSTOMER')

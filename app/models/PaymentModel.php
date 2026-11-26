@@ -18,8 +18,10 @@ class PaymentModel
     public function getCustomerOrder(int $orderId, int $userId): ?array
     {
         $statement = $this->pdo->prepare(
-            'SELECT p.id_pesanan, p.no_invoice, p.tanggal_pesan,
+            'SELECT p.id_pesanan, p.no_invoice, p.tanggal_pesan, p.tanggal_verifikasi_admin,
+                   p.nomor_resi, p.nomor_telepon_kurir,
                    p.status_pesanan::text AS status_pesanan,
+                   (' . PAYMENT_DEADLINE_SQL . ') AS batas_pembayaran,
                    CASE WHEN (' . PAYMENT_DEADLINE_SQL . ") <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
                         THEN 1 ELSE 0 END AS pembayaran_kedaluwarsa,
                    p.alamat_pengiriman, p.catatan_alamat,
@@ -39,7 +41,8 @@ class PaymentModel
         $itemStatement = $this->pdo->prepare(
             'SELECT d.jumlah, COALESCE(d.harga_satuan, produk.harga_dasar) AS harga_satuan,
                     d.panjang, d.lebar, d.tinggi, d.tambah_sarban, d.tambah_sargul,
-                    d.tipe_ukuran::text AS tipe_ukuran, produk.nama_produk
+                    d.tipe_ukuran::text AS tipe_ukuran, d.catatan_pesanan,
+                    produk.nama_produk, produk.gambar_produk
              FROM detail_pesanan d
              JOIN produk ON produk.id_produk = d.id_produk
              WHERE d.id_pesanan = :id_pesanan
@@ -52,7 +55,9 @@ class PaymentModel
             'SELECT id_pembayaran, metode_pembayaran::text AS metode_pembayaran,
                     nominal_transfer, bukti_transfer,
                     status_pembayaran::text AS status_pembayaran,
-                    bukti_nama_asli, bukti_ukuran, bukti_mime
+                    bukti_nama_asli, bukti_ukuran, bukti_mime, tanggal_upload,
+                    catatan_admin, tanggal_verifikasi, nama_pemilik_pengirim,
+                    RIGHT(nomor_rekening_pengirim, 4) AS akhir_rekening
              FROM pembayaran
              WHERE id_pesanan = :id_pesanan
              ORDER BY tanggal_upload DESC, id_pembayaran DESC
