@@ -22,9 +22,9 @@ main.container + .footer {
 /* Filter katalog */
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(200px, 2fr) repeat(3, minmax(140px, 1fr));
-  gap: 10px;
-  margin: 24px 0 10px;
+  grid-template-columns: minmax(240px, 2fr) repeat(2, minmax(170px, 1fr));
+  gap: 12px;
+  margin: 22px 0 14px;
 }
 .search {
   display: flex;
@@ -71,6 +71,7 @@ main.container + .footer {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-top: 4px;
 }
 .catalog-categories__label {
   font-size: 12px;
@@ -82,7 +83,7 @@ main.container + .footer {
   gap: 8px;
 }
 .category-chip {
-  min-height: 40px;
+  min-height: 38px;
   padding: 0 18px;
   color: var(--text);
   background: var(--white);

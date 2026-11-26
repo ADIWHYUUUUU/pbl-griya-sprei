@@ -108,13 +108,6 @@ $email     = "griyasprei@gmail.com";
         <option value="MICROTENCEL">Microtencel</option>
         <option value="MICROTEX">Microtex</option>
       </select>
-      <select class="select filter-select" id="sizeFilter" aria-label="Filter ukuran">
-        <option value="all">Filter Ukuran (Semua)</option>
-        <option value="160 × 200 × 30">160 × 200 × 30</option>
-        <option value="180 × 200 × 30">180 × 200 × 30</option>
-        <option value="180 × 200 × 35">180 × 200 × 35</option>
-        <option value="200 × 200 × 35">200 × 200 × 35</option>
-      </select>
       <select class="select filter-select" id="priceSort" aria-label="Urutkan harga">
         <option value="default">Urutkan Harga</option>
         <option value="price-low">Harga Terendah</option>

@@ -4,7 +4,6 @@ const searchInput = document.getElementById("searchInput");
 const categoryFilters = document.getElementById("categoryFilters");
 const fabricFilter = document.getElementById("fabricFilter");
 const priceSort = document.getElementById("priceSort");
-const sizeFilter = document.getElementById("sizeFilter");
 const catalogSummary = document.getElementById("catalogSummary");
 const resetFilters = document.getElementById("resetFilters");
 const products = Array.isArray(window.catalogProducts) ? window.catalogProducts : [];
@@ -57,7 +56,6 @@ function setActiveCategory(category, updateHistory = false) {
 function getFilteredProducts() {
   const query = searchInput.value.trim().toLocaleLowerCase("id-ID");
   const selectedFabric = fabricFilter.value;
-  const selectedSize = sizeFilter.value;
   const matchingProducts = products.filter((product) => {
     const searchableText = [product.name, product.type, product.fabricLabel, product.desc, product.size]
       .join(" ")
@@ -65,7 +63,6 @@ function getFilteredProducts() {
     return (
       (activeCategory === "all" || product.category === activeCategory) &&
       (selectedFabric === "all" || product.fabric === selectedFabric) &&
-      (selectedSize === "all" || product.size === selectedSize) &&
       searchableText.includes(query)
     );
   });
@@ -194,15 +191,9 @@ priceSort.addEventListener("change", () => {
   renderProducts();
 });
 
-sizeFilter.addEventListener("change", () => {
-  currentPage = 1;
-  renderProducts();
-});
-
 resetFilters.addEventListener("click", () => {
   searchInput.value = "";
   fabricFilter.value = "all";
-  sizeFilter.value = "all";
   priceSort.value = "default";
   setActiveCategory("all", true);
 });
