@@ -14,6 +14,9 @@ if (orderForm) {
   const standardSizeText = document.getElementById("standardSizeText");
   const selectedSizeLabel = document.getElementById("selectedSizeLabel");
   const standardStock = document.getElementById("standardStock");
+  const quantityStepper = document.getElementById("qtySprei")?.closest("[data-stepper]");
+  const submitButton = orderForm.querySelector(".btn-cart");
+  const stock = Number(orderForm.dataset.stock);
   const hiddenQuantities = {
     qtySprei: document.getElementById("qtySpreiInput"),
     qtyBantal: document.getElementById("qtyBantalInput"),
@@ -45,6 +48,18 @@ if (orderForm) {
     modeInput.value = mode;
     orderForm.classList.toggle("is-standard", isStandard);
     if (standardStock) standardStock.hidden = !isStandard;
+    if (quantityStepper) {
+      const maximum = isStandard ? Math.max(1, Math.min(50, stock)) : 50;
+      quantityStepper.dataset.max = String(maximum);
+      const output = quantityStepper.querySelector("output");
+      if (stock > 0 && Number(output.textContent.trim()) > maximum) {
+        output.textContent = String(maximum);
+      }
+      updateStepper(quantityStepper);
+    }
+    if (submitButton) {
+      submitButton.disabled = isStandard && stock <= 0;
+    }
 
     modeButtons.forEach((button) => {
       const selected = button.dataset.mode === mode;
@@ -126,9 +141,15 @@ if (orderForm) {
     }
 
     const quantity = Number(hiddenQuantities.qtySprei.value);
-    const stock = Number(orderForm.dataset.stock);
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > stock) {
-      showMessage("Jumlah sprei melebihi stok yang tersedia.");
+    if (
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      quantity > 50 ||
+      (modeInput.value === "standard" && quantity > stock)
+    ) {
+      showMessage(modeInput.value === "custom"
+        ? "Jumlah pesanan maksimal 50."
+        : "Jumlah sprei melebihi stok yang tersedia.");
       event.preventDefault();
     }
   });
