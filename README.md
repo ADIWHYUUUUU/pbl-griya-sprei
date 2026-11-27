@@ -52,17 +52,65 @@ Atau buka file `database/migrations/21_password_reset_state_table.sql` di pgAdmi
 
 Pengiriman email nyata belum teruji sampai API key Brevo dan alamat pengirim terverifikasi diisi pada `.env`.
 
-## Auto-cancel pesanan kedaluwarsa
+## Auto-cancel pesanan kedaluwarsa (Supabase Cron)
 
-Job `scripts/auto_cancel_orders.php` membatalkan pesanan yang berumur **lebih dari 48 jam** dan masih berstatus `MENUNGGU_VERIFIKASI` atau `MENUNGGU_PEMBAYARAN`. Waktu dihitung sejak `tanggal_pesan`. Pesanan dengan pembayaran yang sedang menunggu verifikasi atau sudah terverifikasi, serta pesanan yang sudah diproses/dikirim/selesai, tidak dibatalkan. Data pesanan dan riwayat pembayaran tidak dihapus.
+Auto-cancel dijalankan langsung oleh PostgreSQL Supabase melalui `pg_cron`, bukan oleh Vercel atau GitHub Actions. Job berjalan setiap lima menit dan memanggil `public.auto_cancel_expired_orders()`.
 
-Atur cron job pada hosting untuk menjalankan script setiap lima menit. Contoh untuk cPanel (sesuaikan lokasi PHP, direktori aplikasi, dan lokasi log):
+Aturan pembatalan:
 
-```cron
-*/5 * * * * /usr/bin/php /home/USER/path-to-app/scripts/auto_cancel_orders.php >> /home/USER/auto-cancel-orders.log 2>&1
+- `MENUNGGU_VERIFIKASI`: dibatalkan setelah 48 jam sejak `tanggal_pesan`.
+- `MENUNGGU_PEMBAYARAN`: dibatalkan setelah 48 jam sejak `tanggal_verifikasi_admin`; bila pembayaran terakhir ditolak, hitungan 48 jam dimulai ulang dari `tanggal_verifikasi` pembayaran yang ditolak.
+- Pesanan dengan pembayaran berstatus `MENUNGGU_VERIFIKASI` atau `TERVERIFIKASI` tidak dibatalkan.
+- Status selain `MENUNGGU_VERIFIKASI` dan `MENUNGGU_PEMBAYARAN` tidak disentuh.
+- Data pesanan dan riwayat pembayaran tidak dihapus.
+
+### Instalasi satu kali
+
+1. Buka **Supabase Dashboard → SQL Editor** pada project database yang dipakai aplikasi.
+2. Jalankan migration `database/migrations/25_auto_cancel_expired_orders.sql`.
+3. Pastikan ekstensi **pg_cron** aktif. Buka **Integrations → Cron** atau **Database → Extensions**, lalu aktifkan `pg_cron` bila belum aktif.
+4. Kembali ke SQL Editor, jalankan `database/jobs/schedule_auto_cancel_expired_orders.sql`.
+5. Buka **Integrations → Cron → Jobs** dan pastikan job `auto-cancel-expired-orders` aktif dengan jadwal `*/5 * * * *`.
+
+### Memantau job
+
+Periksa 20 eksekusi terakhir:
+
+```sql
+SELECT
+    d.runid,
+    d.status,
+    d.start_time,
+    d.end_time,
+    d.return_message
+FROM cron.job_run_details AS d
+JOIN cron.job AS j ON j.jobid = d.jobid
+WHERE j.jobname = 'auto-cancel-expired-orders'
+ORDER BY d.start_time DESC
+LIMIT 20;
 ```
 
-Pastikan job memakai konfigurasi database aplikasi (`.env` atau environment variables hosting) dan PHP CLI memiliki ekstensi PDO PostgreSQL. Karena job berjalan berkala, pembatalan dapat terjadi beberapa menit setelah batas 48 jam.
+Pastikan job terdaftar dan aktif:
+
+```sql
+SELECT jobid, jobname, schedule, active, command
+FROM cron.job
+WHERE jobname = 'auto-cancel-expired-orders';
+```
+
+Untuk menjalankan fungsi secara manual dari SQL Editor:
+
+```sql
+SELECT public.auto_cancel_expired_orders();
+```
+
+**Perhatian:** perintah manual di atas akan benar-benar membatalkan semua pesanan yang sudah kedaluwarsa. Gunakan hanya setelah memeriksa data produksi.
+
+Script `scripts/auto_cancel_orders.php` tetap tersedia untuk eksekusi manual melalui PHP CLI. Script tersebut memanggil fungsi database yang sama agar aturan bisnis tidak memiliki dua versi. Scheduler GitHub Actions lama sudah dihapus agar tidak ada dua scheduler yang berjalan bersamaan.
+
+### Konsistensi waktu
+
+Kolom waktu pesanan dan pembayaran memakai `TIMESTAMP WITHOUT TIME ZONE` dan aplikasi menganggap nilainya UTC. `app/config/database.php` sekarang mengatur zona waktu setiap koneksi PostgreSQL ke UTC. Fungsi database juga membandingkan batas waktu dengan UTC secara eksplisit.
 
 ## Supabase Storage
 

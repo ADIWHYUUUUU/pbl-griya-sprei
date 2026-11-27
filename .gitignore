@@ -2,3 +2,9 @@
 .env.*
 !.env.example
 storage/password-reset-*.json
+# Local Vercel project linkage metadata
+.vercel
+
+# Customer payment proofs are private runtime uploads, never commit them
+/public/uploads/bukti-transfer/*
+!/public/uploads/bukti-transfer/.gitkeep

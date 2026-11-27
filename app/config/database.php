@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 function loadEnv($filePath)
 {
@@ -40,6 +40,11 @@ try {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ]
     );
+
+    // Kolom tanggal_pesan/tanggal_verifikasi_admin/tanggal_upload memakai
+    // TIMESTAMP WITHOUT TIME ZONE dan seluruh nilainya disimpan sebagai UTC.
+    // Setiap koneksi aplikasi harus konsisten agar now() tersimpan sebagai UTC.
+    $pdo->exec("SET TIME ZONE 'UTC'");
 } catch (PDOException $e) {
     throw $e;
 }
