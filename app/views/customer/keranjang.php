@@ -82,12 +82,6 @@ foreach ($items as &$entry) {
 }
 unset($entry);
 
-$perPage = 3;
-$totalPages = max(1, (int) ceil(count($items) / $perPage));
-$page = filter_var($_GET['page_num'] ?? 1, FILTER_VALIDATE_INT);
-$page = max(1, min($totalPages, $page ?: 1));
-$visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
-
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -142,14 +136,14 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             <span data-select-all-label>Pilih Semua</span>
                         </button>
                     </div>
-                    <?php if ($visibleItems === []): ?>
+                    <?php if ($items === []): ?>
                         <div class="kartu kosong">
                             <h2>Keranjang masih kosong.</h2>
                             <p>Pilih produk dari katalog untuk mulai memesan.</p>
                             <a href="/?page=customer-catalog" class="tombol">Lihat Katalog</a>
                         </div>
                     <?php else: ?>
-                        <?php foreach ($visibleItems as $entry): ?>
+                        <?php foreach ($items as $entry): ?>
                             <?php
                             $item = $entry['data'];
                             $product = $entry['product'];
@@ -342,23 +336,6 @@ $visibleItems = array_slice($items, ($page - 1) * $perPage, $perPage);
                             </article>
                         <?php endforeach; ?>
 
-                        <?php if ($totalPages > 1): ?>
-                            <nav class="paginasi" aria-label="Halaman keranjang">
-                                <a href="/?page=customer-cart&amp;page_num=<?= max(1, $page - 1) ?>" aria-label="Halaman sebelumnya" <?= $page === 1 ? 'aria-disabled="true"' : '' ?>>
-                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                        <path d="m15 18-6-6 6-6" />
-                                    </svg>
-                                </a>
-                                <?php for ($number = 1; $number <= $totalPages; $number++): ?>
-                                    <a href="/?page=customer-cart&amp;page_num=<?= $number ?>" class="<?= $page === $number ? 'aktif' : '' ?>" <?= $page === $number ? 'aria-current="page"' : '' ?>><?= $number ?></a>
-                                <?php endfor; ?>
-                                <a href="/?page=customer-cart&amp;page_num=<?= min($totalPages, $page + 1) ?>" aria-label="Halaman berikutnya" <?= $page === $totalPages ? 'aria-disabled="true"' : '' ?>>
-                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                        <path d="m9 18 6-6-6-6" />
-                                    </svg>
-                                </a>
-                            </nav>
-                        <?php endif; ?>
                     <?php endif; ?>
                 </section>
 
