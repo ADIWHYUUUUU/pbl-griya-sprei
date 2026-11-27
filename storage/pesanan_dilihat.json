@@ -46,5 +46,17 @@
         "17": "DIKIRIM|0||"
     },
     "26": [],
-    "16": []
+    "16": [],
+    "29": {
+        "95": "MENUNGGU_PEMBAYARAN|0||",
+        "80": "DIBATALKAN|0||",
+        "79": "MENUNGGU_PEMBAYARAN|0||",
+        "71": "DIKIRIM|1|JNT8954856321|",
+        "70": "SELESAI|2||081456985236",
+        "68": "DIBATALKAN|0||",
+        "67": "DIBATALKAN|0||",
+        "66": "DIBATALKAN|0||",
+        "74": "DIBATALKAN|0||",
+        "72": "DIBATALKAN|0||"
+    }
 }

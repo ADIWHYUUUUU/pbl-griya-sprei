@@ -691,13 +691,25 @@ body.payment-modal-open {
 }
 
 .upload-remove,
-.upload-browse {
+.upload-browse,
+.upload-preview {
   min-height: 44px;
   padding: 0 14px;
   border: 1px solid #d1d0c8;
   border-radius: 9px;
   background: #fff;
   font-size: 14px;
+}
+
+.upload-preview {
+  display: inline-flex;
+  align-items: center;
+  color: #252a23;
+  text-decoration: none;
+}
+
+.upload-preview:hover {
+  background: #f3f4f0;
 }
 
 .upload-remove {
@@ -898,7 +910,8 @@ body.payment-modal-open {
   }
 
   .upload-remove,
-  .upload-browse {
+  .upload-browse,
+  .upload-preview {
     min-height: 44px;
     padding: 0 14px;
     font-size: 14px;
@@ -1237,7 +1250,8 @@ body.payment-modal-open {
   }
 
   .upload-remove,
-  .upload-browse {
+  .upload-browse,
+  .upload-preview {
     min-height: 38px;
     padding: 0 12px;
     border-radius: 8px;

@@ -237,6 +237,7 @@ $copyTotal = fmod($total, 1.0) === 0.0
                             <small class="upload-file-size" aria-live="polite"></small>
                         </span>
                         <span class="upload-actions" hidden>
+                            <a class="upload-preview" target="_blank" rel="noopener" hidden>Lihat gambar</a>
                             <button class="upload-remove" type="button">Hapus file</button>
                             <button class="upload-browse" type="button">Pilih file lain</button>
                         </span>

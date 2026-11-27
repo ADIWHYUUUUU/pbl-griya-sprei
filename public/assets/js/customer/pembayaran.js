@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const proofInput = document.querySelector("#payment-proof");
   const chooseFileButton = document.querySelector(".upload-browse");
   const removeFileButton = document.querySelector(".upload-remove");
+  const previewLink = document.querySelector(".upload-preview");
   const proofName = document.querySelector(".upload-file-name");
   const proofSize = document.querySelector(".upload-file-size");
   const proofIcon = document.querySelector(".upload-file-icon");
@@ -19,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const submitHint = form?.querySelector(".payment-submit-hint");
   const maxProofSize = 8 * 1024 * 1024;
   const accountsAvailable = submitButton ? !submitButton.disabled : false;
+  let previewFile = null;
+  let previewObjectUrl = null;
 
   if (form) {
     const bankOptions = form.querySelectorAll(".method-option");
@@ -111,12 +114,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const file = proofInput.files[0];
     uploadControl.classList.remove("upload-control--dragging");
 
+    if (previewFile !== file) {
+      if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+      }
+      previewFile = file ?? null;
+      previewObjectUrl = file && !getProofError(file) ? URL.createObjectURL(file) : null;
+    }
+
     if (!file) {
       uploadControl.dataset.state = "empty";
       uploadEmpty.hidden = false;
       proofIcon.hidden = true;
       proofName.closest(".upload-file-info").hidden = true;
       uploadActions.hidden = true;
+      previewLink.hidden = true;
+      previewLink.removeAttribute("href");
       uploadHelp.textContent = "JPG atau PNG, maksimal 8 MB. Pastikan nominal dan tanggal terlihat jelas.";
       uploadHelp.classList.remove("upload-help--error");
       submitHint.hidden = false;
@@ -134,6 +147,10 @@ document.addEventListener("DOMContentLoaded", function () {
     proofName.textContent = file.name;
     proofSize.textContent = error?.message ?? `${formatFileSize(file.size)} · siap dikirim`;
     proofIcon.textContent = file.name.split(".").pop().toUpperCase().slice(0, 4) || "FILE";
+    previewLink.hidden = !previewObjectUrl;
+    if (previewObjectUrl) {
+      previewLink.href = previewObjectUrl;
+    }
     uploadHelp.textContent = error?.state === "size-error"
       ? "Coba kompres foto atau ambil tangkapan layar bukti transfer."
       : error?.message ?? "Pastikan nominal dan tanggal transfer terlihat jelas.";
@@ -180,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (uploadControl && proofInput) {
     uploadControl.addEventListener("click", function (event) {
-      if (!event.target.closest("button")) {
+      if (!event.target.closest("button, a")) {
         uploadControl.focus();
         proofInput.click();
       }
@@ -225,4 +242,10 @@ document.addEventListener("DOMContentLoaded", function () {
       updateProofFile();
     });
   }
+
+  window.addEventListener("pagehide", function () {
+    if (previewObjectUrl) {
+      URL.revokeObjectURL(previewObjectUrl);
+    }
+  });
 });
