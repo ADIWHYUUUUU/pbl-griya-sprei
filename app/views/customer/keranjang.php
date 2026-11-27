@@ -81,6 +81,7 @@ foreach ($items as &$entry) {
     $entry['checkout_available'] = in_array($entry['id'], $selectableCartIds, true);
 }
 unset($entry);
+$items = array_reverse($items);
 
 ?>
 <!DOCTYPE html>
@@ -358,7 +359,7 @@ unset($entry);
                         <input type="hidden" name="csrf_token" value="<?= aman($_SESSION['csrf_token']) ?>">
                         <div id="selectedCartItems"></div>
                         <button type="submit" class="checkout-button" id="checkoutSelectedButton" disabled>
-                            Ajukan Pesanan (<span id="checkoutSelectedCount">0</span> produk) <span aria-hidden="true">→</span>
+                            Checkout (<span id="checkoutSelectedCount">0</span> produk) <span aria-hidden="true">→</span>
                         </button>
                     </form>
                     <p class="catatan-pilihan">Pilihan produk tersimpan saat Anda berpindah halaman.</p>
