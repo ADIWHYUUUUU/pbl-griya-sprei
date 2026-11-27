@@ -229,7 +229,7 @@ $copyTotal = fmod($total, 1.0) === 0.0
                     <div class="upload-control" data-state="empty" role="group" tabindex="0" aria-label="Area unggah bukti transfer. Seret file JPG atau PNG ke area ini.">
                         <span class="upload-empty">
                             <strong>Pilih file atau seret ke sini</strong>
-                            <small>JPG atau PNG, maksimal 8 MB. Pastikan nominal dan tanggal terlihat jelas.</small>
+                            <small>JPG atau PNG, maksimal 2 MB. Pastikan nominal dan tanggal terlihat jelas.</small>
                         </span>
                         <span class="upload-file-icon" aria-hidden="true" hidden>JPG</span>
                         <span class="upload-file-info" hidden>
@@ -243,7 +243,7 @@ $copyTotal = fmod($total, 1.0) === 0.0
                         </span>
                         <input id="payment-proof" type="file" name="bukti_transfer" accept=".jpg,.jpeg,.png" aria-label="Pilih bukti transfer" required>
                     </div>
-                    <p class="upload-help" aria-live="polite">JPG atau PNG, maksimal 8 MB. Pastikan nominal dan tanggal terlihat jelas.</p>
+                    <p class="upload-help" aria-live="polite">JPG atau PNG, maksimal 2 MB. Pastikan nominal dan tanggal terlihat jelas.</p>
                     <label class="payment-field">
                         Nama pemilik rekening pengirim <span>(opsional)</span>
                         <input type="text" name="nama_pemilik_pengirim" maxlength="100" value="<?= $escape($form['nama_pemilik_pengirim'] ?? '') ?>" placeholder="Contoh: Vico Dwi Wijaya" autocomplete="name">

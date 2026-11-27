@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const uploadHelp = document.querySelector(".upload-help");
   const submitButton = form?.querySelector(".payment-submit");
   const submitHint = form?.querySelector(".payment-submit-hint");
-  const maxProofSize = 8 * 1024 * 1024;
+  const maxProofSize = 2 * 1024 * 1024;
   const accountsAvailable = submitButton ? !submitButton.disabled : false;
   let previewFile = null;
   let previewObjectUrl = null;
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (file.size > maxProofSize) {
       return {
         state: "size-error",
-        message: `File ${formatFileSize(file.size)}. Maksimal 8 MB.`,
+        message: `File ${formatFileSize(file.size)}. Maksimal 2 MB.`,
       };
     }
 
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
       uploadActions.hidden = true;
       previewLink.hidden = true;
       previewLink.removeAttribute("href");
-      uploadHelp.textContent = "JPG atau PNG, maksimal 8 MB. Pastikan nominal dan tanggal terlihat jelas.";
+      uploadHelp.textContent = "JPG atau PNG, maksimal 2 MB. Pastikan nominal dan tanggal terlihat jelas.";
       uploadHelp.classList.remove("upload-help--error");
       submitHint.hidden = false;
       submitButton.disabled = !accountsAvailable;
