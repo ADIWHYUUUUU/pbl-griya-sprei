@@ -2,7 +2,14 @@
 
 require_once __DIR__ . '/../app/helpers/storage.php';
 
+$action = $_GET['action'] ?? '';
+$action = is_string($action) ? $action : '';
+$page = $_GET['page'] ?? 'customer-home';
+$page = is_string($page) ? $page : '';
+$isAdminRoute = str_starts_with($action !== '' ? $action : $page, 'admin-');
+
 if (session_status() === PHP_SESSION_NONE) {
+	session_name($isAdminRoute ? 'GRIYASPREIADMIN' : 'GRIYASPREICUSTOMER');
 	session_start();
 }
 if (empty($_SESSION['csrf_token'])) {
@@ -23,8 +30,6 @@ $passwordResetActions = [
 	'customer-password-reset-verify' => 'verifyCode',
 	'customer-password-reset-save' => 'savePassword',
 ];
-$action = $_GET['action'] ?? '';
-
 if ($action !== '') {
 	$isLogout = in_array($action, ['customer-logout', 'admin-logout'], true);
 	$productActions = [
@@ -197,7 +202,6 @@ if ($action !== '') {
 }
 
 $pages = require __DIR__ . '/../routes/web.php';
-$page = $_GET['page'] ?? 'customer-home';
 
 $orderPages = ['customer-orders', 'customer-order-detail', 'pesanan.php', 'pesananSaya.php', 'riwayatPesanan.php'];
 if (
