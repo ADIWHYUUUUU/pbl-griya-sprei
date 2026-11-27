@@ -74,4 +74,7 @@ $isCustomerLoggedIn = ($_SESSION['login'] ?? false) === true
         </div>
 
     </div>
+    <div class="footer__copyright">
+        &copy; 2026 Griya Sprei Malang. Seluruh hak cipta dilindungi.
+    </div>
 </footer>
