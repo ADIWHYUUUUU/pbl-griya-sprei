@@ -27,6 +27,8 @@ $totalRows = $paymentData['total_rows'];
 $statusCounts = $paymentData['status_counts'];
 $oldestWaiting = $paymentData['oldest_waiting'];
 $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$requestedSearch = $_GET['cari'] ?? '';
+$paymentSearch = is_string($requestedSearch) ? trim($requestedSearch) : '';
 $months = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 $formatDate = static function ($value) use ($months): string {
     $timestamp = strtotime((string) $value);
@@ -88,10 +90,15 @@ unset($_SESSION['admin_payment_message'], $_SESSION['admin_payment_message_type'
         <?php endif; ?>
 
         <section class="payment-controls" aria-label="Filter pembayaran">
-            <label class="payment-search">
-                <span aria-hidden="true">&#128269;</span>
-                <input type="search" id="paymentSearch" placeholder="Cari invoice, nama, atau nomor WhatsApp" aria-label="Cari invoice, nama, atau nomor WhatsApp">
-            </label>
+            <div class="payment-search">
+                <button type="button" class="payment-search-button" id="paymentSearchButton" aria-label="Cari pembayaran">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="10.8" cy="10.8" r="6.8"></circle>
+                        <path d="m16 16 4.5 4.5"></path>
+                    </svg>
+                </button>
+                <input type="search" id="paymentSearch" value="<?= $escape($paymentSearch) ?>" placeholder="Cari invoice, nama, atau nomor WhatsApp" aria-label="Cari invoice, nama, atau nomor WhatsApp">
+            </div>
             <label class="payment-select-label">
                 <span class="sr-only">Filter metode pembayaran</span>
                 <select id="paymentMethodFilter" aria-label="Filter metode pembayaran">
@@ -201,11 +208,11 @@ unset($_SESSION['admin_payment_message'], $_SESSION['admin_payment_message_type'
 
         <?php if ($totalPages > 1): ?>
         <nav class="payment-pagination" aria-label="Pagination pembayaran">
-            <?php if ($currentPage > 1): ?><a href="/?page=admin-payments&amp;hal=<?= $currentPage - 1 ?>" aria-label="Halaman sebelumnya">&lsaquo;</a><?php else: ?><span aria-hidden="true">&lsaquo;</span><?php endif; ?>
+            <?php if ($currentPage > 1): ?><a href="/?page=admin-payments&amp;hal=<?= $currentPage - 1 ?>">‹ Sebelumnya</a><?php else: ?><span aria-disabled="true">‹ Sebelumnya</span><?php endif; ?>
             <?php for ($page = 1; $page <= $totalPages; $page++): ?>
                 <?php if ($page === $currentPage): ?><strong aria-current="page"><?= $page ?></strong><?php else: ?><a href="/?page=admin-payments&amp;hal=<?= $page ?>"><?= $page ?></a><?php endif; ?>
             <?php endfor; ?>
-            <?php if ($currentPage < $totalPages): ?><a href="/?page=admin-payments&amp;hal=<?= $currentPage + 1 ?>" aria-label="Halaman berikutnya">&rsaquo;</a><?php else: ?><span aria-hidden="true">&rsaquo;</span><?php endif; ?>
+            <?php if ($currentPage < $totalPages): ?><a href="/?page=admin-payments&amp;hal=<?= $currentPage + 1 ?>">Berikutnya ›</a><?php else: ?><span aria-disabled="true">Berikutnya ›</span><?php endif; ?>
         </nav>
         <?php endif; ?>
     </main>

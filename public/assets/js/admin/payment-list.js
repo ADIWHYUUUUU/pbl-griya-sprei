@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const tableBody = document.getElementById("paymentTableBody");
   const search = document.getElementById("paymentSearch");
+  const searchButton = document.getElementById("paymentSearchButton");
   const methodFilter = document.getElementById("paymentMethodFilter");
   const dateFilter = document.getElementById("paymentDateFilter");
   const sortSelect = document.getElementById("paymentSort");
@@ -80,6 +81,13 @@ document.addEventListener("DOMContentLoaded", function () {
   [search, methodFilter, dateFilter, sortSelect].forEach(function (control) {
     control.addEventListener(control === search ? "input" : "change", applyFilters);
   });
+
+  if (searchButton) {
+    searchButton.addEventListener("click", function () {
+      applyFilters();
+      search.focus();
+    });
+  }
 
   applyFilters();
 });
