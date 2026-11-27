@@ -120,6 +120,7 @@ class OrderController
         $productController = new ProductController();
         $items = [];
         $quantitiesByProduct = [];
+        $standardQuantitiesByProduct = [];
         foreach ($cart as $itemId => $item) {
             if (!is_string($itemId) || !preg_match('/^[a-f0-9]{32}$/D', $itemId) || !is_array($item)) {
                 $this->checkoutError('Data keranjang tidak valid. Periksa kembali keranjang Anda.');
@@ -193,6 +194,9 @@ class OrderController
             }
 
             $quantitiesByProduct[$productId] = ($quantitiesByProduct[$productId] ?? 0) + $quantity;
+            if ($mode === 'standard') {
+                $standardQuantitiesByProduct[$productId] = ($standardQuantitiesByProduct[$productId] ?? 0) + $quantity;
+            }
             $items[] = [
                 'id_produk' => (int) $product['id_produk'],
                 'nama_produk' => (string) $product['nama_produk'],
@@ -214,7 +218,10 @@ class OrderController
         }
 
         foreach ($items as $item) {
-            if ($quantitiesByProduct[$item['id_produk']] > min(50, $item['stok'])) {
+            if (
+                $quantitiesByProduct[$item['id_produk']] > 50
+                || ($standardQuantitiesByProduct[$item['id_produk']] ?? 0) > $item['stok']
+            ) {
                 $this->checkoutError('Jumlah pesanan melebihi stok yang tersedia. Periksa kembali keranjang Anda.');
             }
         }
@@ -332,14 +339,18 @@ class OrderController
         $quantity = $this->readInteger($_POST['qtySprei'] ?? null);
         $isPillowBolster = product_is_pillow_bolster_category((string) $product['kategori_produk']);
         $mode = $isPillowBolster ? 'standard' : ($_POST['mode'] ?? '');
-
-        if ($stock < 1 || $quantity === null || $quantity < 1 || $quantity > min(50, $stock)) {
-            $this->setCartMessage('Jumlah produk melebihi stok yang tersedia.', 'error');
+        if (!in_array($mode, ['standard', 'custom'], true)) {
+            $this->setCartMessage('Tipe ukuran tidak valid.', 'error');
             $this->redirect('/?page=customer-detail&id=' . $productId);
         }
 
-        if (!in_array($mode, ['standard', 'custom'], true)) {
-            $this->setCartMessage('Tipe ukuran tidak valid.', 'error');
+        if (
+            $quantity === null
+            || $quantity < 1
+            || $quantity > 50
+            || ($mode === 'standard' && ($stock < 1 || $quantity > $stock))
+        ) {
+            $this->setCartMessage('Jumlah produk melebihi stok yang tersedia.', 'error');
             $this->redirect('/?page=customer-detail&id=' . $productId);
         }
 
@@ -421,13 +432,19 @@ class OrderController
         }
 
         $existingQuantity = 0;
-        foreach ($cart as $cartItem) {
-            if (is_array($cartItem) && (int) ($cartItem['id_produk'] ?? 0) === $productId) {
-                $existingQuantity += max(0, (int) ($cartItem['qtySprei'] ?? 0));
+        if ($mode === 'standard') {
+            foreach ($cart as $cartItem) {
+                if (
+                    is_array($cartItem)
+                    && (int) ($cartItem['id_produk'] ?? 0) === $productId
+                    && ($cartItem['mode'] ?? 'standard') === 'standard'
+                ) {
+                    $existingQuantity += max(0, (int) ($cartItem['qtySprei'] ?? 0));
+                }
             }
         }
 
-        if ($existingQuantity + $quantity > $stock) {
+        if ($mode === 'standard' && $existingQuantity + $quantity > $stock) {
             $this->setCartMessage('Jumlah pesanan di keranjang melebihi stok yang tersedia.', 'error');
             $this->redirect('/?page=customer-detail&id=' . $productId);
         }
@@ -506,33 +523,48 @@ class OrderController
         ]);
         $quantity = $this->readInteger($_POST['qtySprei'] ?? null);
         $product = $productId === false ? false : (new ProductController())->getProductById($productId);
+        $isEdit = ($_POST['edit_cart'] ?? '') === '1';
 
         if (!$product || $quantity === null || $quantity < 1) {
             $this->setCartMessage('Produk atau jumlah pesanan tidak valid.', 'error');
             $this->redirect('/?page=customer-cart');
         }
 
+        $isPillowBolster = product_is_pillow_bolster_category((string) $product['kategori_produk']);
+        $mode = $isPillowBolster
+            ? 'standard'
+            : ($isEdit ? ($_POST['mode'] ?? '') : ($cart[$itemId]['mode'] ?? 'standard'));
+        if ($isEdit && !in_array($mode, ['standard', 'custom'], true)) {
+            $this->setCartMessage('Tipe ukuran tidak valid.', 'error');
+            $this->redirect('/?page=customer-cart');
+        }
+
         $stock = (int) $product['stok'];
-        $otherQuantity = 0;
+        $otherStandardQuantity = 0;
         foreach ($cart as $otherId => $cartItem) {
-            if ($otherId !== $itemId && is_array($cartItem) && (int) ($cartItem['id_produk'] ?? 0) === $productId) {
-                $otherQuantity += max(0, (int) ($cartItem['qtySprei'] ?? 0));
+            if (
+                $otherId !== $itemId
+                && is_array($cartItem)
+                && (int) ($cartItem['id_produk'] ?? 0) === $productId
+                && ($cartItem['mode'] ?? 'standard') !== 'custom'
+            ) {
+                $otherStandardQuantity += max(0, (int) ($cartItem['qtySprei'] ?? 0));
             }
         }
 
-        if ($quantity > min(50, $stock) || $otherQuantity + $quantity > $stock) {
+        if (
+            $quantity > 50
+            || ($mode !== 'custom' && (
+                $stock < 1
+                || $quantity > $stock
+                || $otherStandardQuantity + $quantity > $stock
+            ))
+        ) {
             $this->setCartMessage('Jumlah pesanan melebihi stok yang tersedia.', 'error');
             $this->redirect('/?page=customer-cart');
         }
 
-        if (($_POST['edit_cart'] ?? '') === '1') {
-            $isPillowBolster = product_is_pillow_bolster_category((string) $product['kategori_produk']);
-            $mode = $isPillowBolster ? 'standard' : ($_POST['mode'] ?? '');
-            if (!in_array($mode, ['standard', 'custom'], true)) {
-                $this->setCartMessage('Tipe ukuran tidak valid.', 'error');
-                $this->redirect('/?page=customer-cart');
-            }
-
+        if ($isEdit) {
             $keepStandardSize = ($cart[$itemId]['mode'] ?? 'standard') === 'standard';
             $dimensions = [
                 'panjang' => (int) ($isPillowBolster
@@ -601,7 +633,7 @@ class OrderController
         $this->persistCartItem($itemId, $cart[$itemId]);
         $_SESSION['cart'] = $cart;
         $this->setCartMessage(
-            ($_POST['edit_cart'] ?? '') === '1'
+            $isEdit
                 ? 'Pesanan berhasil diperbarui.'
                 : 'Jumlah pesanan berhasil diperbarui.',
             'success'

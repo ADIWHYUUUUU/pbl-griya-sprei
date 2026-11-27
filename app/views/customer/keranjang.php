@@ -32,6 +32,7 @@ $items = [];
 $totalConfigurations = 0;
 $selectableCartIds = [];
 $cartQuantities = [];
+$standardCartQuantities = [];
 $cartProductsByItem = [];
 
 foreach ($cart as $itemId => $item) {
@@ -46,13 +47,22 @@ foreach ($cart as $itemId => $item) {
     $product = $productId === false ? false : $products->getProductById($productId);
     $name = (string) ($product['nama_produk'] ?? $item['nama_produk'] ?? 'Produk tidak tersedia');
     $quantity = max(0, (int) ($item['qtySprei'] ?? 0));
+    $isPillowBolster = $product
+        && product_is_pillow_bolster_category((string) $product['kategori_produk']);
+    $mode = !$isPillowBolster && ($item['mode'] ?? 'standard') === 'custom'
+        ? 'custom'
+        : 'standard';
     if ($product && $quantity > 0 && $productId !== false) {
         $cartQuantities[$productId] = ($cartQuantities[$productId] ?? 0) + $quantity;
+        if ($mode === 'standard') {
+            $standardCartQuantities[$productId] = ($standardCartQuantities[$productId] ?? 0) + $quantity;
+        }
     }
     $cartProductsByItem[$itemId] = [
         'product' => $product,
         'product_id' => $productId,
         'quantity' => $quantity,
+        'mode' => $mode,
     ];
 
     $items[] = [
@@ -71,7 +81,11 @@ foreach ($cartProductsByItem as $itemId => $cartItem) {
         $cartItem['product']
         && $cartItem['quantity'] > 0
         && $productId !== false
-        && $cartQuantities[$productId] <= min(50, (int) $cartItem['product']['stok'])
+        && $cartQuantities[$productId] <= 50
+        && (
+            $cartItem['mode'] === 'custom'
+            || ($standardCartQuantities[$productId] ?? 0) <= (int) $cartItem['product']['stok']
+        )
     ) {
         $selectableCartIds[] = $itemId;
     }
@@ -149,18 +163,25 @@ $items = array_reverse($items);
                             $item = $entry['data'];
                             $product = $entry['product'];
                             $stock = (int) ($product['stok'] ?? 0);
-                            $otherQuantity = 0;
-                            foreach ($cart as $otherId => $otherItem) {
-                                if ($otherId !== $entry['id'] && is_array($otherItem) && (int) ($otherItem['id_produk'] ?? 0) === (int) ($item['id_produk'] ?? 0)) {
-                                    $otherQuantity += max(0, (int) ($otherItem['qtySprei'] ?? 0));
-                                }
-                            }
-                            $maxQuantity = min(50, max(0, $stock - $otherQuantity));
-                            $image = trim((string) ($product['gambar_produk'] ?? $item['gambar_produk'] ?? ''));
-                            $imageUrl = $image !== '' ? product_image_url($image) : '';
                             $isPillowBolster = $product
                                 && product_is_pillow_bolster_category((string) $product['kategori_produk']);
                             $isCustom = !$isPillowBolster && ($item['mode'] ?? '') === 'custom';
+                            $otherStandardQuantity = 0;
+                            foreach ($cart as $otherId => $otherItem) {
+                                if (
+                                    $otherId !== $entry['id']
+                                    && is_array($otherItem)
+                                    && (int) ($otherItem['id_produk'] ?? 0) === (int) ($item['id_produk'] ?? 0)
+                                    && ($otherItem['mode'] ?? 'standard') !== 'custom'
+                                ) {
+                                    $otherStandardQuantity += max(0, (int) ($otherItem['qtySprei'] ?? 0));
+                                }
+                            }
+                            $maxQuantity = $isCustom
+                                ? 50
+                                : min(50, max(0, $stock - $otherStandardQuantity));
+                            $image = trim((string) ($product['gambar_produk'] ?? $item['gambar_produk'] ?? ''));
+                            $imageUrl = $image !== '' ? product_image_url($image) : '';
                             $itemLength = (int) ($isPillowBolster
                                 ? ($product['panjang_standar'] ?? 0)
                                 : ($item['panjang'] ?? 0));
