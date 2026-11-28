@@ -41,7 +41,7 @@ class DashboardModel
 
     public function getRecentOrders(int $limit = 10): array
     {
-        return $this->fetchOrders('', [], $limit);
+        return $this->fetchOrders('', [], $limit, true);
     }
 
     public function getOrderStatusCounts(): array
@@ -153,8 +153,46 @@ class DashboardModel
     return $stmt->fetchAll();
 }
 
-    private function fetchOrders(string $condition, array $parameters, ?int $limit = null): array
-    {
+    private function fetchOrders(
+        string $condition,
+        array $parameters,
+        ?int $limit = null,
+        bool $includeModalDetails = false
+    ): array {
+        $modalOrderFields = $includeModalDetails
+            ? "
+                    p.diskon,
+                    detail.items AS produk_detail,
+                    pembayaran_terbaru.bukti_nama_asli,
+                    pembayaran_terbaru.tanggal_upload,
+                    pembayaran_terbaru.nama_pemilik_pengirim,
+                    pembayaran_terbaru.nomor_rekening_pengirim,"
+            : '';
+        $modalItemsField = $includeModalDetails
+            ? ",
+                        JSON_AGG(
+                            JSON_BUILD_OBJECT(
+                                'nama_produk', produk.nama_produk,
+                                'gambar_produk', produk.gambar_produk,
+                                'tipe_ukuran', d.tipe_ukuran::text,
+                                'jumlah', d.jumlah,
+                                'panjang', d.panjang,
+                                'lebar', d.lebar,
+                                'tinggi', d.tinggi,
+                                'tambah_sarban', d.tambah_sarban,
+                                'tambah_sargul', d.tambah_sargul,
+                                'catatan_pesanan', d.catatan_pesanan
+                            ) ORDER BY d.id_detail
+                        ) AS items"
+            : '';
+        $modalPaymentFields = $includeModalDetails
+            ? "
+                        bukti_nama_asli,
+                        tanggal_upload,
+                        nama_pemilik_pengirim,
+                        nomor_rekening_pengirim,"
+            : '';
+
         $sql = "SELECT
                     p.id_pesanan,
                     COALESCE(p.no_invoice, 'ORD-' || p.id_pesanan::text) AS kode,
@@ -177,6 +215,7 @@ class DashboardModel
                     pembayaran_terbaru.metode_pembayaran::text AS metode_pembayaran,
                     pembayaran_terbaru.nominal_transfer,
                     pembayaran_terbaru.bukti_transfer,
+                    {$modalOrderFields}
                     pembayaran_terbaru.catatan_admin
                 FROM pesanan p
                 JOIN \"user\" u ON u.id_user = p.id_user
@@ -201,7 +240,7 @@ class DashboardModel
                                 ELSE ''
                             END,
                             CHR(10) || CHR(10) ORDER BY d.id_detail
-                        ) AS daftar_spesifikasi
+                        ) AS daftar_spesifikasi{$modalItemsField}
                     FROM detail_pesanan d
                     JOIN produk ON produk.id_produk = d.id_produk
                     GROUP BY d.id_pesanan
@@ -212,6 +251,7 @@ class DashboardModel
                         metode_pembayaran,
                         nominal_transfer,
                         bukti_transfer,
+                        {$modalPaymentFields}
                         catatan_admin
                     FROM pembayaran
                     WHERE id_pesanan = p.id_pesanan

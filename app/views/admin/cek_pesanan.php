@@ -31,6 +31,7 @@ try {
     error_log('[admin-orders] Failed to load orders: ' . $error->getMessage());
     $ordersError = true;
 }
+require_once __DIR__ . '/../../helpers/storage.php';
 $flash = $_SESSION['admin_order_message'] ?? null;
 unset($_SESSION['admin_order_message']);
 $escape = static function ($value): string {
@@ -43,11 +44,6 @@ $orderStatuses = [
     'DIKIRIM' => ['Dikirim', 'shipped'],
     'SELESAI' => ['Selesai', 'complete'],
     'DIBATALKAN' => ['Dibatalkan', 'cancelled'],
-];
-$paymentStatuses = [
-    'MENUNGGU_VERIFIKASI' => 'Menunggu verifikasi',
-    'TERVERIFIKASI' => 'Terverifikasi',
-    'DITOLAK' => 'Ditolak',
 ];
 $transitions = [
     'MENUNGGU_VERIFIKASI' => ['MENUNGGU_PEMBAYARAN', 'DIBATALKAN'],
@@ -97,7 +93,7 @@ foreach ($orders as $order) {
         $oldestWaitingOrder = $order;
     }
 }
-$formatOrderDate = static function ($value) use ($escape): string {
+$formatOrderDateValue = static function ($value): string {
     try {
         $date = new DateTimeImmutable((string) $value, new DateTimeZone('UTC'));
         $date = $date->setTimezone(new DateTimeZone('Asia/Jakarta'));
@@ -107,6 +103,20 @@ $formatOrderDate = static function ($value) use ($escape): string {
         return (string) $value;
     }
 };
+$formatOrderDate = static fn ($value): string => $escape($formatOrderDateValue($value));
+$shippingMethodLabels = [
+    'INSTANT_GOJEK' => 'GoJek Instant',
+    'EKSPEDISI_JNE' => 'JNE Express',
+    'EKSPEDISI_JNT' => 'J&T Express',
+];
+$instantShippingMethods = ['INSTANT_GOJEK'];
+$paymentMethodLabels = [
+    'TRANSFER_BCA' => 'Transfer BCA',
+    'TRANSFER_BRI' => 'Transfer BRI',
+    'TRANSFER_BSI' => 'Transfer BSI',
+    'TRANSFER_MANDIRI' => 'Transfer Mandiri',
+];
+$formatRupiah = static fn ($value): string => 'Rp ' . number_format((float) $value, 0, ',', '.');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -221,14 +231,102 @@ $formatOrderDate = static function ($value) use ($escape): string {
                                 <?php
                                 $statusCode = (string) ($order['status_pesanan'] ?? '');
                                 $status = $orderStatuses[$statusCode] ?? [$statusCode, 'other'];
-                                $paymentStatus = $paymentStatuses[$order['status_pembayaran'] ?? ''] ?? 'Belum ada pembayaran';
-                                $paymentClass = match ($order['status_pembayaran'] ?? '') {
+                                $tanggalLabel = $formatOrderDate($order['tanggal_pesan']);
+                                $itemsJson = $order['produk_detail'] ?? null;
+                                $detailItems = json_decode(
+                                    is_string($itemsJson) && $itemsJson !== '' ? $itemsJson : '[]',
+                                    true,
+                                    512,
+                                    JSON_THROW_ON_ERROR
+                                );
+                                $detailItems = is_array($detailItems) ? array_values($detailItems) : [];
+                                $modalItems = [];
+                                foreach ($detailItems as $detailItem) {
+                                    if (!is_array($detailItem)) {
+                                        continue;
+                                    }
+                                    $imagePath = trim((string) ($detailItem['gambar_produk'] ?? ''));
+                                    $modalItems[] = [
+                                        'name' => (string) ($detailItem['nama_produk'] ?? ''),
+                                        'image' => $imagePath !== '' ? product_image_url($imagePath) : '',
+                                        'type' => (string) ($detailItem['tipe_ukuran'] ?? ''),
+                                        'quantity' => (int) ($detailItem['jumlah'] ?? 0),
+                                        'length' => $detailItem['panjang'] ?? null,
+                                        'width' => $detailItem['lebar'] ?? null,
+                                        'height' => $detailItem['tinggi'] ?? null,
+                                        'pillow' => (int) ($detailItem['tambah_sarban'] ?? 0),
+                                        'bolster' => (int) ($detailItem['tambah_sargul'] ?? 0),
+                                        'note' => (string) ($detailItem['catatan_pesanan'] ?? ''),
+                                    ];
+                                }
+                                $shippingMethod = (string) ($order['metode_pengiriman'] ?? '');
+                                $instantCourier = in_array($shippingMethod, $instantShippingMethods, true);
+                                $shippingReference = trim((string) ($instantCourier
+                                    ? ($order['nomor_telepon_kurir'] ?? '')
+                                    : ($order['nomor_resi'] ?? '')));
+                                $paymentCode = (string) ($order['status_pembayaran'] ?? '');
+                                $paymentTone = match ($paymentCode) {
                                     'MENUNGGU_VERIFIKASI' => 'waiting',
                                     'TERVERIFIKASI' => 'complete',
                                     'DITOLAK' => 'cancelled',
                                     default => 'other',
                                 };
-                                $tanggalLabel = $formatOrderDate($order['tanggal_pesan']);
+                                $paymentLabels = [
+                                    'MENUNGGU_VERIFIKASI' => 'Menunggu Verifikasi',
+                                    'TERVERIFIKASI' => 'Terverifikasi',
+                                    'DITOLAK' => 'Ditolak',
+                                ];
+                                $hasPayment = $paymentCode !== '';
+                                $principal = $order['tagihan_pokok'] === null ? null : (float) $order['tagihan_pokok'];
+                                $shippingCost = (float) ($order['ongkir'] ?? 0);
+                                $discount = $order['diskon'] === null ? null : (float) $order['diskon'];
+                                $hasCompleteBilling = $principal !== null && $shippingCost > 0;
+                                $paymentProofName = trim((string) ($order['bukti_nama_asli'] ?? ''));
+                                if ($paymentProofName === '') {
+                                    $paymentProofName = basename((string) ($order['bukti_transfer'] ?? ''));
+                                }
+                                $address = trim((string) ($order['alamat_pengiriman'] ?? ''));
+                                $addressNote = trim((string) ($order['catatan_alamat'] ?? ''));
+                                if ($addressNote !== '') {
+                                    $address .= ($address !== '' ? "\n" : '') . $addressNote;
+                                }
+                                $modalData = [
+                                    'invoice' => (string) ($order['kode'] ?? ''),
+                                    'date' => $formatOrderDateValue($order['tanggal_pesan'] ?? ''),
+                                    'status' => ['label' => $status[0], 'tone' => $status[1]],
+                                    'items' => $modalItems,
+                                    'customer' => [
+                                        'name' => (string) ($order['nama_pelanggan'] ?? ''),
+                                        'phone' => (string) ($order['telepon'] ?? ''),
+                                        'address' => $address,
+                                        'shippingMethod' => $shippingMethodLabels[$shippingMethod] ?? $shippingMethod,
+                                        'shippingReferenceLabel' => $instantCourier ? 'Nomor Telepon Kurir' : 'Nomor Resi',
+                                        'shippingReference' => $shippingReference,
+                                        'shippingNote' => (string) ($order['catatan_pengiriman'] ?? ''),
+                                    ],
+                                    'billing' => [
+                                        'principal' => $principal,
+                                        'discount' => $discount,
+                                        'shipping' => $shippingCost > 0 ? $shippingCost : null,
+                                        'total' => $hasCompleteBilling ? (float) $order['total'] : null,
+                                    ],
+                                    'payment' => [
+                                        'exists' => $hasPayment,
+                                        'status' => $paymentLabels[$paymentCode] ?? 'Belum ada pembayaran',
+                                        'tone' => $hasPayment ? $paymentTone : 'other',
+                                        'method' => $paymentMethodLabels[$order['metode_pembayaran'] ?? ''] ?? (string) ($order['metode_pembayaran'] ?? ''),
+                                        'amount' => $order['nominal_transfer'] === null ? null : (float) $order['nominal_transfer'],
+                                        'date' => !empty($order['tanggal_upload']) ? $formatOrderDateValue($order['tanggal_upload']) : '',
+                                        'sender' => trim((string) ($order['nama_pemilik_pengirim'] ?? '')),
+                                        'account' => trim((string) ($order['nomor_rekening_pengirim'] ?? '')),
+                                        'proof' => $paymentProofName,
+                                        'adminNote' => trim((string) ($order['catatan_admin'] ?? '')),
+                                    ],
+                                ];
+                                $modalJson = json_encode(
+                                    $modalData,
+                                    JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_THROW_ON_ERROR
+                                );
                                 $specificationText = trim((string) ($order['daftar_spesifikasi'] ?? ''));
                                 $specifications = $specificationText !== ''
                                     ? preg_split('/\n\s*\n/', $specificationText)
@@ -270,7 +368,7 @@ $formatOrderDate = static function ($value) use ($escape): string {
                                     </td>
                                     <td class="order-total">
                                         <strong>
-                                            <?= 'Rp ' . number_format((float) $order['total'], 0, ',', '.') ?>
+                                            <?= $escape($formatRupiah($order['total'])) ?>
                                         </strong>
                                         <?php if ((float) ($order['ongkir'] ?? 0) <= 0): ?><small>Ongkir belum ditetapkan</small><?php endif; ?>
                                     </td>
@@ -296,20 +394,10 @@ $formatOrderDate = static function ($value) use ($escape): string {
                                     </td>
                                     <td>
                                         <div class="order-actions">
-                                            <button class="order-action" type="button" data-toggle-details aria-expanded="false" aria-controls="order-detail-<?= (int) $order['id_pesanan'] ?>">Detail</button>
+                                            <button class="order-action" type="button" data-order-detail-trigger data-order-detail="<?= $escape($modalJson) ?>" aria-haspopup="dialog" aria-label="Lihat detail pesanan <?= $escape($order['kode']) ?>">Detail</button>
                                             <?php if ($statusCode === 'MENUNGGU_VERIFIKASI'): ?>
                                                 <a class="order-action order-action--verify" href="/?page=admin-order-verification&amp;id=<?= (int) $order['id_pesanan'] ?>">Verifikasi</a>
                                             <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="order-details-row" id="order-detail-<?= (int) $order['id_pesanan'] ?>" data-order-details hidden>
-                                    <td colspan="6">
-                                        <div class="order-details">
-                                            <div><small>Alamat Pengiriman</small><p><?= $escape($order['alamat_pengiriman'] ?: '-') ?></p></div>
-                                            <div><small>Metode Pengiriman</small><p><?= $escape(str_replace('_', ' ', (string) $order['metode_pengiriman'])) ?></p></div>
-                                            <div><small>Status Pembayaran</small><p><span class="order-payment order-payment--<?= $escape($paymentClass) ?>"><?= $escape($paymentStatus) ?></span></p></div>
-                                            <?php if (!empty($order['catatan_pengiriman'])): ?><div><small>Catatan Pengiriman</small><p><?= $escape($order['catatan_pengiriman']) ?></p></div><?php endif; ?>
                                         </div>
                                     </td>
                                 </tr>
@@ -338,6 +426,45 @@ $formatOrderDate = static function ($value) use ($escape): string {
                     <button type="button" data-page-next>Berikutnya ›</button>
                 </nav>
             </section>
+
+            <dialog class="order-detail-modal" id="orderDetailModal" aria-labelledby="orderDetailTitle" aria-modal="true" tabindex="-1">
+                <div class="order-detail-modal__panel">
+                    <header class="order-detail-modal__header">
+                        <div class="order-detail-modal__heading">
+                            <div class="order-detail-modal__title-line">
+                                <h2 id="orderDetailTitle">Detail Pesanan</h2>
+                                <span class="order-status" data-modal-order-status hidden></span>
+                            </div>
+                            <p><span data-modal-invoice></span><span aria-hidden="true"> · </span><span data-modal-date></span></p>
+                        </div>
+                        <button class="order-detail-modal__icon-close" type="button" data-modal-close aria-label="Tutup detail pesanan">&times;</button>
+                    </header>
+                    <div class="order-detail-modal__content">
+                        <section class="order-detail-card">
+                            <h3>Spesifikasi Pesanan</h3>
+                            <div class="order-detail-items" data-modal-items></div>
+                        </section>
+                        <section class="order-detail-card">
+                            <h3>Data Pelanggan &amp; Pengiriman</h3>
+                            <div class="order-detail-fields order-detail-fields--customer" data-modal-customer></div>
+                        </section>
+                        <div class="order-detail-financials">
+                            <section class="order-detail-card">
+                                <h3>Tagihan</h3>
+                                <div class="order-detail-billing" data-modal-billing></div>
+                                <div class="order-detail-total" data-modal-total></div>
+                            </section>
+                            <section class="order-detail-card">
+                                <h3>Pembayaran</h3>
+                                <div data-modal-payment></div>
+                            </section>
+                        </div>
+                    </div>
+                    <footer class="order-detail-modal__footer">
+                        <button type="button" data-modal-close>Tutup</button>
+                    </footer>
+                </div>
+            </dialog>
 
             <section class="orders-info-card" aria-labelledby="statusFlowTitle">
                 <h2 id="statusFlowTitle">Alur Status yang Diizinkan</h2>
