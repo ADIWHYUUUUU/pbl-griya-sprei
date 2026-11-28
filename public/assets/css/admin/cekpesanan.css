@@ -1859,7 +1859,7 @@ html.orders-js:not(.orders-ready) [data-order-row] {
 .admin-orders-list .status-flow-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
   margin-top: 12px;
 }
