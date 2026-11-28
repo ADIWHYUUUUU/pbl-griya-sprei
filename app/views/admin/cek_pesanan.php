@@ -11,12 +11,26 @@ if (
     exit;
 }
 
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../models/DashboardModel.php';
-
-$dashboard = new DashboardModel($pdo);
-$orders = $dashboard->getRecentOrders(100);
-$statusCounts = $dashboard->getOrderStatusCounts();
+$ordersError = false;
+$orders = [];
+$statusCounts = [
+    'MENUNGGU_VERIFIKASI' => 0,
+    'MENUNGGU_PEMBAYARAN' => 0,
+    'DIPROSES' => 0,
+    'DIKIRIM' => 0,
+    'SELESAI' => 0,
+    'DIBATALKAN' => 0,
+];
+try {
+    require_once __DIR__ . '/../../config/database.php';
+    require_once __DIR__ . '/../../models/DashboardModel.php';
+    $dashboard = new DashboardModel($pdo);
+    $orders = $dashboard->getRecentOrders(100);
+    $statusCounts = $dashboard->getOrderStatusCounts();
+} catch (PDOException $error) {
+    error_log('[admin-orders] Failed to load orders: ' . $error->getMessage());
+    $ordersError = true;
+}
 $flash = $_SESSION['admin_order_message'] ?? null;
 unset($_SESSION['admin_order_message']);
 $escape = static function ($value): string {
@@ -58,7 +72,6 @@ $filters = [
     'DIPROSES' => 'Diproses',
     'DIKIRIM' => 'Dikirim',
     'SELESAI' => 'Selesai',
-    'DIBATALKAN' => 'Dibatalkan',
 ];
 $requestedFilter = $_GET['status'] ?? 'semua';
 $activeFilter = is_string($requestedFilter) && array_key_exists($requestedFilter, $filters)
@@ -78,7 +91,22 @@ $visibleOrders = array_values(array_filter($orders, static function (array $orde
 }));
 $visibleOrderIds = array_fill_keys(array_column($visibleOrders, 'id_pesanan'), true);
 $statusCounts['semua'] = array_sum($statusCounts);
-$bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+$oldestWaitingOrder = null;
+foreach ($orders as $order) {
+    if (($order['status_pesanan'] ?? '') === 'MENUNGGU_VERIFIKASI') {
+        $oldestWaitingOrder = $order;
+    }
+}
+$formatOrderDate = static function ($value) use ($escape): string {
+    try {
+        $date = new DateTimeImmutable((string) $value, new DateTimeZone('UTC'));
+        $date = $date->setTimezone(new DateTimeZone('Asia/Jakarta'));
+        $months = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        return $date->format('d') . ' ' . $months[(int) $date->format('n')] . $date->format(' Y, H:i') . ' WIB';
+    } catch (Exception $error) {
+        return (string) $value;
+    }
+};
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -86,6 +114,10 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cek Pesanan - Griya Sprei</title>
+    <script>document.documentElement.classList.add('orders-js');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/admin/sidebar.css">
     <link rel="stylesheet" href="/assets/css/admin/dashboard-new.css">
     <link rel="stylesheet" href="/assets/css/admin/cekpesanan.css">
@@ -116,8 +148,44 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                 </div>
             <?php endif; ?>
 
-            <section class="orders-content" aria-label="Daftar pesanan">
-                <div class="orders-toolbar">
+            <?php if (!$ordersError && (int) ($statusCounts['MENUNGGU_VERIFIKASI'] ?? 0) > 0): ?>
+                <aside class="orders-warning" aria-label="Pesanan menunggu verifikasi">
+                    <div>
+                        <strong><?= (int) $statusCounts['MENUNGGU_VERIFIKASI'] ?> pesanan menunggu verifikasi</strong>
+                        <?php if ($oldestWaitingOrder !== null): ?>
+                            <span>Yang terlama di daftar terbaru sejak <?= $escape($formatOrderDate($oldestWaitingOrder['tanggal_pesan'])) ?>.</span>
+                        <?php else: ?>
+                            <span>Pesanan menunggu verifikasi belum tersedia pada daftar terbaru.</span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($oldestWaitingOrder !== null): ?>
+                        <a class="orders-warning__action" href="#order-<?= (int) $oldestWaitingOrder['id_pesanan'] ?>" data-oldest-order="<?= (int) $oldestWaitingOrder['id_pesanan'] ?>">
+                            Verifikasi yang terlama <span aria-hidden="true">→</span>
+                        </a>
+                    <?php endif; ?>
+                </aside>
+            <?php endif; ?>
+
+            <form class="order-search" action="/" method="get" role="search">
+                <input type="hidden" name="page" value="admin-orders">
+                <input type="hidden" name="status" value="<?= $escape($activeFilter) ?>">
+                <label class="sr-only" for="orderSearch">Cari nomor invoice atau nama pelanggan</label>
+                <span class="order-search__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+                </span>
+                <input
+                    id="orderSearch"
+                    type="search"
+                    name="cari"
+                    value="<?= $escape($searchTerm) ?>"
+                    placeholder="Cari invoice / nama..."
+                    autocomplete="off"
+                >
+            </form>
+
+            <section class="orders-content" aria-label="Daftar pesanan" data-orders-error="<?= $ordersError ? 'true' : 'false' ?>">
+                <div class="orders-panel">
+                    <div class="orders-toolbar">
                     <nav class="order-tabs" aria-label="Filter status pesanan">
                         <?php foreach ($filters as $filter => $label): ?>
                             <?php
@@ -131,33 +199,16 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                                 <?= $isActive ? 'aria-current="page"' : '' ?>
                             >
                                 <?= $escape($label) ?>
-                                <span><?= (int) $count ?></span>
+                                <span class="order-tab__count"><?= (int) $count ?></span>
                             </a>
                         <?php endforeach; ?>
                     </nav>
-
-                    <form class="order-search" action="/" method="get" role="search">
-                        <input type="hidden" name="page" value="admin-orders">
-                        <input type="hidden" name="status" value="<?= $escape($activeFilter) ?>">
-                        <label class="sr-only" for="orderSearch">Cari nomor invoice atau nama pelanggan</label>
-                        <input
-                            id="orderSearch"
-                            type="search"
-                            name="cari"
-                            value="<?= $escape($searchTerm) ?>"
-                            placeholder="Cari invoice / nama..."
-                        >
-                        <button type="submit" aria-label="Cari">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="orders-panel orders-table-scroll">
+                    </div>
+                    <div class="orders-table-scroll">
                     <table class="orders-table">
                         <thead>
                             <tr>
-                                <th scope="col">No. Invoice &amp; Tanggal</th>
+                                <th scope="col">Invoice &amp; Tanggal</th>
                                 <th scope="col">Pelanggan</th>
                                 <th scope="col">Spesifikasi Sprei</th>
                                 <th scope="col">Tagihan</th>
@@ -177,19 +228,21 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                                     'DITOLAK' => 'cancelled',
                                     default => 'other',
                                 };
-                                $tanggalPesanan = strtotime((string) $order['tanggal_pesan']);
-                                $tanggalLabel = $tanggalPesanan
-                                    ? date('d', $tanggalPesanan) . ' ' . $bulanPendek[(int) date('n', $tanggalPesanan)] . date(' Y, H:i', $tanggalPesanan) . ' WIB'
-                                    : (string) $order['tanggal_pesan'];
+                                $tanggalLabel = $formatOrderDate($order['tanggal_pesan']);
                                 $specificationText = trim((string) ($order['daftar_spesifikasi'] ?? ''));
                                 $specifications = $specificationText !== ''
                                     ? preg_split('/\n\s*\n/', $specificationText)
                                     : [(string) ($order['daftar_produk'] ?? 'Produk tidak tersedia')];
                                 $specifications = array_values(array_filter($specifications, static fn ($value) => trim((string) $value) !== ''));
                                 $shownSpecifications = array_slice($specifications, 0, 2);
-                                $sizeType = stripos($specificationText, 'Custom:') !== false ? 'Custom' : 'Standar';
+                                $isCustomSize = stripos($specificationText, 'Custom:') !== false;
+                                $sizeType = $isCustomSize ? 'Custom Size' : 'Standar';
+                                $sizeTypeClass = $isCustomSize ? 'custom' : 'standard';
                                 ?>
                                 <tr
+                                    id="order-<?= (int) $order['id_pesanan'] ?>"
+                                    class="<?= $statusCode === 'MENUNGGU_VERIFIKASI' ? 'order-row--verification' : '' ?>"
+                                    tabindex="-1"
                                     data-order-row
                                     data-category="<?= $escape($statusCode) ?>"
                                     data-search="<?= $escape(strtolower((string) ($order['kode'] ?? '') . ' ' . (string) ($order['nama_pelanggan'] ?? ''))) ?>"
@@ -198,7 +251,7 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                                     <td>
                                         <strong class="order-invoice"><?= $escape($order['kode']) ?></strong>
                                         <small><?= $escape($tanggalLabel) ?></small>
-                                        <span class="order-size-label order-size-label--<?= strtolower($sizeType) ?>"><?= $escape($sizeType) ?></span>
+                                        <span class="order-size-label order-size-label--<?= $sizeTypeClass ?>"><?= $escape($sizeType) ?></span>
                                     </td>
                                     <td>
                                         <strong class="order-customer-name"><?= $escape($order['nama_pelanggan']) ?></strong>
@@ -217,9 +270,7 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                                     </td>
                                     <td class="order-total">
                                         <strong>
-                                            <?= (float) $order['total'] > 0
-                                                ? 'Rp ' . number_format((float) $order['total'], 0, ',', '.')
-                                                : 'Belum ditagih' ?>
+                                            <?= 'Rp ' . number_format((float) $order['total'], 0, ',', '.') ?>
                                         </strong>
                                         <?php if ((float) ($order['ongkir'] ?? 0) <= 0): ?><small>Ongkir belum ditetapkan</small><?php endif; ?>
                                     </td>
@@ -239,7 +290,7 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                                                         <option value="<?= $escape($targetStatus) ?>"><?= $escape($orderStatuses[$targetStatus][0]) ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
-                                                <button type="submit">Simpan</button>
+                                                <button type="submit" disabled>Simpan</button>
                                             </form>
                                         <?php endif; ?>
                                     </td>
@@ -248,8 +299,6 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                                             <button class="order-action" type="button" data-toggle-details aria-expanded="false" aria-controls="order-detail-<?= (int) $order['id_pesanan'] ?>">Detail</button>
                                             <?php if ($statusCode === 'MENUNGGU_VERIFIKASI'): ?>
                                                 <a class="order-action order-action--verify" href="/?page=admin-order-verification&amp;id=<?= (int) $order['id_pesanan'] ?>">Verifikasi</a>
-                                            <?php else: ?>
-                                                <a class="order-action order-action--verify" href="/?page=admin-order-detail&amp;id=<?= (int) $order['id_pesanan'] ?>">Rincian</a>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -265,15 +314,29 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
-                            <tr class="orders-empty" id="ordersEmpty"<?= $visibleOrders ? ' hidden' : '' ?>>
+                            <tr class="orders-loading" data-orders-loading aria-hidden="true">
+                                <td colspan="6"><span></span><span></span><span></span></td>
+                            </tr>
+                            <tr class="orders-empty" id="ordersEmpty"<?= $visibleOrders || $ordersError ? ' hidden' : '' ?>>
                                 <td colspan="6">
-                                    <?= $orders ? 'Tidak ada pesanan yang cocok dengan filter atau pencarian.' : 'Belum ada pesanan.' ?>
+                                    <?= $orders ? 'Tidak ada pesanan yang cocok dengan pencarian.' : 'Tidak ada pesanan.' ?>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    </div>
                 </div>
-                <p class="orders-list-note">Menampilkan maksimal 100 pesanan terbaru. Jumlah pada tab menghitung seluruh data pesanan.</p>
+                <?php if ($ordersError): ?>
+                    <div class="orders-state orders-state--error" role="alert">
+                        Pesanan tidak dapat dimuat. Silakan muat ulang halaman atau coba lagi nanti.
+                    </div>
+                <?php endif; ?>
+                <p class="orders-list-note" id="ordersResultCount" aria-live="polite"></p>
+                <nav class="orders-pagination" aria-label="Navigasi halaman pesanan" hidden>
+                    <button type="button" data-page-previous disabled>‹ Sebelumnya</button>
+                    <div class="orders-pagination__pages" data-page-numbers></div>
+                    <button type="button" data-page-next>Berikutnya ›</button>
+                </nav>
             </section>
 
             <section class="orders-info-card" aria-labelledby="statusFlowTitle">
@@ -287,15 +350,22 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                         </span>
                     <?php endforeach; ?>
                 </div>
-                <p class="status-flow-note">
-                    Pesanan dapat dibatalkan saat Menunggu Verifikasi, Menunggu Pembayaran, atau Diproses.
-                    Status Selesai dan Dibatalkan bersifat final.
-                </p>
-                <span class="order-status order-status--cancelled"><span class="order-status-dot" aria-hidden="true"></span>Dibatalkan</span>
+                <div class="status-flow-footer">
+                    <p class="status-flow-note">
+                        Pesanan dapat dibatalkan saat Menunggu Verifikasi, Menunggu Pembayaran, atau Diproses.
+                        Status Selesai dan Dibatalkan bersifat final.
+                    </p>
+                    <span class="order-status order-status--cancelled"><span class="order-status-dot" aria-hidden="true"></span>Dibatalkan</span>
+                </div>
             </section>
 
-            <section class="orders-info-card" aria-labelledby="statusActionsTitle">
-                <h2 id="statusActionsTitle">Aksi per Status</h2>
+            <details class="orders-info-card orders-actions-card">
+                <summary>
+                    <h2 id="statusActionsTitle">Aksi per Status</h2>
+                    <span class="orders-actions-card__toggle" data-open-label="Tampilkan" data-close-label="Sembunyikan">Tampilkan
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"></path></svg>
+                    </span>
+                </summary>
                 <div class="status-actions-scroll">
                     <table class="status-actions-table">
                         <thead>
@@ -328,8 +398,8 @@ $bulanPendek = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
                         </tbody>
                     </table>
                 </div>
-                <p class="status-actions-note">Perubahan melalui Verifikasi, Cek Pembayaran, dan Nomor Resi tetap memakai alur khusus agar tagihan, pembayaran, dan nomor resi tercatat dengan benar. Dropdown hanya menyimpan pembatalan atau penyelesaian yang diizinkan, dan server memvalidasi ulang setiap perubahan.</p>
-            </section>
+                <p class="status-actions-note">Perpindahan ke Menunggu Pembayaran, Diproses, dan Dikirim memakai alur Verifikasi, Cek Pembayaran, dan Nomor Resi agar data terkait tercatat dengan benar. Dropdown hanya menawarkan perubahan yang didukung oleh aksi ini.</p>
+            </details>
         </main>
     </div>
 
