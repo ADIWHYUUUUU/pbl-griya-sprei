@@ -2053,22 +2053,27 @@ html.orders-js:not(.orders-ready) [data-order-row] {
 
 .order-detail-modal__title-line {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .order-detail-modal__title-line h2 {
   margin: 0;
+  flex: 0 0 auto;
   color: #262d27;
   font-size: 19px;
   font-weight: 750;
+  white-space: nowrap;
 }
 
 .order-detail-modal__title-line .order-status {
   max-width: none;
+  flex: 0 0 auto;
   padding: 4px 8px;
   font-size: 11px;
+  white-space: nowrap;
 }
 
 .order-detail-modal__meta,
@@ -2307,15 +2312,15 @@ html.orders-js:not(.orders-ready) [data-order-row] {
 }
 
 .order-detail-row--admin-note {
-  display: block;
   padding-top: 8px;
   border-top: 1px solid #eeefeb;
 }
 
 .order-detail-row--admin-note .order-detail-row__value {
-  display: block;
-  margin-top: 3px;
-  text-align: left;
+  flex: 0 1 65%;
+  margin-top: 0;
+  text-align: right;
+  white-space: normal;
 }
 
 .order-detail-pending-text {
@@ -2397,6 +2402,10 @@ html.orders-js:not(.orders-ready) [data-order-row] {
 
   .order-detail-modal__title-line h2 {
     font-size: 17px;
+  }
+
+  .order-detail-modal__title-line {
+    flex-wrap: wrap;
   }
 
   .order-detail-modal__content {

@@ -173,6 +173,7 @@ class DashboardModel
                         JSON_AGG(
                             JSON_BUILD_OBJECT(
                                 'nama_produk', produk.nama_produk,
+                                'kategori_produk', produk.kategori_produk::text,
                                 'gambar_produk', produk.gambar_produk,
                                 'tipe_ukuran', d.tipe_ukuran::text,
                                 'jumlah', d.jumlah,

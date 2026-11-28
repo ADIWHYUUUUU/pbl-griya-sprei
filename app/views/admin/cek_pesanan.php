@@ -248,6 +248,7 @@ $formatRupiah = static fn ($value): string => 'Rp ' . number_format((float) $val
                                     $imagePath = trim((string) ($detailItem['gambar_produk'] ?? ''));
                                     $modalItems[] = [
                                         'name' => (string) ($detailItem['nama_produk'] ?? ''),
+                                        'category' => (string) ($detailItem['kategori_produk'] ?? ''),
                                         'image' => $imagePath !== '' ? product_image_url($imagePath) : '',
                                         'type' => (string) ($detailItem['tipe_ukuran'] ?? ''),
                                         'quantity' => (int) ($detailItem['jumlah'] ?? 0),

@@ -79,6 +79,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (items.length === 0) {
             itemsContainer.appendChild(createElement('p', 'order-detail-empty', 'Spesifikasi pesanan tidak tersedia.'));
         }
+        const productLabels = {
+            BED_COVER: 'Bedcover',
+            BEDCOVER: 'Bedcover',
+            SARUNG_BANTAL: 'Sarung Bantal',
+            SARUNG_GULING: 'Sarung Guling',
+            SARUNG_BANTAL_GULING: 'Sarung Bantal & Guling'
+        };
         items.forEach(function (item) {
             const itemElement = createElement('article', 'order-detail-item');
             const productHeader = createElement('div', 'order-detail-product');
@@ -106,13 +113,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const extras = [];
             if (Number(item.pillow) > 0) extras.push(Number(item.pillow) + ' Sarung Bantal');
             if (Number(item.bolster) > 0) extras.push(Number(item.bolster) + ' Sarung Guling');
-            const sizeValues = [item.length, item.width, item.height];
-            const size = sizeValues.every(function (value) {
-                return value !== null && value !== undefined && String(value) !== '';
-            }) ? sizeValues.join(' × ') + ' cm' : '-';
-            const completeness = displayValue(item.quantity, '0') + ' Sprei'
+            const completenessLabel = productLabels[item.category] || 'Sprei';
+            const sizeValues = [item.length, item.width, item.height]
+                .filter(function (value) {
+                    return value !== null && value !== undefined && String(value) !== '';
+                });
+            const size = sizeValues.length >= 2 ? sizeValues.join(' × ') + ' cm' : '-';
+            const completeness = displayValue(item.quantity, '0') + ' ' + completenessLabel
                 + (extras.length ? ' + ' + extras.join(' + ') : '');
-            const additions = extras.length ? '+' + extras.join(', ') : '-';
+            const additions = extras.length ? extras.map(function (extra) {
+                return '+' + extra;
+            }).join(', ') : '-';
             const specificationFields = createElement('div', 'order-detail-fields order-detail-fields--specification');
             specificationFields.append(
                 createField('Ukuran', size),
