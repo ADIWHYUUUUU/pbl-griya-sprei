@@ -356,7 +356,7 @@ class AuthController
     // =========================================
     public function logoutCustomer()
     {
-        $this->logoutRole('CUSTOMER', '/?page=customer-login');
+        $this->logoutRole('CUSTOMER', '/?page=customer-home');
     }
 
     public function logoutAdmin()
@@ -382,6 +382,7 @@ class AuthController
             session_regenerate_id(true);
             $_SESSION = $anonymousSession;
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $_SESSION['logout_notice'] = true;
         } else {
             $_SESSION = [];
             if (ini_get('session.use_cookies')) {

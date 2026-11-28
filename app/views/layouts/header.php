@@ -26,6 +26,8 @@ $isLogin = (
 $namaUser = $isLogin
     ? ($_SESSION['nama'] ?? 'Pelanggan')
     : '';
+$showLogoutNotice = !$isLogin && ($_SESSION['logout_notice'] ?? false) === true;
+unset($_SESSION['logout_notice']);
 
 // Jumlah pesanan yang punya update baru dari Admin (badge di menu Pesanan Saya)
 $orderUpdateCount = 0;
@@ -151,16 +153,15 @@ $activeNavPage = match ($currentPage) {
                 </summary>
                 <!-- Isi dropdown -->
                 <div class="user-dropdown__menu">
-                    <a
-                        href="/?page=customer-home"
-                        class="user-dropdown__item">
-                        <?= htmlspecialchars(
-                            $_SESSION['email'] ?? '',
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ); ?>
-                    </a>
+                    <div class="user-dropdown__account">
+                        <strong><?= htmlspecialchars($namaUser, ENT_QUOTES, 'UTF-8'); ?></strong>
+                        <span><?= htmlspecialchars($_SESSION['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
+                    </div>
 
+                    <div class="user-dropdown__divider"></div>
+                    <a href="/?page=customer-orders" class="user-dropdown__item">
+                        Pesanan Saya
+                    </a>
                     <div class="user-dropdown__divider"></div>
                     <!-- Logout menggunakan POST -->
                     <form
@@ -171,7 +172,10 @@ $activeNavPage = match ($currentPage) {
                         <button
                             type="submit"
                             class="user-dropdown__item user-dropdown__logout">
-                            Logout
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9" />
+                            </svg>
+                            <span>Keluar</span>
                         </button>
                     </form>
                 </div>
@@ -210,10 +214,35 @@ $activeNavPage = match ($currentPage) {
     </div>
 </header>
 
+<?php if ($showLogoutNotice): ?>
+    <aside class="logout-notice" role="status" aria-live="polite">
+        <strong>Anda telah keluar.</strong>
+        <span>Anda diarahkan ke Beranda. Keranjang dan Pesanan Saya tersedia lagi setelah masuk.</span>
+    </aside>
+<?php endif; ?>
+
 <script>
     (function () {
         var header = document.getElementById('siteHeader');
         var burger = header ? header.querySelector('.burger') : null;
+        var logoutForm = header ? header.querySelector('.user-dropdown__form') : null;
+
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function (event) {
+                var button = logoutForm.querySelector('.user-dropdown__logout');
+                if (!button || button.disabled) {
+                    event.preventDefault();
+                    return;
+                }
+
+                button.disabled = true;
+                button.classList.add('user-dropdown__logout--loading');
+                button.setAttribute('aria-busy', 'true');
+                button.setAttribute('aria-label', 'Sedang keluar');
+                button.querySelector('span').textContent = 'Sedang keluar...';
+            });
+        }
+
         if (!burger) return;
 
         function setOpen(open) {

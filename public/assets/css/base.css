@@ -320,7 +320,7 @@ button {
   top: calc(100% + 10px);
   right: 0;
 
-  width: 200px;
+  width: 298px;
   padding: 8px;
 
   background: #ffffff;
@@ -332,9 +332,28 @@ button {
   z-index: 1000;
 }
 
+.user-dropdown__account {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.user-dropdown__account strong {
+  color: #1f241c;
+  font-size: 15px;
+}
+
+.user-dropdown__account span {
+  color: #5a6156;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
 /* Item dropdown */
 .user-dropdown__item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
 
   padding: 11px 12px;
@@ -374,12 +393,73 @@ button {
 
 /* Warna logout */
 .user-dropdown__logout {
-  color: #b42318;
+  background: #fdf3f1;
+  color: #a23227;
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease, opacity 160ms ease;
 }
 
 .user-dropdown__logout:hover {
   background: #fff1f0;
-  color: #b42318;
+  color: #a23227;
+}
+
+.user-dropdown__logout:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.user-dropdown__logout:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.user-dropdown__logout--loading::after {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: logout-spin 700ms linear infinite;
+  content: "";
+}
+
+@keyframes logout-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-dropdown__logout {
+    transition: none;
+  }
+
+  .user-dropdown__logout--loading::after {
+    animation: none;
+  }
+}
+
+.logout-notice {
+  display: grid;
+  gap: 6px;
+  max-width: 416px;
+  margin: 16px 32px 0 auto;
+  padding: 14px 16px;
+  border: 1px solid #b9cdb1;
+  border-left: 4px solid #3f7a3a;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  color: #3a4136;
+  font-size: 14px;
+}
+
+.logout-notice strong {
+  color: #1f241c;
+  font-weight: 600;
+}
+
+.logout-notice span {
+  line-height: 1.5;
 }
 
 
@@ -610,12 +690,17 @@ img {
     text-overflow: ellipsis;
   }
   .user-dropdown__menu {
-    width: 180px;
+    width: 280px;
   }
   .user-dropdown__item {
     padding: 9px 10px;
     font-size: 13px;
     overflow-wrap: anywhere;
+  }
+  .logout-notice {
+    max-width: none;
+    margin-right: 14px;
+    margin-left: 14px;
   }
   .burger {
     width: 36px;
